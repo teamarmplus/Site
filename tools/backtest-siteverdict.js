@@ -10,8 +10,7 @@
  * Options:
  *   --limit N          Process N rows (default: 10)
  *   --dry-run          Print plan without calling any API
- *   --no-paid-api      Skip paid APIs; use only free/public sources (default)
- *   --use-paid-api     Allow paid APIs if implemented and keys are present
+ *   --no-paid-api      Skip DA Leads; use only free government APIs
  *   --no-ai            No Claude calls (always true; AI never used in batch)
  *   --input FILE       Input CSV path (default: data/backtest-input.csv)
  *   --output FILE      Output CSV path (default: data/backtest-results.csv)
@@ -27,7 +26,7 @@
  * Examples:
  *   node tools/backtest-siteverdict.js --limit 10 --no-paid-api --dry-run
  *   node tools/backtest-siteverdict.js --limit 100 --no-paid-api
- *   node tools/backtest-siteverdict.js --limit 1000 --no-paid-api
+ *   node tools/backtest-siteverdict.js --limit 1000
  */
 
 'use strict';
@@ -49,8 +48,7 @@ const hasFlag = flag => args.includes(flag);
 
 const LIMIT       = parseInt(getArg('--limit', '10'), 10);
 const DRY_RUN     = hasFlag('--dry-run');
-const USE_PAID_API = hasFlag('--use-paid-api');
-const NO_PAID_API = !USE_PAID_API || hasFlag('--no-paid-api');
+const NO_PAID_API = hasFlag('--no-paid-api');
 const RESUME      = hasFlag('--resume');
 const DELAY_MS    = parseInt(getArg('--delay-ms', '1200'), 10);
 const INPUT_FILE  = getArg('--input',  path.join(__dirname, '../data/backtest-input.csv'));
@@ -137,93 +135,94 @@ async function processRow(row, idx, total, existingAddresses) {
 
   console.log(`\n[${idx+1}/${total}] ${address} (${council})`);
 
+  // Helper: build error/skip return object
+  const errRow = (sv_score, sv_verdict, flag, notes, lat='', lon='', coord_src='failed') => ({
+    address, council,
+    real_da_status:    row.da_status || '',
+    real_lots:         row.lots_or_dwellings || row.lots || '',
+    real_timeline_days:'',
+    sv_score, sv_verdict, sv_band: '', sv_lots: '',
+    zone: '', mls: '', mls_real: '', block: '', zone_allows: '',
+    planning_strength: '', overlay_risk: '', yield_potential: '',
+    approval_confidence: '', holding_cost_risk: '', council_complexity: '',
+    overlay_flags: '', council_days: '', council_name: '',
+    match: sv_score === 'DRY_RUN' ? 'DRY_RUN' : 'ERROR',
+    flag, timeline_note: '',
+    coordinate_source: coord_src,
+    notes,
+    geocode_lat: lat, geocode_lon: lon,
+  });
+
   if (DRY_RUN) {
     console.log('  [DRY RUN] skipping API calls');
-    return {
-      address, council,
-      real_da_status: row.da_status || '',
-      real_lots: row.lots_or_dwellings || '',
-      real_timeline_days: '',
-      sv_score: 'DRY_RUN', sv_verdict: 'DRY_RUN', sv_band: '',
-      sv_lots: '', zone: '', mls: '', mls_real: '',
-      block: '', zone_allows: '',
-      planning_strength: '', overlay_risk: '', yield_potential: '',
-      approval_confidence: '', holding_cost_risk: '', council_complexity: '',
-      overlay_flags: '', council_days: '', council_name: '',
-      match: 'DRY_RUN', flag: 'DRY_RUN', timeline_note: '',
-      notes: 'dry-run: no API calls made',
-      geocode_lat: '', geocode_lon: '',
-    };
+    return errRow('DRY_RUN', 'DRY_RUN', 'DRY_RUN', 'dry-run: no API calls made', '', '', 'dry_run');
   }
 
-  // Geocode
-  let geo;
-  try {
-    geo = await geocodeAddress(address, DELAY_MS);
-  } catch (e) {
-    console.warn(`  [geo] failed: ${e.message}`);
-    geo = null;
+  // ── Coordinate resolution ─────────────────────────────────────────
+  // If the input CSV has lat/lng columns, use them directly.
+  // This avoids geocoding imprecision and is preferred for validated DA records.
+  let geo = null;
+  let coordSource = 'failed';
+  let coordNote   = '';
+
+  const inputLat = parseFloat(row.lat || row.latitude || '');
+  const inputLon = parseFloat(row.lng || row.lon || row.longitude || '');
+
+  if (!isNaN(inputLat) && !isNaN(inputLon) && inputLat !== 0 && inputLon !== 0) {
+    geo = { lat: inputLat, lon: inputLon };
+    coordSource = 'input_lat_lng';
+    console.log('  [geo] using input lat/lng: ' + inputLat.toFixed(5) + ', ' + inputLon.toFixed(5));
+  } else {
+    try {
+      geo = await geocodeAddress(address, DELAY_MS);
+    } catch (e) {
+      console.warn('  [geo] failed: ' + e.message);
+      geo = null;
+    }
+
+    if (!geo) {
+      console.warn('  [geo] no result — skipping');
+      return errRow('ERROR', 'Geocode failed', 'GEOCODE_FAILED',
+        'Geocode returned no result — add lat/lng columns to CSV for this row');
+    }
+
+    coordSource = 'geocoded';
+    // Nominatim returns the address centroid, not the cadastral boundary.
+    // For large or irregular lots the centroid may fall outside the actual parcel.
+    coordNote = 'Geocoded — coordinate may not match DA site precisely; add lat/lng columns for accuracy';
+    console.log('  [geo] geocoded: ' + geo.lat.toFixed(5) + ', ' + geo.lon.toFixed(5) + ' (use lat/lng columns for precision)');
   }
 
-  if (!geo) {
-    return {
-      address, council,
-      real_da_status: row.da_status || '',
-      real_lots: row.lots_or_dwellings || '',
-      real_timeline_days: '',
-      sv_score: 'ERROR', sv_verdict: 'Geocode failed', sv_band: '',
-      sv_lots: '', zone: '', mls: '', mls_real: '',
-      block: '', zone_allows: '',
-      planning_strength: '', overlay_risk: '', yield_potential: '',
-      approval_confidence: '', holding_cost_risk: '', council_complexity: '',
-      overlay_flags: '', council_days: '', council_name: '',
-      match: 'ERROR', flag: 'GEOCODE_FAILED', timeline_note: '',
-      notes: 'Geocode returned no result',
-      geocode_lat: '', geocode_lon: '',
-    };
-  }
-
-  console.log(`  [geo] lat=${geo.lat.toFixed(5)} lon=${geo.lon.toFixed(5)}`);
-
-  // Fetch planning data
+  // ── Fetch planning data ───────────────────────────────────────────
   let raw, parsed;
   try {
     raw    = await fetchPlanningData(geo.lat, geo.lon, { usePaidApi: !NO_PAID_API });
     parsed = parsePlanningData(raw, council);
-    console.log(`  [plan] zone=${parsed.zone} mls=${parsed.mls} block=${parsed.block}m² overlays=${[parsed.heritage?'H':'',parsed.flood?'FL':'',parsed.bushfire?'BF':''].filter(Boolean).join('')||'clear'}`);
+    const overlayStr = [
+      parsed.heritage ? 'H' : '',
+      parsed.flood    ? 'FL' : '',
+      parsed.bushfire ? 'BF' : '',
+    ].filter(Boolean).join('') || 'clear';
+    console.log('  [plan] zone=' + parsed.zone + ' mls=' + parsed.mls + ' block=' + parsed.block + 'm\u00b2 overlays=' + overlayStr);
   } catch (e) {
-    console.warn(`  [plan] failed: ${e.message}`);
-    return {
-      address, council,
-      real_da_status: row.da_status || '',
-      real_lots: row.lots_or_dwellings || '',
-      real_timeline_days: '',
-      sv_score: 'ERROR', sv_verdict: 'API fetch failed', sv_band: '',
-      sv_lots: '', zone: '', mls: '', mls_real: '',
-      block: '', zone_allows: '',
-      planning_strength: '', overlay_risk: '', yield_potential: '',
-      approval_confidence: '', holding_cost_risk: '', council_complexity: '',
-      overlay_flags: '', council_days: '', council_name: '',
-      match: 'ERROR', flag: 'API_FAILED', timeline_note: '',
-      notes: e.message.slice(0, 100),
-      geocode_lat: geo.lat, geocode_lon: geo.lon,
-    };
+    console.warn('  [plan] failed: ' + e.message);
+    return errRow('ERROR', 'API fetch failed', 'API_FAILED',
+      e.message.slice(0, 100), geo.lat, geo.lon, coordSource);
   }
 
-  // Score
+  // ── Score ─────────────────────────────────────────────────────────
   const sv = scoreProperty(parsed);
-  console.log(`  [score] ${sv.score} (${sv.band}) | lots=${sv.estimatedLots} | ${sv.verdict}`);
+  console.log('  [score] ' + sv.score + ' (' + sv.band + ') | lots=' + sv.estimatedLots + ' | ' + sv.verdict);
 
-  // Compare
+  // ── Compare ───────────────────────────────────────────────────────
   const comp = compareResult(sv, row);
-  const daTimeline = comp.daTimeline;
 
   return {
     address,
     council,
     real_da_status:       row.da_status || '',
     real_lots:            row.lots_or_dwellings || row.lots || '',
-    real_timeline_days:   daTimeline || '',
+    real_timeline_days:   comp.daTimeline || '',
     sv_score:             sv.score,
     sv_verdict:           sv.verdict,
     sv_band:              sv.band,
@@ -245,7 +244,8 @@ async function processRow(row, idx, total, existingAddresses) {
     match:                comp.match,
     flag:                 comp.flag,
     timeline_note:        comp.timelineNote,
-    notes:                '',
+    coordinate_source:    coordSource,
+    notes:                coordNote,
     geocode_lat:          geo.lat,
     geocode_lon:          geo.lon,
   };
@@ -516,7 +516,7 @@ async function main() {
     'sv_score','sv_verdict','sv_band','sv_lots','zone','mls','mls_real','block','zone_allows',
     'planning_strength','overlay_risk','yield_potential','approval_confidence',
     'holding_cost_risk','council_complexity','overlay_flags','council_days','council_name',
-    'match','flag','timeline_note','notes','geocode_lat','geocode_lon',
+    'match','flag','timeline_note','coordinate_source','notes','geocode_lat','geocode_lon',
   ];
 
   // Open output file (append if resume)

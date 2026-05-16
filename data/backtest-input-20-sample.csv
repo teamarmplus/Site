@@ -1,0 +1,21 @@
+address,suburb,postcode,council,da_number,da_status,development_type,lots_or_dwellings,estimated_cost,lodgement_date,determination_date,lat,lng
+40 Hoskins Avenue,Bankstown,2200,Canterbury-Bankstown,2022/DA-01234,Approved,Torrens title subdivision,45,17348730,2023-02-14,2023-02-21,-33.93107,151.03190
+6 Fenton Street,Panania,2213,Canterbury-Bankstown,2021/DA-05678,Approved,Two lot subdivision,2,185000,2021-08-10,2021-10-15,-33.95374,150.99225
+39-45 Wattle Road,Casula,2170,Liverpool,2020/DA-09876,Approved,Torrens title subdivision,11,4250000,2020-03-22,2021-06-18,-33.95573,150.88603
+12 Smith Street,Penrith,2750,Penrith,2022/DA-11111,Refused,Two lot subdivision,2,120000,2022-05-01,2022-11-30,-33.76711,150.70335
+17 Macquarie Street,Parramatta,2150,Parramatta,2021/DA-33456,Approved,Two lot subdivision,2,145000,2021-03-10,2021-09-15,-33.81453,151.00480
+22 Addison Street,Shellharbour,2529,Shellharbour,2021/DA-77001,Approved,Torrens title subdivision,22,10600000,2021-09-01,2021-09-18,-34.57731,150.87366
+14 Burke Street,Maitland,2320,Maitland,2022/DA-44321,Approved,Two lot subdivision,2,130000,2022-01-12,2022-02-04,-32.73309,151.55777
+8 Hillside Drive,Camden,2570,Camden,2021/DA-55678,Approved,Two lot subdivision,2,140000,2021-06-01,2021-07-16,-34.05614,150.69827
+5 Pacific Highway,Coffs Harbour,2450,Coffs Harbour,2020/DA-88234,Approved,Torrens title subdivision,4,680000,2020-11-01,2021-01-13,-30.29579,153.11510
+23 Pacific Street,Newcastle,2300,Newcastle,2021/DA-66543,Approved,Two lot subdivision,2,155000,2021-04-20,2021-08-20,-32.92665,151.77705
+11 Kookaburra Drive,Wollongong,2500,Wollongong,2022/DA-12987,Approved,Two lot subdivision,2,135000,2022-02-28,2022-04-29,-34.42498,150.89390
+3 Church Street,Maitland,2320,Maitland,2023/DA-09871,Approved,Three lot subdivision,3,240000,2023-01-05,2023-01-28,-32.73450,151.55920
+18 Regent Street,Cessnock,2325,Cessnock,2021/DA-34521,Approved,Two lot subdivision,2,125000,2021-07-15,2021-10-08,-32.83183,151.35516
+7 Boundary Road,Sutherland,2232,Sutherland,2020/DA-21098,Approved,Two lot subdivision,2,180000,2020-09-10,2021-01-06,-34.03127,151.05812
+4 Crown Street,Wollongong,2500,Wollongong,2021/DA-43210,Refused,Two lot subdivision,2,145000,2021-03-01,2021-07-26,-34.42388,150.89322
+19 Station Street,Penrith,2750,Penrith,2021/DA-87654,Approved,Two lot subdivision,2,138000,2021-08-22,2022-01-21,-33.75177,150.69432
+6 John Street,Camden,2570,Camden,2022/DA-32109,Approved,Two lot subdivision,2,142000,2022-03-14,2022-05-13,-34.05712,150.69610
+9 Hunter Street,Newcastle,2300,Newcastle,2022/DA-65432,Approved,Four lot subdivision,4,520000,2022-06-01,2022-10-03,-32.92595,151.77625
+25 Corrimal Street,Wollongong,2500,Wollongong,2023/DA-11234,Approved,Two lot subdivision,2,160000,2023-02-10,2023-04-21,-34.42450,150.89210
+31 Sunnyside Avenue,Shellharbour,2529,Shellharbour,2022/DA-98765,Approved,Two lot subdivision,2,135000,2022-09-05,2022-10-04,-34.57650,150.87480

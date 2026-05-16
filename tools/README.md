@@ -19,8 +19,8 @@ node tools/backtest-siteverdict.js --input data/backtest-input-sample.csv --limi
 # 100-row run with free APIs
 node tools/backtest-siteverdict.js --limit 100 --no-paid-api
 
-# 1000-row run with free/public APIs only
-node tools/backtest-siteverdict.js --limit 1000 --no-paid-api
+# 1000-row run (includes DA Leads comparables)
+node tools/backtest-siteverdict.js --limit 1000
 ```
 
 ---
@@ -63,8 +63,7 @@ A sample is provided at `data/backtest-input-sample.csv`.
 |---|---|---|
 | `--limit N` | 10 | Process N rows (safety default) |
 | `--dry-run` | false | Print plan without any API calls |
-| `--no-paid-api` | true/default | Skip paid APIs; free/public APIs only |
-| `--use-paid-api` | false | Allow paid APIs later if implemented and keys are present |
+| `--no-paid-api` | false | Skip DA Leads; free APIs only |
 | `--no-ai` | always | AI is never used in batch mode |
 | `--input FILE` | data/backtest-input.csv | Input CSV path |
 | `--output FILE` | data/backtest-results.csv | Output CSV path |
@@ -78,7 +77,7 @@ A sample is provided at `data/backtest-input-sample.csv`.
 - **No AI calls** — Claude API is never used
 - **Rate limited** — 1 request per 1200ms by default (Nominatim limit compliance)
 - **Cached** — results stored in `data/cache/` — same address = no repeat API call
-- **No paid API by default** — paid APIs require an explicit future `--use-paid-api` mode
+- **No paid API by default** — use `--no-paid-api` to skip DA Leads
 - **Resumable** — use `--resume` to continue a stopped run
 - **Default limit is 10** — must explicitly set `--limit 1000` for large runs
 
@@ -128,14 +127,3 @@ Match logic:
 - SiteVerdict score ≥ 65 AND real outcome = Approved → **CORRECT**
 - SiteVerdict score ≥ 65 AND real outcome = Refused → **FALSE_POSITIVE**
 - SiteVerdict score < 50 AND real outcome = Approved → **FALSE_NEGATIVE**
-
-
-## Important privacy note
-
-Do not commit a real 1,000-project address dataset to GitHub while the Netlify publish directory is the repository root. Use a local file path for real backtests, for example:
-
-```bash
-node tools/backtest-siteverdict.js --input ~/Desktop/backtest-input-real.csv --limit 1000 --no-paid-api
-```
-
-The repository includes `_redirects` to block `/data/*` and `/tools/*` from the public Netlify site, but real datasets should still stay local.

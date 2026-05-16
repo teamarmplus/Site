@@ -1,2 +1,2 @@
-/data/*  /404  404
-/tools/* /404  404
+/tools/* /404.html 404
+/data/* /404.html 404

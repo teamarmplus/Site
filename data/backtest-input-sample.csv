@@ -1,6 +1,6 @@
-address,suburb,postcode,council,da_number,da_status,development_type,lots_or_dwellings,estimated_cost,lodgement_date,determination_date
-40 Hoskins Avenue,Bankstown,2200,Canterbury-Bankstown,2022/DA-01234,Approved,Torrens title subdivision,45,17348730,2023-02-14,2023-02-21
-6 Fenton Street,Panania,2213,Canterbury-Bankstown,2021/DA-05678,Approved,Two lot subdivision,2,185000,2021-08-10,2021-10-15
-39-45 Wattle Road,Casula,2170,Liverpool,2020/DA-09876,Approved,Torrens title subdivision,11,4250000,2020-03-22,2021-06-18
-12 Smith Street,Penrith,2750,Penrith,2022/DA-11111,Refused,Two lot subdivision,2,120000,2022-05-01,2022-11-30
-8 Heritage Avenue,Parramatta,2150,Parramatta,2021/DA-22222,Approved,Two lot subdivision,2,145000,2021-01-15,2021-07-30
+address,suburb,postcode,council,da_number,da_status,development_type,lots_or_dwellings,estimated_cost,lodgement_date,determination_date,lat,lng
+40 Hoskins Avenue,Bankstown,2200,Canterbury-Bankstown,2022/DA-01234,Approved,Torrens title subdivision,45,17348730,2023-02-14,2023-02-21,-33.93107,151.03190
+6 Fenton Street,Panania,2213,Canterbury-Bankstown,2021/DA-05678,Approved,Two lot subdivision,2,185000,2021-08-10,2021-10-15,-33.95374,150.99225
+39-45 Wattle Road,Casula,2170,Liverpool,2020/DA-09876,Approved,Torrens title subdivision,11,4250000,2020-03-22,2021-06-18,-33.95573,150.88603
+12 Smith Street,Penrith,2750,Penrith,2022/DA-11111,Refused,Two lot subdivision,2,120000,2022-05-01,2022-11-30,-33.76711,150.70335
+17 Macquarie Street,Parramatta,2150,Parramatta,2021/DA-33456,Approved,Two lot subdivision,2,145000,2021-03-10,2021-09-15,-33.81453,151.00480
