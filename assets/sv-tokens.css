@@ -1,0 +1,60 @@
+/* SiteVerdict — Design Tokens v2.0 */
+:root{
+  /* Background */
+  --bg:#07080a;
+  --bg2:#0f1118;
+  --bg3:#161820;
+
+  /* Borders */
+  --border:rgba(255,255,255,.06);
+  --border2:rgba(255,255,255,.13);
+
+  /* Text */
+  --text:#eeedf0;
+  --muted:#6b6b78;
+  --muted2:#3f3f48;
+
+  /* Gold — primary accent */
+  --gold:#c8a84b;
+  --goldl:rgba(200,168,75,.1);
+  --goldm:rgba(200,168,75,.28);
+
+  /* Green — positive */
+  --green:#3ecf8e;
+  --greenl:rgba(62,207,142,.08);
+  --greenb:rgba(62,207,142,.22);
+
+  /* Amber — caution */
+  --amber:#f59e0b;
+  --amberl:rgba(245,158,11,.08);
+  --amberb:rgba(245,158,11,.22);
+
+  /* Red — warning */
+  --red:#f26b5b;
+  --redl:rgba(242,107,91,.08);
+  --redb:rgba(242,107,91,.2);
+
+  /* Blue — data */
+  --blue:#5b9cf2;
+  --bluel:rgba(91,156,242,.08);
+  --blueb:rgba(91,156,242,.2);
+
+  /* Border radius */
+  --r:10px;
+  --r2:16px;
+  --r3:24px;
+
+  /* Typography */
+  --font-sans:"DM Sans",sans-serif;
+  --font-serif:"Instrument Serif",serif;
+  --font-mono:"DM Mono",monospace;
+
+  /* Spacing */
+  --sp-1:4px;
+  --sp-2:8px;
+  --sp-3:12px;
+  --sp-4:16px;
+  --sp-5:20px;
+  --sp-6:24px;
+  --sp-8:32px;
+}

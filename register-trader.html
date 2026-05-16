@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Join SiteVerdict — Free Trader Listing · All 8 States</title>
+<meta name="description" content="List your surveying, planning, civil engineering or finance business free on SiteVerdict. Get matched to active development projects in your council area.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+ --gold:#C9A84C;--goldl:rgba(201,168,76,.1);--goldm:rgba(201,168,76,.22);
+ --bg:#08090b;--bg2:#10111a;--bg3:#171820;
+ --border:rgba(255,255,255,.055);--border2:rgba(255,255,255,.11);
+ --text:#f0eff0;--muted:#6c6c7a;--muted2:#46464f;
+ --green:#4ade80;--greenl:rgba(74,222,128,.1);--greenb:rgba(74,222,128,.2);
+ --red:#f87171;--amber:#fbbf24;--blue:#60a5fa;
+ --r:8px;--r2:14px;--r3:22px
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:13px 5%;border-bottom:1px solid var(--border);background:rgba(8,9,11,.96);position:sticky;top:0;z-index:400}
+.logo{font-size:.96rem;font-weight:600}.logo span{color:var(--gold)}
+.logo-badge{background:var(--goldl);border:1px solid var(--goldm);color:var(--gold);font-size:.5rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:8px;margin-left:8px}
+.page{max-width:680px;margin:0 auto;padding:52px 5% 80px}
+.hero{text-align:center;margin-bottom:40px}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--greenl);border:1px solid var(--greenb);color:var(--green);font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 12px;border-radius:14px;margin-bottom:14px}
+h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;letter-spacing:-.03em;margin-bottom:10px;line-height:1.1}
+h1 em{font-style:normal;color:var(--gold)}
+.hero-sub{font-size:.88rem;color:var(--muted);line-height:1.9;max-width:480px;margin:0 auto}
+.benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:36px}
+.ben{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center}
+.ben-icon{font-size:1.4rem;margin-bottom:5px}
+.ben-title{font-size:.8rem;font-weight:500;margin-bottom:2px}
+.ben-desc{font-size:.68rem;color:var(--muted);line-height:1.5}
+form{display:flex;flex-direction:column;gap:20px}
+.form-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px}
+.section-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:14px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+label{font-size:.76rem;font-weight:500;color:var(--muted)}
+input[type=text],input[type=email],input[type=tel],input[type=url],select,textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:10px 12px;color:var(--text);font-family:inherit;font-size:.84rem;outline:none;width:100%;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--goldm)}
+select option{background:var(--bg3);color:var(--text)}
+textarea{resize:vertical;min-height:80px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cb-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cb-label{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted);cursor:pointer;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r);transition:.15s}
+.cb-label:hover{border-color:var(--goldm);color:var(--text)}
+.cb-label input[type=checkbox]{accent-color:var(--gold);width:14px;height:14px;flex-shrink:0}
+.cb-label.checked{border-color:var(--goldm);color:var(--text);background:var(--goldl)}
+.council-tags{display:flex;flex-wrap:wrap;gap:5px;min-height:32px;margin-top:6px}
+.council-tag{background:var(--bg3);border:1px solid var(--goldm);color:var(--gold);font-size:.7rem;padding:3px 10px;border-radius:12px;display:flex;align-items:center;gap:5px}
+.council-tag button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;padding:0;line-height:1}
+.council-tag button:hover{color:var(--red)}
+.radio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.radio-label{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted);cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);transition:.15s}
+.radio-label:hover{border-color:var(--goldm)}
+.radio-label input{accent-color:var(--gold)}
+.hint{font-size:.68rem;color:var(--muted);line-height:1.6;margin-top:3px}
+.privacy-box{background:rgba(96,165,250,.04);border:1px solid rgba(96,165,250,.15);border-radius:var(--r);padding:10px 14px;font-size:.72rem;color:var(--muted);line-height:1.8}
+.submit-btn{background:var(--gold);color:#000;border:none;border-radius:var(--r2);padding:14px;font-size:.92rem;font-weight:700;cursor:pointer;width:100%;transition:opacity .15s;letter-spacing:-.01em}
+.submit-btn:hover{opacity:.9}
+.submit-btn:disabled{opacity:.5;cursor:default}
+.success-box{display:none;text-align:center;padding:48px 24px;background:var(--bg2);border:1px solid var(--greenb);border-radius:var(--r2)}
+.success-icon{font-size:3rem;margin-bottom:12px}
+.success-title{font-size:1.2rem;font-weight:500;margin-bottom:8px}
+.success-sub{font-size:.84rem;color:var(--muted);line-height:1.8}
+@media(max-width:600px){.benefits{grid-template-columns:1fr}.two{grid-template-columns:1fr}.cb-grid{grid-template-columns:1fr}.radio-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<nav style="position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:13px 5%;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(7,8,10,.94);backdrop-filter:blur(24px)">
+  <a href="index.html" style="font-family:Instrument Serif,serif;font-size:1.05rem;display:flex;align-items:center;gap:9px;color:#eeedf0;text-decoration:none"><span style="width:8px;height:8px;border-radius:50%;background:#c8a84b;display:inline-block"></span>SiteVerdict</a>
+  <div style="display:flex;gap:2px;font-size:.74rem">
+    <a href="index.html" style="padding:6px 12px;border-radius:8px;color:#6b6b78;text-decoration:none">Site Check</a>
+    <a href="hot-list.html" style="padding:6px 12px;border-radius:8px;color:#6b6b78;text-decoration:none">&#128293; Hot list</a>
+    <a href="services.html" style="padding:6px 12px;border-radius:8px;color:#6b6b78;text-decoration:none">Services</a>
+  </div>
+</nav><!-- nav fixed -->
+
+<div class="page">
+<div class="hero">
+ <div class="eyebrow">Free listing &middot; All 8 states &middot; No lock-in</div>
+ <h1>Join Australia&#39;s development<br><em>professional network.</em></h1>
+ <div class="hero-sub">List your business free on SiteVerdict. Get matched to property owners and developers actively planning subdivisions and civil construction in your council area.</div>
+</div>
+
+<div class="benefits">
+ <div class="ben"><div class="ben-icon">&#127919;</div><div class="ben-title">Matched leads only</div><div class="ben-desc">You are only contacted for enquiries matching your services and council area.</div></div>
+ <div class="ben"><div class="ben-icon">&#128274;</div><div class="ben-title">Privacy protected</div><div class="ben-desc">Your details go into our internal system only. Never shown publicly.</div></div>
+ <div class="ben"><div class="ben-icon">&#10003;</div><div class="ben-title">No win, no fee</div><div class="ben-desc">Free to register. $97 only when you confirm a job won through SiteVerdict.</div></div>
+</div>
+
+<div id="success-box" class="success-box">
+ <div class="success-icon">&#10003;</div>
+ <div class="success-title">Application received</div>
+ <div class="success-sub">We will review your details and confirm your listing within 24 hours.<br>We will contact you via WhatsApp or email within 24 hours to confirm your listing.<br><br><a href="index.html" style="color:var(--gold)">Check an address &rarr;</a></div>
+</div>
+
+<form id="trader-form" name="trader-registration" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+ <input type="hidden" name="form-name" value="trader-registration">
+ <input type="hidden" name="bot-field" style="display:none">
+ <input type="hidden" name="status" value="pending">
+ <input type="hidden" name="submitted_at" id="submitted_at">
+
+ <!-- PERSONAL DETAILS -->
+ <div class="form-section">
+  <div class="section-title">About you</div>
+  <div class="two">
+   <div class="field">
+    <label for="first_name">First name *</label>
+    <input type="text" id="first_name" name="first_name" placeholder="James">
+   </div>
+   <div class="field">
+    <label for="last_name">Last name *</label>
+    <input type="text" id="last_name" name="last_name" placeholder="Smith">
+   </div>
+  </div>
+  <div class="field">
+   <label for="business_name">Business name *</label>
+   <input type="text" id="business_name" name="business_name" placeholder="Smith Surveying Pty Ltd">
+  </div>
+  <div class="two">
+   <div class="field">
+    <label for="email">Email address *</label>
+    <input type="email" id="email" name="email" placeholder="james@smithsurveying.com.au">
+   </div>
+   <div class="field">
+    <label for="phone">Phone (optional)</label>
+    <input type="tel" id="phone" name="phone" placeholder="04XX XXX XXX">
+   </div>
+  </div>
+  <div class="field">
+   <label for="website">Website (optional)</label>
+   <input type="url" id="website" name="website" placeholder="https://smithsurveying.com.au">
+  </div>
+  <div class="field">
+   <label for="licence">Licence or registration number (optional)</label>
+   <input type="text" id="licence" name="licence" placeholder="e.g. NSW Surveyor Reg. 12345">
+   <div class="hint">Helps clients verify your credentials. Not shown publicly without your permission.</div>
+  </div>
+ </div>
+
+ <!-- SPECIALTY -->
+ <div class="form-section">
+  <div class="section-title">Your services</div>
+  <div class="hint" style="margin-bottom:10px">Select all that apply. You will only be matched to enquiries for services you offer.</div>
+  <div style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--muted2);margin-bottom:6px">Construction</div>
+  <div class="cb-grid" style="margin-bottom:14px">
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Driveway"><span>Driveway</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Retaining wall"><span>Retaining wall</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Drainage &amp; stormwater"><span>Drainage &amp; stormwater</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Landscaping &amp; turf"><span>Landscaping &amp; turf</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Concrete &amp; paving"><span>Concrete &amp; paving</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Earthworks &amp; excavation"><span>Earthworks &amp; excavation</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Civil construction"><span>Civil construction</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Structural construction"><span>Structural construction</span></label>
+  </div>
+  <div style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--muted2);margin-bottom:6px">Development</div>
+  <div class="cb-grid" style="margin-bottom:14px">
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Licensed surveyor"><span>Licensed surveyor</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Town planner"><span>Town planner</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Civil engineering design"><span>Civil engineering design</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Structural engineering design"><span>Structural engineering design</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Hydraulic design"><span>Hydraulic design</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Geotechnical report"><span>Geotechnical report</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Heritage assessment"><span>Heritage assessment</span></label>
+  </div>
+  <div style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--muted2);margin-bottom:6px">Compliance</div>
+  <div class="cb-grid">
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Occupation Certificate"><span>Occupation Certificate</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Building certification"><span>Building certification</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Subdivision certificate"><span>Subdivision certificate</span></label>
+   <label class="cb-label"><input type="checkbox" name="specialty[]" value="Drainage compliance certificate"><span>Drainage compliance certificate</span></label>
+  </div>
+ </div>
+
+ <!-- LOCATION -->
+ <div class="form-section">
+  <div class="section-title">Where you work</div>
+  <div class="field">
+   <label for="state_primary">Primary state *</label>
+   <select id="state_primary" name="state_primary" onchange="updateCouncils(this.value)">
+    <option value="">Select state</option>
+    <option value="NSW">NSW</option>
+    <option value="QLD">QLD</option>
+    <option value="WA">WA</option>
+    <option value="SA">SA</option>
+    <option value="VIC">VIC</option>
+    <option value="TAS">TAS</option>
+    <option value="ACT">ACT</option>
+    <option value="NT">NT</option>
+   </select>
+  </div>
+  <div class="field">
+   <label>Council areas you cover *</label>
+   <div class="hint">Select your primary state first, then pick council areas. You can cover multiple states.</div>
+   <select id="council-select" onchange="addCouncil(this.value)" style="margin-top:6px">
+    <option value="">Select council area to add</option>
+   </select>
+   <div class="council-tags" id="council-tags"></div>
+   <input type="hidden" name="councils" id="councils-hidden">
+  </div>
+  <div class="field">
+   <label for="other_states">Other states you also work in (optional)</label>
+   <div class="cb-grid">
+    <label class="cb-label"><input type="checkbox" name="other_states[]" value="NSW"><span>NSW</span></label>
+    <label class="cb-label"><input type="checkbox" name="other_states[]" value="QLD"><span>QLD</span></label>
+    <label class="cb-label"><input type="checkbox" name="other_states[]" value="WA"><span>WA</span></label>
+    <label class="cb-label"><input type="checkbox" name="other_states[]" value="SA"><span>SA</span></label>
+    <label class="cb-label"><input type="checkbox" name="other_states[]" value="VIC"><span>VIC</span></label>
+    <label class="cb-label"><input type="checkbox" name="other_states[]" value="TAS"><span>TAS</span></label>
+    <label class="cb-label"><input type="checkbox" name="other_states[]" value="ACT"><span>ACT</span></label>
+    <label class="cb-label"><input type="checkbox" name="other_states[]" value="NT"><span>NT</span></label>
+   </div>
+  </div>
+ </div>
+
+ <!-- PUBLIC PROFILE -->
+ <div class="form-section">
+  <div class="section-title">Your public profile</div>
+  <div class="field">
+   <label for="bio">Short bio (shown publicly) *</label>
+   <textarea id="bio" name="bio" placeholder="Licensed surveyor with 15 years experience in Torrens title subdivision across Western Sydney councils. Maitland, Cessnock and Hunter Valley specialist."></textarea>
+   <div class="hint">2-3 sentences. Mention your experience, council areas and speciality. This is what clients read before contacting you.</div>
+  </div>
+  <div class="field">
+   <label>How should clients contact you? *</label>
+   <div class="radio-grid">
+    <label class="radio-label"><input type="radio" name="contact_pref" value="whatsapp"><span>&#128172; WhatsApp</span></label>
+    <label class="radio-label"><input type="radio" name="contact_pref" value="email"><span>&#9993; Email</span></label>
+    <label class="radio-label"><input type="radio" name="contact_pref" value="phone"><span>&#128222; Phone call</span></label>
+    <label class="radio-label"><input type="radio" name="contact_pref" value="form"><span>&#128203; Enquiry form</span></label>
+    <label class="radio-label"><input type="radio" name="contact_pref" value="website"><span>&#127760; Website</span></label>
+    <label class="radio-label"><input type="radio" name="contact_pref" value="any"><span>&#10003; Any</span></label>
+   </div>
+  </div>
+  <div class="field">
+   <label>What do you want shown publicly?</label>
+   <div class="cb-grid">
+    <label class="cb-label"><input type="checkbox" name="show[]" value="business_name" checked><span>Business name</span></label>
+    <label class="cb-label"><input type="checkbox" name="show[]" value="website"><span>Website link</span></label>
+    <label class="cb-label"><input type="checkbox" name="show[]" value="licence"><span>Licence number</span></label>
+    <label class="cb-label"><input type="checkbox" name="show[]" value="phone"><span>Phone number</span></label>
+   </div>
+   <div class="hint">Your email address is never shown publicly. Contact is always through our platform first.</div>
+  </div>
+ </div>
+
+ <!-- PRIVACY -->
+ <div class="privacy-box">
+  &#128274; <strong>Privacy:</strong> Your information is collected under the Australian Privacy Act 1988. Your email and phone number are never shown publicly without your permission. You can update or remove your listing at any time by emailing <a href="mailto:hello@siteverdict.com.au" style="color:var(--blue)">hello@siteverdict.com.au</a>. By submitting this form you agree to our <a href="terms.html" style="color:var(--blue)">terms</a>.
+ </div>
+
+ <button type="button" class="submit-btn" id="submit-btn" onclick="handleSubmit(event)">Submit free listing &rarr;</button>
+</form>
+</div>
+
+<script>var selectedCouncils=[],COUNCILS={NSW:["Albury","Armidale","Ballina","Bathurst","Bayside","Bellingen","Berrigan","Blacktown","Blue Mountains","Bogan","Bourke","Brewarrina","Byron","Camden","Campbelltown","Canada Bay","Canterbury-Bankstown","Central Coast","Cessnock","Clarence Valley","Cobar","Coffs Harbour","Coolamon","Coonamble","Cootamundra-Gundagai","Cumberland","Dubbo","Dungog","Edward River","Eurobodalla","Fairfield","Forbes","Gilgandra","Glen Innes Severn","Goulburn Mulwaree","Greater Hume","Griffith","Gunnedah","Gwydir","Hawkesbury","Hay","Hilltops","Hunter Valley","Inner West","Inverell","Junee","Kempsey","Kiama","Lake Macquarie","Leeton","Lismore","Lithgow","Liverpool","Liverpool Plains","Lachlan","MidCoast","Maitland","Mid-Western Regional","Moree Plains","Muswellbrook","Murray River","Murrumbidgee","Narrabri","Narrandera","Narromine","Newcastle","Northern Beaches","North Sydney","Oberon","Orange","Parkes","Parramatta","Penrith","Port Macquarie-Hastings","Port Stephens","Queanbeyan-Palerang","Richmond Valley","Ryde","Shellharbour","Shoalhaven","Singleton","Snowy Monaro","Snowy Valleys","Strathfield","Sutherland","Sydney","Tamworth","Temora","Tenterfield","The Hills","Unincorporated Far West","Upper Hunter","Upper Lachlan","Uralla","Wagga Wagga","Walcha","Walgett","Warren","Warrumbungle","Weddin","Wentworth","Wingecarribee","Wollondilly","Wollongong","Woollahra","Yass Valley"]};function updateCouncils(e){var n=document.getElementById("council-select");n.innerHTML='<option value="">Select council area to add</option>',e&&COUNCILS[e]&&COUNCILS[e].forEach(function(t){var o=document.createElement("option");o.value=e+" — "+t,o.textContent=t,n.appendChild(o)})}function addCouncil(e){!e||selectedCouncils.indexOf(e)>-1||(selectedCouncils.push(e),renderCouncils(),document.getElementById("council-select").value="")}function removeCouncil(e){selectedCouncils=selectedCouncils.filter(function(n){return n!==e}),renderCouncils()}function renderCouncils(){document.getElementById("council-tags").innerHTML=selectedCouncils.map(function(e){return'<div class="council-tag"><span>'+e+'</span><button type="button" onclick="removeCouncil('+JSON.stringify(e)+')">&#10005;</button></div>'}).join(""),document.getElementById("councils-hidden").value=selectedCouncils.join(", ")}function showErr(e){var n=document.getElementById("form-error");if(!n){(n=document.createElement("div")).id="form-error",n.style.cssText="color:#f26b5b;font-size:.78rem;padding:10px 12px;margin-bottom:10px;background:rgba(242,107,91,.08);border:1px solid rgba(242,107,91,.2);border-radius:8px";var t=document.getElementById("submit-btn");t.parentNode.insertBefore(n,t)}n.textContent=e,n.style.display="block",n.scrollIntoView({behavior:"smooth",block:"center"})}function clearErr(){var e=document.getElementById("form-error");e&&(e.style.display="none")}function handleSubmit(e){e&&e.preventDefault&&e.preventDefault(),clearErr();var n=document.getElementById("first_name").value.trim(),t=document.getElementById("last_name").value.trim(),o=document.getElementById("business_name").value.trim(),r=document.getElementById("email").value.trim(),a=document.getElementById("phone").value.trim();if(!n)return showErr("Please enter your first name."),void document.getElementById("first_name").focus();if(!t)return showErr("Please enter your last name."),void document.getElementById("last_name").focus();if(!o)return showErr("Please enter your business name."),void document.getElementById("business_name").focus();if(!r)return showErr("Please enter your email address."),void document.getElementById("email").focus();var l=document.getElementById("trader-form"),i=Array.from(l.querySelectorAll('input[name="specialty[]"]:checked')).map(function(e){return e.value});if(0!==i.length)if(0!==selectedCouncils.length){document.getElementById("submitted_at").value=(new Date).toISOString();var c=document.getElementById("submit-btn");c.disabled=!0,c.textContent="Submitting...";var s="NEW TRADER APPLICATION\nName: "+(n+" "+t)+"\nBusiness: "+o+"\nPhone: "+(a||"Not provided")+"\nEmail: "+r+"\nServices: "+i.slice(0,5).join(", ")+(i.length>5?" +"+(i.length-5)+" more":"")+"\nCouncils: "+selectedCouncils.slice(0,4).join(", ")+"\n\nReview and approve in admin.";fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(new FormData(l)).toString()}).then(function(){onSuccess(s)}).catch(function(){onSuccess(s)})}else showErr("Please add at least one council area you cover.");else showErr("Please select at least one service you offer.")}function onSuccess(e){document.getElementById("trader-form").style.display="none",document.getElementById("success-box").style.display="block",document.getElementById("success-box").scrollIntoView({behavior:"smooth",block:"center"}),window.open("https://web.whatsapp.com/send?phone=61402623628&text="+encodeURIComponent(e),"_blank")}document.querySelectorAll(".cb-label input[type=checkbox]").forEach(function(e){e.addEventListener("change",function(){this.closest(".cb-label").classList.toggle("checked",this.checked)})});</script>
+<div style="text-align:center;padding:16px;font-size:.6rem;color:#3f3f48;border-top:1px solid rgba(255,255,255,.06)">SiteVerdict &middot; ABN 42 663 950 070 &middot; <a href="terms.html" style="color:inherit">Terms</a> &middot; <a href="https://wa.me/61402623628" style="color:inherit">Chat with us</a></div></body>
+</html>

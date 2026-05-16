@@ -1,0 +1,10 @@
+# SiteVerdict — Netlify Configuration
+# Environment variables are set in Netlify UI, not here.
+# Required: ANTHROPIC_API_KEY, DALEADS_API_KEY
+# Optional: ANTHROPIC_MODEL (default: claude-sonnet-4-5)
+
+[build]
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
