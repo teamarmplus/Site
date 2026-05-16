@@ -521,18 +521,38 @@ function calcCouncilComplexity(cm){
 // Sets innerHTML on #result with the full report card structure.
 // All enhancement sections (verdict, scorecard etc) are added by
 // the renderResult wrapper AFTER this function runs.
-function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount){
+function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,overallScore){
   var resultEl=document.getElementById('result');
   if(!resultEl) return;
 
   // Signal
   var riskCount=[heritage,flood,bushfire].filter(Boolean).length;
-  var sig=riskCount>0?'r':n>=3?'g':n>=2||skipLotCount?'a':'r';
-  var sigLabel=riskCount>0?'Overlays present — professional review required'
-    :n>=3?'Strong development opportunity'
-    :n>=2?'Review opportunity — professional verification required'
-    :skipLotCount?'Enter block size for full analysis'
-    :'Limited potential — confirm with a licensed town planner';
+  // Task 1-3: sig and sigLabel must match the score-band, not lot count alone.
+  // overallScore is passed in from renderResult wrapper (calculated before this call).
+  var _score=overallScore||0;
+  var sig, sigLabel;
+  if(riskCount>0){
+    sig='r';
+    sigLabel='Overlays present — professional review required';
+  }else if(_score>=80){
+    sig='g';
+    sigLabel='STRONG DEVELOPMENT OPPORTUNITY';
+  }else if(_score>=65){
+    sig='a';
+    sigLabel='REVIEW OPPORTUNITY — PROFESSIONAL VERIFICATION REQUIRED';
+  }else if(_score>=50){
+    sig='a';
+    sigLabel='MODERATE POTENTIAL — KEY CONSTRAINTS TO VERIFY';
+  }else if(_score>=35){
+    sig='r';
+    sigLabel='LIMITED POTENTIAL — PROCEED CAREFULLY';
+  }else if(skipLotCount){
+    sig='a';
+    sigLabel='Enter block size for full analysis';
+  }else{
+    sig='r';
+    sigLabel='LOW DEVELOPMENT POTENTIAL';
+  }
   var sigColor={'g':'var(--green)','a':'var(--amber)','r':'var(--red)'}[sig];
 
   // Lot count display
@@ -868,7 +888,7 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
 
   // Run inner renderer (sets innerHTML on #result)
   try{
-    _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount);
+    _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,overall);
   }catch(e){console.error("_renderResultInner failed:",e); return;}
 
   var resultEl=document.getElementById('result');
