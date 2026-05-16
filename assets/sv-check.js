@@ -76,8 +76,7 @@ async function safeFunctionJson(url, fallback){
 }
 
 // ── API ENGINE (preserved) ──────────────────────────
-function chatPro(){window.open("https://web.whatsapp.com/send?phone=61402623628&text=Hi+SiteVerdict+I+want+to+chat+with+a+professional","_blank")}var MF={R1:12,R2:12,R3:9,R4:9,RU1:50,RU2:50,RU4:2e3},CD={ALBURY:{days:63,range:"53-63",n:3},BATHURST:{days:43,range:"33-73",n:3},BLACKTOWN:{days:153,range:"40-399",n:12},BYRON:{days:189,range:"14-393",n:6},CAMDEN:{days:45,range:"2-375",n:12},CAMPBELLTOWN:{days:109,range:"109-329",n:3},"CANADA BAY":{days:206,range:"127-557",n:5},CANTERBURY:{days:49,range:"5-448",n:62},BANKSTOWN:{days:49,range:"5-448",n:62},"CENTRAL COAST":{days:89,range:"21-165",n:8},CESSNOCK:{days:85,range:"50-110",n:3},"COFFS HARBOUR":{days:73,range:"65-168",n:3},CUMBERLAND:{days:186,range:"48-361",n:8},FAIRFIELD:{days:177,range:"136-177",n:2},GOULBURN:{days:122,range:"15-292",n:6},"INNER WEST":{days:119,range:"54-166",n:9},"LAKE MACQUARIE":{days:131,range:"41-474",n:15},LIVERPOOL:{days:314,range:"71-425",n:14},MAITLAND:{days:23,range:"18-85",n:4},NEWCASTLE:{days:122,range:"73-360",n:11},"NORTH SYDNEY":{days:279,range:"194-279",n:2},"NORTHERN BEACHES":{days:160,range:"90-173",n:3},PARRAMATTA:{days:133,range:"2-243",n:24},PENRITH:{days:204,range:"74-386",n:9},"PORT MACQUARIE":{days:281,range:"97-281",n:2},"PORT STEPHENS":{days:85,range:"1-92",n:3},RYDE:{days:86,range:"5-86",n:4},SHELLHARBOUR:{days:71,range:"7-392",n:8},SHOALHAVEN:{days:108,range:"3-171",n:6},SUTHERLAND:{days:118,range:"35-315",n:28},"THE HILLS":{days:148,range:"70-199",n:9},WAVERLEY:{days:332,range:"132-332",n:2},WOLLONDILLY:{days:480,range:"175-480",n:2},WOLLONGONG:{days:70,range:"15-233",n:12},WOOLLAHRA:{days:232,range:"208-232",n:2}};function gc(e){if(!e)return null;var t=e.toUpperCase().replace(/\bCITY COUNCIL\b/g,"").replace(/\bSHIRE COUNCIL\b/g,"").replace(/\bMUNICIPAL COUNCIL\b/g,"").replace(/\bREGIONAL COUNCIL\b/g,"").replace(/\bCOUNCIL\b/g,"").replace(/\bCITY\b/g,"").replace(/\bSHIRE\b/g,"").replace(/\bMUNICIPAL\b/g,"").replace(/\bREGIONAL\b/g,"").replace(/\bOF\b/g,"").replace(/\s+/g," ").trim();if(CD[t])return{name:t,data:CD[t]};for(var a in CD)if(t.indexOf(a)>-1||a.indexOf(t)>-1)return{name:a,data:CD[a]};return null}function calcLots(e,t,a,r){var s=Math.floor(e/a);return!t||t<3?s:Math.max(0,Math.min(s,Math.floor(t/(MF[r]||12))))}function getSig(e,t,a){if(e<2)return"r";var r=(e>=4?3:e>=3?2:1)+(t<=90?3:t<=150?2:1)+(a>=80?3:a>=70?2:1);return r>=7?"g":r>=4?"a":"r"}function setSt(e){document.getElementById("status").textContent=e}
-
+function chatPro(){window.open("https://web.whatsapp.com/send?phone=61402623628&text=Hi+SiteVerdict+I+want+to+chat+with+a+professional","_blank")}var MF={R1:12,R2:12,R3:9,R4:9,RU1:50,RU2:50,RU4:2e3},CD={ALBURY:{days:63,range:"53-63",n:3},BATHURST:{days:43,range:"33-73",n:3},BLACKTOWN:{days:153,range:"40-399",n:12},BYRON:{days:189,range:"14-393",n:6},CAMDEN:{days:45,range:"2-375",n:12},CAMPBELLTOWN:{days:109,range:"109-329",n:3},"CANADA BAY":{days:206,range:"127-557",n:5},CANTERBURY:{days:49,range:"5-448",n:62},BANKSTOWN:{days:49,range:"5-448",n:62},"CENTRAL COAST":{days:89,range:"21-165",n:8},CESSNOCK:{days:85,range:"50-110",n:3},"COFFS HARBOUR":{days:73,range:"65-168",n:3},CUMBERLAND:{days:186,range:"48-361",n:8},FAIRFIELD:{days:177,range:"136-177",n:2},GOULBURN:{days:122,range:"15-292",n:6},"INNER WEST":{days:119,range:"54-166",n:9},"LAKE MACQUARIE":{days:131,range:"41-474",n:15},LIVERPOOL:{days:314,range:"71-425",n:14},MAITLAND:{days:23,range:"18-85",n:4},NEWCASTLE:{days:122,range:"73-360",n:11},"NORTH SYDNEY":{days:279,range:"194-279",n:2},"NORTHERN BEACHES":{days:160,range:"90-173",n:3},PARRAMATTA:{days:133,range:"2-243",n:24},PENRITH:{days:204,range:"74-386",n:9},"PORT MACQUARIE":{days:281,range:"97-281",n:2},"PORT STEPHENS":{days:85,range:"1-92",n:3},RYDE:{days:86,range:"5-86",n:4},SHELLHARBOUR:{days:71,range:"7-392",n:8},SHOALHAVEN:{days:108,range:"3-171",n:6},SUTHERLAND:{days:118,range:"35-315",n:28},"THE HILLS":{days:148,range:"70-199",n:9},WAVERLEY:{days:332,range:"132-332",n:2},WOLLONDILLY:{days:480,range:"175-480",n:2},WOLLONGONG:{days:70,range:"15-233",n:12},WOOLLAHRA:{days:232,range:"208-232",n:2}};function gc(e){if(!e)return null;var t=e.toUpperCase().replace(/\bCITY COUNCIL\b/g,"").replace(/\bSHIRE COUNCIL\b/g,"").replace(/\bMUNICIPAL COUNCIL\b/g,"").replace(/\bREGIONAL COUNCIL\b/g,"").replace(/\bCOUNCIL\b/g,"").replace(/\bCITY\b/g,"").replace(/\bSHIRE\b/g,"").replace(/\bMUNICIPAL\b/g,"").replace(/\bREGIONAL\b/g,"").replace(/\bOF\b/g,"").replace(/\s+/g," ").trim();if(CD[t])return{name:t,data:CD[t]};for(var a in CD)if(t.indexOf(a)>-1||a.indexOf(t)>-1)return{name:a,data:CD[a]};return null}function calcLots(e,t,a,r){var s=Math.floor(e/a);return!t||t<3?s:Math.max(0,Math.min(s,Math.floor(t/(MF[r]||12))))}function getSig(e,t,a){if(e<2)return"r";var r=(e>=4?3:e>=3?2:1)+(t<=90?3:t<=150?2:1)+(a>=80?3:a>=70?2:1);return r>=7?"g":r>=4?"a":"r"}function setSt(e){document.getElementById("status").textContent=e;}
 // ── SHARED GEOCODING ─────────────────────────────────────────────
 // Used by both autoLookupBlock() and runCheck() so coordinates match.
 async function geocodeAddress(addr){
@@ -285,6 +284,23 @@ function srcBadge(type, text){
   return '<span class="'+cls+'"><span class="src-badge-dot"></span>'+text+'</span>';
 }
 
+// ── VERDICT LABEL FROM SCORE (v2.2 — score-band primary) ──────────
+// Task 1+2+3: score is the single source of truth for verdict label.
+// Never use lot count alone to determine verdict wording.
+function verdictLabelFromScore(score){
+  if(score>=80) return 'Strong development opportunity';
+  if(score>=65) return 'Review opportunity — professional verification required';
+  if(score>=50) return 'Moderate potential — key constraints to verify';
+  if(score>=35) return 'Limited potential — proceed carefully';
+  return 'Low development potential';
+}
+function scoreRangeBand(score){
+  if(score>=80) return 'STRONG DEVELOPMENT OPPORTUNITY';
+  if(score>=65) return 'REVIEW OPPORTUNITY';
+  if(score>=50) return 'MODERATE POTENTIAL';
+  if(score>=35) return 'LIMITED POTENTIAL';
+  return 'LOW DEVELOPMENT POTENTIAL';
+}
 // ── IMPROVED buildVerdictSection ──────────────────────
 function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,sepp800,mls,mlsReal,block,overallScore){
   var days = cm&&cm.data ? cm.data.days : null;
@@ -292,23 +308,32 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
 
   var hasMajorOverlay=!!(heritage||flood||bushfire);
   var verdict, verdictColor, verdictRange;
-  // Verdict from lot count + overlays (Tasks 2 & 5)
+  // Task 1+4: Verdict from score band (primary) + overlay check
+  // Score 80+: Strong | 65-79: Review | 50-64: Moderate | 35-49: Limited | <35: Low
   if(hasMajorOverlay){
-    verdict='Proceed with caution \u2014 professional review required';
+    verdict='Proceed with caution — professional review required';
     verdictColor='var(--red)';
     verdictRange='Caution required';
-  }else if(n>=3){
+  }else if(overallScore>=80){
     verdict='Strong development opportunity';
     verdictColor='var(--green)';
     verdictRange='Strong';
-  }else if(n===2){
-    verdict='Review opportunity \u2014 possible 2-lot pathway';
+  }else if(overallScore>=65){
+    verdict='Review opportunity — professional verification required';
     verdictColor='var(--amber)';
     verdictRange='Review opportunity';
-  }else{
-    verdict='Limited subdivision potential';
+  }else if(overallScore>=50){
+    verdict='Moderate potential — key constraints to verify';
+    verdictColor='var(--amber)';
+    verdictRange='Moderate potential';
+  }else if(overallScore>=35){
+    verdict='Limited potential — proceed carefully';
     verdictColor='var(--red)';
     verdictRange='Limited potential';
+  }else{
+    verdict='Low development potential';
+    verdictColor='var(--red)';
+    verdictRange='Low potential';
   }
 
   var approvalPct = 55;
@@ -363,7 +388,7 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
           +'<div class="vc-item"><div class="vc-label">&#9652; Hidden upside</div><div class="vc-text">'+hiddenUpside+'</div></div>'
           +'<div class="vc-item"><div class="vc-label">&#9660; Primary risk</div><div class="vc-text">'+primaryRisk+'</div></div>'
           +'<div class="vc-item"><div class="vc-label">&#9654; Approval outlook</div><div class="vc-text">'+outlook+'</div></div>'
-          +'<div class="vc-item"><div class="vc-label">&#9203; Strategy</div><div class="vc-text">'+(n>=4?'Secure under option. Confirm sewer, BVM and DCP frontage before exchanging.':n===3?'Pre-DA meeting recommended. Commission surveyor and town planner before any offer.':n===2?'LEP calculation indicates a possible 2-lot pathway. Feasibility depends on frontage, access, easements, servicing and DCP controls. Commission a town planner and surveyor before any decision.':'Duplex or granny flat may be viable. Full Torrens subdivision unlikely at this block size — confirm with a town planner.')+'</div></div>'
+          +'<div class="vc-item"><div class="vc-label">&#9203; Strategy</div><div class="vc-text">'+(n>=4?'Secure under option. Confirm sewer, BVM and DCP frontage before exchanging.':n===3?'Pre-DA meeting recommended. Commission surveyor and town planner before any offer.':n>=2?'Indicative 2-lot pathway — confirm LEP controls, frontage, access, easements and servicing with a licensed planner and surveyor before any offer.':overallScore>=50?'Block size not confirmed. If subdivision is a goal, engage a town planner to assess LEP controls, frontage and DCP requirements.':'Duplex or secondary dwelling may be viable. Full Torrens subdivision unlikely given site constraints — confirm with a licensed town planner.')+'</div></div>'
         +'</div>'
       +'</div>'
       +'<div class="vs-right">'
@@ -502,11 +527,12 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
 
   // Signal
   var riskCount=[heritage,flood,bushfire].filter(Boolean).length;
-  var sig=riskCount>0?'r':n>=3?'g':n>=2?'a':'r';
+  var sig=riskCount>0?'r':n>=3?'g':n>=2||skipLotCount?'a':'r';
   var sigLabel=riskCount>0?'Overlays present — professional review required'
     :n>=3?'Strong development opportunity'
-    :n>=2?'Review opportunity — possible 2-lot pathway'
-    :'Limited subdivision potential';
+    :n>=2?'Review opportunity — professional verification required'
+    :skipLotCount?'Enter block size for full analysis'
+    :'Limited potential — confirm with a licensed town planner';
   var sigColor={'g':'var(--green)','a':'var(--amber)','r':'var(--red)'}[sig];
 
   // Lot count display
@@ -657,9 +683,12 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
 function buildHBUSection(zone,block,mls,n,heritage,flood,cm){
   var days=cm&&cm.data?cm.data.days:null;
   var opts=[];
-  if(n>=10)opts.push({label:'Large-scale Torrens subdivision ('+n+'+ lots)',status:'primary',complexity:'High',timeline:days?(Math.round(days/30)+9)+'\u2013'+(Math.round(days/30)+15)+' months':'Allow 18\u201326 months',desc:'Full civil design, staging and DA package required. Strong LEP precedent. Confirm sewer capacity with Sydney Water before offer.'});
-  else if(n>=4)opts.push({label:'Torrens title subdivision ('+n+' lots)',status:'primary',complexity:'Medium',timeline:days?(Math.round(days/30)+3)+'\u2013'+(Math.round(days/30)+9)+' months':'Allow 9\u201315 months',desc:'Standard residential subdivision. Most common approval type in this zone. Survey plan, engineering drawings and DA required.'});
-  else if(n>=2)opts.push({label:'Two-lot Torrens subdivision',status:'primary',complexity:'Low\u2013Medium',timeline:days?(Math.round(days/30)+2)+'\u2013'+(Math.round(days/30)+6)+' months':'Allow 6\u201312 months',desc:'Most common NSW residential pathway. Standard DA with survey plan. Confirm DCP frontage requirement with council.'});
+  // Task 5: use block/mls to estimate lots even if n was zeroed by skipLotCount
+  var possibleLots=block&&mls&&block>=mls?Math.floor(block/mls):n;
+  var lotsForHBU=Math.max(n,possibleLots);
+  if(lotsForHBU>=10)opts.push({label:'Large-scale Torrens subdivision ('+lotsForHBU+'+ lots)',status:'primary',complexity:'High',timeline:days?(Math.round(days/30)+9)+'\u2013'+(Math.round(days/30)+15)+' months':'Allow 18\u201326 months',desc:'Full civil design, staging and DA package required. Strong LEP precedent. Confirm sewer capacity with Sydney Water before offer.'});
+  else if(lotsForHBU>=4)opts.push({label:'Torrens title subdivision ('+n+' lots)',status:'primary',complexity:'Medium',timeline:days?(Math.round(days/30)+3)+'\u2013'+(Math.round(days/30)+9)+' months':'Allow 9\u201315 months',desc:'Standard residential subdivision. Most common approval type in this zone. Survey plan, engineering drawings and DA required.'});
+  else if(lotsForHBU>=2)opts.push({label:'Two-lot Torrens subdivision',status:'primary',complexity:'Low\u2013Medium',timeline:days?(Math.round(days/30)+2)+'\u2013'+(Math.round(days/30)+6)+' months':'Allow 6\u201312 months',desc:'Possible 2-lot pathway subject to LEP controls, DCP frontage, site access, easements and servicing. Requires survey plan and standard DA. Commission a licensed town planner and surveyor before any decision.'});
   if(['R2','R3','R4'].indexOf(zone)>-1)opts.push({label:'Duplex (dual occupancy)',status:'alt',complexity:'Low',timeline:'6\u201312 months',desc:'May be permissible as complying development or standard DA. Does not require subdivision. Lower yield.'});
   if(['R3','R4','MU1','B4'].indexOf(zone)>-1)opts.push({label:'Townhouse \/ multi-dwelling',status:'alt',complexity:'High',timeline:'12\u201324 months',desc:'Medium density pathway. Higher yield but greater design complexity and council assessment. Subject to DCP controls.'});
   opts.push({label:'Single dwelling or renovation',status:'lowest',complexity:'Low',timeline:'N\/A',desc:'Lowest-yield option. Only suitable if subdivision is not achievable due to site constraints.'});
@@ -688,7 +717,7 @@ function buildHBUSection(zone,block,mls,n,heritage,flood,cm){
 function buildRiskRegister(heritage,flood,bushfire,acid,contaminated,riparian,landRes,foreshore,cm,n){
   var days=cm&&cm.data?cm.data.days:null;
   var risks=[];
-  risks.push({cat:'Planning',name:'Lot count unconfirmed',sev:n<2?'High':n>=4?'Low':'Medium',desc:'Calculated from block \u00f7 min lot size. Does not check DCP frontage, shape or access. May be lower than LEP calculation.',mit:'Town planner to review DCP before offer.'});
+  risks.push({cat:'Planning',name:'Lot count requires verification',sev:n<2?'Medium':n>=4?'Low':'Low',desc:'The automated calculation suggests a possible subdivision pathway, but the real yield depends on LEP controls, DCP frontage, access, easements, slope and servicing. A licensed town planner must confirm before any offer.',mit:'Engage a licensed NSW town planner to verify LEP controls and DCP requirements.'});
   if(heritage)risks.push({cat:'Planning',name:'Heritage overlay',sev:'High',desc:'Heritage Impact Statement required ($3K\u2013$8K). Adds DA complexity and time.',mit:'Engage heritage consultant. Pre-DA meeting.'});
   if(flood)risks.push({cat:'Overlay',name:'Flood planning area',sev:'High',desc:'Flood impact assessment required. Construction standards may apply.',mit:'Hydraulic engineer report required for DA.'});
   if(bushfire)risks.push({cat:'Overlay',name:'Bushfire prone land',sev:'Medium',desc:'BAL assessment required. AS3959 construction standards increase costs.',mit:'BAL assessment before DA lodgement.'});
