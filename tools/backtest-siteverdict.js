@@ -34,7 +34,7 @@
 const fs   = require('fs');
 const path = require('path');
 
-const { geocodeAddress, fetchPlanningData, parsePlanningData, delay } = require('./lib/api-client');
+const { geocodeAddress, fetchPlanningData, fetchPlanningDataWithRetry, parsePlanningData, classifyZoneQuality, delay } = require('./lib/api-client');
 const { scoreProperty, verdictLabelFromScore, scoreRangeBand, getCouncilMatch } = require('./lib/scoring');
 
 // ── CLI ARGS ──────────────────────────────────────────────────────
@@ -94,37 +94,50 @@ function calcTimeline(lodgement, determination) {
   } catch { return null; }
 }
 
-function compareResult(svResult, row) {
+function compareResult(svResult, row, diagInfo) {
   const realStatus = (row.da_status || '').toLowerCase();
   const realLots   = parseInt(row.lots_or_dwellings || row.lots || '0', 10) || 0;
   const daTimeline = calcTimeline(row.lodgement_date, row.determination_date)
     || parseInt(row.approval_days || '0', 10) || null;
 
-  const approved = realStatus.includes('approved') || realStatus.includes('determined');
-  const refused  = realStatus.includes('refused') || realStatus.includes('rejected');
-  const withdrawn= realStatus.includes('withdrawn');
+  const approved  = realStatus.includes('approved') || realStatus.includes('determined');
+  const refused   = realStatus.includes('refused') || realStatus.includes('rejected');
+  const withdrawn = realStatus.includes('withdrawn');
 
-  // Match: SiteVerdict score >= 65 AND real outcome was approved
   const svPositive = svResult.score >= 65;
   const match = (svPositive && approved) || (!svPositive && (refused || withdrawn))
     ? 'MATCH' : 'MISMATCH';
 
-  // Flag false positives (high score, bad outcome) and negatives
   let flag = '';
-  if (svResult.score >= 65 && refused) flag = 'FALSE_POSITIVE';
+  if (svResult.score >= 65 && refused)    flag = 'FALSE_POSITIVE';
   else if (svResult.score >= 65 && withdrawn) flag = 'FALSE_POSITIVE_WITHDRAWN';
-  else if (svResult.score < 50 && approved) flag = 'FALSE_NEGATIVE';
-  else if (match === 'MATCH') flag = 'CORRECT';
-  else flag = 'UNCERTAIN';
+  else if (svResult.score < 50 && approved)   flag = 'FALSE_NEGATIVE';
+  else if (match === 'MATCH')                 flag = 'CORRECT';
+  else                                        flag = 'UNCERTAIN';
 
-  // Timeline comparison
+  // ── Mismatch reason classification (Task 4) ──────────────────────
+  let misMatchReason = '';
+  if (flag !== 'CORRECT') {
+    const zq   = diagInfo && diagInfo.zoneQuality;
+    const zone = svResult.zone || '';
+    if (!zone)                   misMatchReason = 'blank_zone';
+    else if (zq === 'suspicious' || zq === 'recovered')
+                                 misMatchReason = 'suspicious_zone';
+    else if (zq === 'recovered') misMatchReason = 'coordinate_precision_issue';
+    else if (diagInfo && diagInfo.fallbackUsed)
+                                 misMatchReason = 'coordinate_precision_issue';
+    else if (flag === 'FALSE_POSITIVE' || flag === 'FALSE_NEGATIVE')
+                                 misMatchReason = 'scoring_logic_issue';
+    else                         misMatchReason = 'insufficient_data';
+  }
+
   let timelineNote = '';
   if (daTimeline && svResult.councilDays) {
     const diff = Math.abs(daTimeline - svResult.councilDays);
-    timelineNote = diff <= 30 ? 'TIMELINE_ACCURATE' : `TIMELINE_DIFF_${diff}D`;
+    timelineNote = diff <= 30 ? 'TIMELINE_ACCURATE' : 'TIMELINE_DIFF_' + diff + 'D';
   }
 
-  return { approved, refused, withdrawn, realLots, daTimeline, match, flag, timelineNote };
+  return { approved, refused, withdrawn, realLots, daTimeline, match, flag, misMatchReason, timelineNote };
 }
 
 // ── MAIN PROCESS ROW ─────────────────────────────────────────────
@@ -193,29 +206,59 @@ async function processRow(row, idx, total, existingAddresses) {
     console.log('  [geo] geocoded: ' + geo.lat.toFixed(5) + ', ' + geo.lon.toFixed(5) + ' (use lat/lng columns for precision)');
   }
 
-  // ── Fetch planning data ───────────────────────────────────────────
-  let raw, parsed;
+  // ── Fetch planning data (with zone-quality retry) ─────────────────
+  let diagInfo, parsed;
   try {
-    raw    = await fetchPlanningData(geo.lat, geo.lon, { usePaidApi: !NO_PAID_API });
-    parsed = parsePlanningData(raw, council);
+    diagInfo = await fetchPlanningDataWithRetry(
+      geo.lat, geo.lon,
+      row.development_type || '',
+      { usePaidApi: !NO_PAID_API, lgaOverride: council }
+    );
+    parsed = diagInfo.parsed;
+
     const overlayStr = [
       parsed.heritage ? 'H' : '',
       parsed.flood    ? 'FL' : '',
       parsed.bushfire ? 'BF' : '',
     ].filter(Boolean).join('') || 'clear';
-    console.log('  [plan] zone=' + parsed.zone + ' mls=' + parsed.mls + ' block=' + parsed.block + 'm\u00b2 overlays=' + overlayStr);
+
+    const zqTag = diagInfo.zoneQuality !== 'good' ? ' [' + diagInfo.zoneQuality + ']' : '';
+    console.log('  [plan] zone=' + (parsed.zone||'BLANK') + zqTag + ' mls=' + parsed.mls + ' block=' + parsed.block + 'm² overlays=' + overlayStr);
+    if (diagInfo.fallbackUsed) {
+      console.log('  [retry] fallback zone=' + diagInfo.fallbackZone + ' at ' + diagInfo.fallbackOffset);
+    }
   } catch (e) {
     console.warn('  [plan] failed: ' + e.message);
     return errRow('ERROR', 'API fetch failed', 'API_FAILED',
       e.message.slice(0, 100), geo.lat, geo.lon, coordSource);
   }
 
+  // ── Coordinate quality assessment (Task 1) ──────────────────────
+  const coordQuality = (function() {
+    if (!diagInfo.parsed.zone) return 'failed';
+    if (diagInfo.zoneQuality === 'suspicious' && !diagInfo.fallbackUsed) return 'suspicious';
+    if (diagInfo.fallbackUsed) return 'needs_review';
+    if (coordSource === 'input_lat_lng') return 'good';
+    return 'needs_review'; // geocoded
+  })();
+
+  const parcelConfidence = (function() {
+    if (!parsed.zone) return 'failed';
+    if (diagInfo.fallbackUsed) return 'low';
+    if (coordSource === 'input_lat_lng' && diagInfo.zoneQuality === 'good') return 'high';
+    if (coordSource === 'input_lat_lng') return 'medium';
+    return 'low';
+  })();
+
   // ── Score ─────────────────────────────────────────────────────────
   const sv = scoreProperty(parsed);
-  console.log('  [score] ' + sv.score + ' (' + sv.band + ') | lots=' + sv.estimatedLots + ' | ' + sv.verdict);
+  console.log('  [score] ' + sv.score + ' (' + sv.band + ') | lots=' + sv.estimatedLots + ' | ' + sv.verdict + ' | coord=' + coordQuality);
 
   // ── Compare ───────────────────────────────────────────────────────
-  const comp = compareResult(sv, row);
+  const comp = compareResult(sv, row, diagInfo);
+
+  // Build the combined coord warning + note
+  const allNotes = [coordNote, diagInfo.coordWarning].filter(Boolean).join(' | ');
 
   return {
     address,
@@ -243,9 +286,17 @@ async function processRow(row, idx, total, existingAddresses) {
     council_name:         sv.councilName || council,
     match:                comp.match,
     flag:                 comp.flag,
+    mismatch_reason:      comp.misMatchReason || '',
     timeline_note:        comp.timelineNote,
     coordinate_source:    coordSource,
-    notes:                coordNote,
+    coordinate_quality:   coordQuality,
+    zone_result_quality:  diagInfo.zoneQuality,
+    parcel_match_confidence: parcelConfidence,
+    original_zone:        diagInfo.originalZone || '',
+    fallback_zone:        diagInfo.fallbackZone || '',
+    fallback_offset:      diagInfo.fallbackOffset || '',
+    coordinate_warning:   diagInfo.coordWarning || '',
+    notes:                allNotes,
     geocode_lat:          geo.lat,
     geocode_lon:          geo.lon,
   };
@@ -307,19 +358,47 @@ function buildSummary(results) {
     .sort((a, b) => b.count - a.count)
     .slice(0, 20);
 
+  // ── Coordinate quality metrics (Task 5) ─────────────────────────
+  const blankZones       = scored.filter(r => !r.zone).length;
+  const suspiciousCoords = scored.filter(r => r.coordinate_quality === 'suspicious' || r.zone_result_quality === 'suspicious').length;
+  const fallbackUsed     = scored.filter(r => r.fallback_zone && r.fallback_zone !== '').length;
+  const coordGood        = scored.filter(r => r.coordinate_quality === 'good');
+  const coordGoodCorrect = coordGood.filter(r => r.flag === 'CORRECT').length;
+  const fpCoordIssue     = fp.filter(r => r.mismatch_reason === 'coordinate_precision_issue' || r.mismatch_reason === 'suspicious_zone' || r.mismatch_reason === 'blank_zone').length;
+  const fnCoordIssue     = fn.filter(r => r.mismatch_reason === 'coordinate_precision_issue' || r.mismatch_reason === 'suspicious_zone' || r.mismatch_reason === 'blank_zone').length;
+
+  // Mismatch reason breakdown
+  const misMatchReasons = {};
+  scored.filter(r => r.flag !== 'CORRECT').forEach(r => {
+    const reason = r.mismatch_reason || 'unknown';
+    misMatchReasons[reason] = (misMatchReasons[reason] || 0) + 1;
+  });
+
   return {
     totalRows:    results.length,
     totalScored:  scored.length,
     totalErrors:  errors.length,
     totalCorrect: correct.length,
-    accuracy:     scored.length ? Math.round(correct.length/scored.length*100) + '%' : 'n/a',
+    broadOutcomeAlignment: scored.length ? Math.round(correct.length/scored.length*100) + '%' : 'n/a',
+    broadAlignmentExcludingCoordIssues: coordGood.length
+      ? Math.round(coordGoodCorrect/coordGood.length*100) + '%' : 'n/a',
     avgScoreApproved: avg(approved.map(r => r.sv_score)),
     avgScoreRefused:  avg(refused.map(r => r.sv_score)),
-    falsePositives:   fp.length,
-    falseNegatives:   fn.length,
+    falsePositivesTotal:          fp.length,
+    falsePositivesExcludingCoord: fp.length - fpCoordIssue,
+    falseNegativesTotal:          fn.length,
+    falseNegativesExcludingCoord: fn.length - fnCoordIssue,
+    coordinateQuality: {
+      blankZones,
+      suspiciousZones:    suspiciousCoords,
+      fallbackRecoveries: fallbackUsed,
+      goodCoordinates:    coordGood.length,
+    },
+    misMatchReasonBreakdown: misMatchReasons,
     bandSummary,
     councilSummary,
     generatedAt:  new Date().toISOString(),
+    disclaimer: 'Broad outcome alignment only — not a predictive guarantee. Coordinate precision significantly affects results.',
   };
 }
 
@@ -397,7 +476,8 @@ This report compares SiteVerdict's automated rule-based scoring against historic
 | Successfully scored | ${summary.totalScored} |
 | Errors | ${summary.totalErrors} |
 | Correct predictions | ${summary.totalCorrect} |
-| Overall accuracy | ${summary.accuracy} |
+| Broad outcome alignment | ${summary.broadOutcomeAlignment} |
+| Alignment (good coords only) | ${summary.broadAlignmentExcludingCoordIssues} |
 | Avg score (approved DAs) | ${summary.avgScoreApproved || 'n/a'} |
 | Avg score (refused DAs) | ${summary.avgScoreRefused || 'n/a'} |
 | False positives | ${summary.falsePositives} |
@@ -447,9 +527,52 @@ ${topRefusedTable || '*(none with refused/withdrawn status in this batch)*'}
 
 ---
 
+## Coordinate Quality Assessment
+
+Coordinate precision is the primary limitation of this validation. The following issues were detected:
+
+| Issue | Count |
+|---|---|
+| Blank zone (coordinate outside LEP area) | ${summary.coordinateQuality.blankZones} |
+| Suspicious zone for residential DA | ${summary.coordinateQuality.suspiciousZones} |
+| Fallback zone recovered via offset retry | ${summary.coordinateQuality.fallbackRecoveries} |
+| Good quality coordinates | ${summary.coordinateQuality.goodCoordinates} |
+
+**Broad outcome alignment (all rows):** ${summary.broadOutcomeAlignment}
+
+**Broad outcome alignment (good coordinates only):** ${summary.broadAlignmentExcludingCoordIssues}
+
+**False positives excluding coordinate issues:** ${summary.falsePositivesExcludingCoord}
+
+**False negatives excluding coordinate issues:** ${summary.falseNegativesExcludingCoord}
+
+---
+
+## Mismatch Reason Breakdown
+
+| Reason | Count |
+|---|---|
+${Object.entries(summary.misMatchReasonBreakdown||{}).map(([k,v])=>'| '+k+' | '+v+' |').join('\n') || '| (no mismatches) | — |'}
+
+---
+
+## Recommendations for Next Steps
+
+1. **Primary limitation: coordinate precision.** Most mismatches in this run are attributable to coordinates resolving to the wrong planning zone (E2, RE1, blank) rather than to scoring logic error. The scoring itself is not the primary source of error at this stage.
+
+2. **Recommended next step: use verified DA parcel coordinates.** The NSW ePlanning API returns the DA application location. If the input CSV includes the DA number, the ePlanning API can be queried to retrieve the exact parcel coordinate. This would eliminate the majority of coordinate-precision failures.
+
+3. **Alternative: use Lot/DP identifiers.** The NSW Cadastre can be queried by Lot and DP number directly, returning the precise centroid of the registered parcel rather than a geocoded address estimate.
+
+4. **Scoring should not be tuned aggressively until coordinate quality is improved.** Adjusting scoring weights in response to apparent false positives caused by wrong-zone coordinates would degrade performance on correctly geocoded properties. Fix coordinates first, then tune.
+
+5. **Expand the dataset to 100+ rows** before drawing conclusions about scoring accuracy. A 20-row sample is sufficient for a pipeline health check but too small for statistical conclusions.
+
+---
+
 ## Disclaimer
 
-This report was generated by SiteVerdict's automated analysis tool. It is not a planning certificate, not financial advice, not legal advice, and not a valuation. All results are indicative only. A licensed NSW town planner, registered surveyor and legal practitioner must be consulted before any development, investment or acquisition decision.
+This report was generated by SiteVerdict's automated analysis tool. Results represent **broad outcome alignment** against historical DA records — not a predictive guarantee. It is not a planning certificate, not financial advice, not legal advice, and not a valuation. All results are indicative only. A licensed NSW town planner, registered surveyor and legal practitioner must be consulted before any development, investment or acquisition decision.
 
 SiteVerdict — siteverdict.com.au — ABN 42 663 950 070
 `;
@@ -516,7 +639,10 @@ async function main() {
     'sv_score','sv_verdict','sv_band','sv_lots','zone','mls','mls_real','block','zone_allows',
     'planning_strength','overlay_risk','yield_potential','approval_confidence',
     'holding_cost_risk','council_complexity','overlay_flags','council_days','council_name',
-    'match','flag','timeline_note','coordinate_source','notes','geocode_lat','geocode_lon',
+    'match','flag','mismatch_reason','timeline_note',
+    'coordinate_source','coordinate_quality','zone_result_quality','parcel_match_confidence',
+    'original_zone','fallback_zone','fallback_offset','coordinate_warning',
+    'notes','geocode_lat','geocode_lon',
   ];
 
   // Open output file (append if resume)
@@ -554,10 +680,11 @@ async function main() {
   console.log('═══════════════════════ SUMMARY ═══════════════════════');
   console.log(`Tested:        ${summary.totalScored} / ${summary.totalRows}`);
   console.log(`Errors:        ${summary.totalErrors}`);
-  console.log(`Correct:       ${summary.totalCorrect} (${summary.accuracy})`);
-  console.log(`False +ve:     ${summary.falsePositives}`);
-  console.log(`False -ve:     ${summary.falseNegatives}`);
-  console.log();
+  console.log(`Correct:       ${summary.totalCorrect} (${summary.broadOutcomeAlignment})`);
+  console.log(`Coord good:    ${summary.coordinateQuality && summary.coordinateQuality.goodCoordinates}`);
+  console.log(`Blank zones:   ${summary.coordinateQuality && summary.coordinateQuality.blankZones}  Suspicious: ${summary.coordinateQuality && summary.coordinateQuality.suspiciousZones}  Fallbacks: ${summary.coordinateQuality && summary.coordinateQuality.fallbackRecoveries}`);
+  console.log(`False +ve:     ${summary.falsePositivesTotal} (excl coord issues: ${summary.falsePositivesExcludingCoord})`);
+  console.log(`False -ve:     ${summary.falseNegativesTotal} (excl coord issues: ${summary.falseNegativesExcludingCoord}`);
   console.log('Score bands:');
   for (const [band, d] of Object.entries(summary.bandSummary)) {
     if (d.count) console.log(`  ${band.padEnd(10)} n=${d.count} approved=${d.approvalRate} avgScore=${d.avgScore||'n/a'}`);

@@ -194,8 +194,3 @@ The three Netlify functions act as server-side proxies. They:
 ## Licence
 
 Private. Not open source. All rights reserved — Arm Plus Group · ABN 42 663 950 070
-
-
-## Public safety
-
-The `_redirects` file blocks public access to `/tools/*` and `/data/*` on Netlify. Keep real validation datasets local and do not commit private input files or backtest outputs.

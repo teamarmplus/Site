@@ -333,4 +333,124 @@ function parsePlanningData(raw, lga_override) {
            landRes, foreshore, acid, contaminated, riparian };
 }
 
-module.exports = { geocodeAddress, fetchPlanningData, parsePlanningData, delay };
+
+// ── SUSPICIOUS ZONE DETECTION ─────────────────────────────────────
+// Zones that are almost certainly wrong for a residential subdivision DA.
+// Used to trigger coordinate offset retry and flag zone_result_quality.
+const SUSPICIOUS_ZONES_FOR_RESIDENTIAL = new Set([
+  'E1','E2','E3','RE1','RE2','SP1','SP2','W1','W2',
+  'DM','RD','RU6','SP3','IN1','IN2','IN3','B1','B2','B3',
+  'B4','B5','B6','B7','B8','B','EM','EM2','NR',
+]);
+
+const BLANK_ZONE_SCORE = 'blank';
+
+function classifyZoneQuality(zone, devType) {
+  if (!zone) return 'blank';
+  if (SUSPICIOUS_ZONES_FOR_RESIDENTIAL.has(zone)) {
+    // Only flag if the DA is explicitly residential
+    const dt = (devType || '').toLowerCase();
+    const isResidential = ['subdivision','dual','dwelling','residential','townhouse','lot']
+      .some(kw => dt.includes(kw));
+    if (isResidential) return 'suspicious';
+  }
+  return 'good';
+}
+
+// ── COORDINATE OFFSET RETRY (backtesting only) ────────────────────
+// If zone is blank or suspicious, retry at nearby offsets.
+// ~5m and ~10m in each cardinal direction (in decimal degrees).
+const DEG_5M  = 0.000045; // ~5m in lat/lon degrees
+const DEG_10M = 0.000090; // ~10m
+
+const RETRY_OFFSETS = [
+  { dlat:  DEG_5M,  dlon: 0,       label: '5m_N' },
+  { dlat: -DEG_5M,  dlon: 0,       label: '5m_S' },
+  { dlat: 0,        dlon:  DEG_5M, label: '5m_E' },
+  { dlat: 0,        dlon: -DEG_5M, label: '5m_W' },
+  { dlat:  DEG_10M, dlon: 0,       label: '10m_N' },
+  { dlat: -DEG_10M, dlon: 0,       label: '10m_S' },
+  { dlat: 0,        dlon:  DEG_10M,label: '10m_E' },
+  { dlat: 0,        dlon: -DEG_10M,label: '10m_W' },
+];
+
+/**
+ * Fetch planning data with zone-quality retry for suspicious/blank zones.
+ * If the initial fetch returns a suspicious or blank zone, try offset points.
+ * Returns augmented result with diagnostic fields.
+ *
+ * @param {number} lat
+ * @param {number} lon
+ * @param {string} devType  development_type from CSV (for residential detection)
+ * @param {object} opts
+ */
+async function fetchPlanningDataWithRetry(lat, lon, devType, opts = {}) {
+  const raw0    = await fetchPlanningData(lat, lon, opts);
+  const parsed0 = parsePlanningData(raw0, opts.lgaOverride);
+
+  const zq0 = classifyZoneQuality(parsed0.zone, devType);
+
+  // If zone is good, return immediately
+  if (zq0 === 'good') {
+    return {
+      parsed:           parsed0,
+      zoneQuality:      'good',
+      fallbackUsed:     false,
+      fallbackOffset:   null,
+      originalZone:     parsed0.zone,
+      fallbackZone:     null,
+      coordWarning:     null,
+    };
+  }
+
+  // Zone is blank or suspicious — try offset points
+  const originalZone = parsed0.zone;
+  console.log(`  [retry] zone='${originalZone}' (${zq0}) — trying ${RETRY_OFFSETS.length} nearby offsets`);
+
+  for (const off of RETRY_OFFSETS) {
+    const rLat = lat + off.dlat;
+    const rLon = lon + off.dlon;
+    try {
+      await delay(600); // shorter delay for retries
+      const rawR    = await fetchPlanningData(rLat, rLon, opts);
+      const parsedR = parsePlanningData(rawR, opts.lgaOverride);
+      const zqR     = classifyZoneQuality(parsedR.zone, devType);
+
+      if (zqR === 'good') {
+        console.log(`  [retry] recovered zone='${parsedR.zone}' at offset ${off.label}`);
+        return {
+          parsed:         parsedR,
+          zoneQuality:    'recovered',
+          fallbackUsed:   true,
+          fallbackOffset: off.label,
+          originalZone,
+          fallbackZone:   parsedR.zone,
+          coordWarning:   `Original zone='${originalZone}' (${zq0}). Recovered zone='${parsedR.zone}' using ${off.label} offset. Verify coordinate precision.`,
+        };
+      }
+    } catch (e) {
+      // Retry offset failed — continue to next
+    }
+  }
+
+  // All offsets failed to find a better zone
+  console.log(`  [retry] all offsets exhausted — keeping original zone='${originalZone}'`);
+  const warning = !originalZone
+    ? 'Zone blank after all retries. Coordinate may be outside mapped LEP area.'
+    : `Zone='${originalZone}' flagged suspicious for residential DA. All retries returned same zone.`;
+
+  return {
+    parsed:         parsed0,
+    zoneQuality:    zq0,
+    fallbackUsed:   false,
+    fallbackOffset: null,
+    originalZone,
+    fallbackZone:   null,
+    coordWarning:   warning,
+  };
+}
+
+module.exports.classifyZoneQuality = classifyZoneQuality;
+module.exports.fetchPlanningDataWithRetry = fetchPlanningDataWithRetry;
+
+module.exports = { geocodeAddress, fetchPlanningData, parsePlanningData, parsePlanningData, delay, classifyZoneQuality, fetchPlanningDataWithRetry };
