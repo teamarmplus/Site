@@ -1,0 +1,6 @@
+address,council,real_da_status,real_lots,real_timeline_days,sv_score,sv_verdict,sv_band,sv_lots,zone,mls,mls_real,block,zone_allows,planning_strength,overlay_risk,yield_potential,approval_confidence,holding_cost_risk,council_complexity,overlay_flags,council_days,council_name,match,flag,timeline_note,notes,geocode_lat,geocode_lon
+"40 Hoskins Avenue, Bankstown, 2200",Canterbury-Bankstown,Approved,45,,DRY_RUN,DRY_RUN,,,,,,,,,,,,,,,,,DRY_RUN,DRY_RUN,,dry-run: no API calls made,,
+"6 Fenton Street, Panania, 2213",Canterbury-Bankstown,Approved,2,,DRY_RUN,DRY_RUN,,,,,,,,,,,,,,,,,DRY_RUN,DRY_RUN,,dry-run: no API calls made,,
+"39-45 Wattle Road, Casula, 2170",Liverpool,Approved,11,,DRY_RUN,DRY_RUN,,,,,,,,,,,,,,,,,DRY_RUN,DRY_RUN,,dry-run: no API calls made,,
+"12 Smith Street, Penrith, 2750",Penrith,Refused,2,,DRY_RUN,DRY_RUN,,,,,,,,,,,,,,,,,DRY_RUN,DRY_RUN,,dry-run: no API calls made,,
+"8 Heritage Avenue, Parramatta, 2150",Parramatta,Approved,2,,DRY_RUN,DRY_RUN,,,,,,,,,,,,,,,,,DRY_RUN,DRY_RUN,,dry-run: no API calls made,,

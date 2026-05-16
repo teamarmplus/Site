@@ -1,0 +1,50 @@
+{
+  "totalRows": 5,
+  "totalScored": 0,
+  "totalErrors": 0,
+  "totalCorrect": 0,
+  "accuracy": "n/a",
+  "avgScoreApproved": null,
+  "avgScoreRefused": null,
+  "falsePositives": 0,
+  "falseNegatives": 0,
+  "bandSummary": {
+    "STRONG": {
+      "count": 0,
+      "approvedCount": 0,
+      "approvalRate": "n/a",
+      "avgScore": null,
+      "medianTimeline": null
+    },
+    "REVIEW": {
+      "count": 0,
+      "approvedCount": 0,
+      "approvalRate": "n/a",
+      "avgScore": null,
+      "medianTimeline": null
+    },
+    "MODERATE": {
+      "count": 0,
+      "approvedCount": 0,
+      "approvalRate": "n/a",
+      "avgScore": null,
+      "medianTimeline": null
+    },
+    "LIMITED": {
+      "count": 0,
+      "approvedCount": 0,
+      "approvalRate": "n/a",
+      "avgScore": null,
+      "medianTimeline": null
+    },
+    "LOW": {
+      "count": 0,
+      "approvedCount": 0,
+      "approvalRate": "n/a",
+      "avgScore": null,
+      "medianTimeline": null
+    }
+  },
+  "councilSummary": [],
+  "generatedAt": "2026-05-16T06:39:12.656Z"
+}

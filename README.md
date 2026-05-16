@@ -194,3 +194,31 @@ The three Netlify functions act as server-side proxies. They:
 ## Licence
 
 Private. Not open source. All rights reserved — Arm Plus Group · ABN 42 663 950 070
+
+---
+
+## Backtesting / validation
+
+This repo includes a local batch validation tool under `tools/`.
+
+Use it to compare SiteVerdict's rule-based score against historical DA outcomes.
+
+Safe dry run:
+
+```bash
+node tools/backtest-siteverdict.js --input data/backtest-input-sample.csv --limit 5 --dry-run --no-paid-api
+```
+
+Small free/public API run:
+
+```bash
+node tools/backtest-siteverdict.js --input data/backtest-input-sample.csv --limit 5 --no-paid-api
+```
+
+For a real 1,000-project validation run, keep the real input CSV local and do not commit it to GitHub:
+
+```bash
+node tools/backtest-siteverdict.js --input ~/Desktop/backtest-input-real.csv --limit 1000 --no-paid-api --resume
+```
+
+No Claude/Anthropic calls are made by the backtesting tool.
