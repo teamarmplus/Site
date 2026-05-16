@@ -1,3 +1,4 @@
-# Keep local validation tools/data private on public Netlify site
 /tools/* /404.html 404
+/tools /404.html 404
 /data/* /404.html 404
+/data /404.html 404

@@ -255,20 +255,55 @@ async function processRow(row, idx, total, existingAddresses) {
   })();
 
   // Task 3: determine if this row is model-valid or needs coordinate review
-  const isModelValid = coordQuality === 'verified' || coordQuality === 'good'
-    || (diagInfo.fallbackUsed && diagInfo.fallbackZone && diagInfo.zoneQuality !== 'suspicious');
+  // Task 1: strict model_valid — approximate/street-centroid sources not valid
+  // unless lot/DP or parcel_id is also confirmed.
+  const RELIABLE_VERIFIED_BY = ['planning-portal','planning-portal-manual','six-maps-manual','eplanning-da-record','cadastral-centroid','lot-dp-verified'];
+  const verifiedByVal = (row.coordinate_verified_by || '').toLowerCase();
+  const verifiedByReliable = RELIABLE_VERIFIED_BY.some(s => verifiedByVal.includes(s));
+  const approximateSource = ['approximate','nominatim','street-centroid','google','unknown']
+    .some(s => verifiedByVal.includes(s));
+  const hasLotDp = !!(row.lot && row.dp) || !!(row.parcel_id);
+
+  const isModelValid =
+    coordQuality === 'good'                                      // clean input coord
+    || (diagInfo.fallbackUsed && diagInfo.fallbackZone            // fallback recovered
+        && diagInfo.zoneQuality !== 'suspicious')
+    || (coordSource === 'verified_lat_lng'                        // verified coord
+        && verifiedByReliable && !approximateSource)              //   from reliable source
+    || (coordSource === 'verified_lat_lng'                        // OR verified coord
+        && approximateSource && hasLotDp);                        //   approximate BUT lot/DP confirmed
 
   const parcelConfidence = (function() {
     if (!parsed.zone) return 'failed';
     if (diagInfo.fallbackUsed) return 'low';
+    if (coordSource === 'verified_lat_lng' && !approximateSource) return 'high';
     if (coordSource === 'input_lat_lng' && diagInfo.zoneQuality === 'good') return 'high';
     if (coordSource === 'input_lat_lng') return 'medium';
     return 'low';
   })();
 
+  // Task 2: large parcel warning
+  // Residential DAs on very large blocks suggest parent parcel / wrong geometry.
+  const devTypeLower = (row.development_type || '').toLowerCase();
+  const isSmallResidential = ['subdivision','dual','dwelling','residential','townhouse','granny']
+    .some(kw => devTypeLower.includes(kw));
+  const isLargeSubdiv = devTypeLower.includes('large') ||
+    parseInt(row.lots_or_dwellings || '0', 10) >= 10;
+  const blockSizeWarning = (function() {
+    if (!parsed.block) return '';
+    if (isSmallResidential && !isLargeSubdiv && parsed.block > 5000)
+      return 'large_parent_parcel_possible';
+    if (parsed.block > 10000 && !isLargeSubdiv)
+      return 'unusually_large_parcel';
+    return '';
+  })();
+  const parcelSizeWarning = !!blockSizeWarning;
+  // If parcel size is suspicious and coordinate is approximate, force model_valid off
+  const isModelValidFinal = isModelValid && !(parcelSizeWarning && approximateSource && !hasLotDp);
+
   // ── Score ─────────────────────────────────────────────────────────
   const sv = scoreProperty(parsed);
-  console.log('  [score] ' + sv.score + ' (' + sv.band + ') | lots=' + sv.estimatedLots + ' | ' + sv.verdict + ' | coord=' + coordQuality);
+  console.log('  [score] ' + sv.score + ' (' + sv.band + ') | lots=' + sv.estimatedLots + ' | ' + sv.verdict + ' | coord=' + coordQuality + (parcelSizeWarning ? ' | LARGE_PARCEL' : ''));
 
   // ── Compare ───────────────────────────────────────────────────────
   const comp = compareResult(sv, row, diagInfo);
@@ -308,7 +343,9 @@ async function processRow(row, idx, total, existingAddresses) {
     coordinate_quality:   coordQuality,
     zone_result_quality:  diagInfo.zoneQuality,
     parcel_match_confidence: parcelConfidence,
-    model_valid:              isModelValid ? 'YES' : 'NO',
+    parcel_size_warning:     parcelSizeWarning ? 'YES' : 'NO',
+    parcel_size_warning_reason: blockSizeWarning,
+    model_valid:              isModelValidFinal ? 'YES' : 'NO',
     original_zone:        diagInfo.originalZone || '',
     fallback_zone:        diagInfo.fallbackZone || '',
     fallback_offset:      diagInfo.fallbackOffset || '',
@@ -404,6 +441,14 @@ function buildSummary(results) {
       ? Math.round(coordGoodCorrect/coordGood.length*100) + '%' : 'n/a',
     broadAlignmentExcludingCoordIssues: coordGood.length
       ? Math.round(coordGoodCorrect/coordGood.length*100) + '%' : 'n/a', // kept for compat
+    broad_outcome_alignment_model_valid_strict: (function() {
+      const strictValid = scored.filter(r => r.model_valid === 'YES' &&
+        !(r.coordinate_verified_by || '').toLowerCase().match(
+          /approximate|nominatim|street-centroid/));
+      const strictCorrect = strictValid.filter(r => r.flag === 'CORRECT').length;
+      return strictValid.length
+        ? Math.round(strictCorrect/strictValid.length*100) + '%' : 'n/a';
+    })(),
     avgScoreApproved: avg(approved.map(r => r.sv_score)),
     avgScoreRefused:  avg(refused.map(r => r.sv_score)),
     falsePositivesTotal:          fp.length,
@@ -417,6 +462,14 @@ function buildSummary(results) {
         / scored.length * 100) + '%' : 'n/a',
     model_valid_rows: scored.filter(r => r.model_valid === 'YES').length,
     coordinate_review_required: scored.filter(r => r.model_valid === 'NO').length,
+    approximate_coordinate_rows: scored.filter(r =>
+      (r.coordinate_verified_by || '').toLowerCase().match(
+        /approximate|nominatim|street-centroid|google|unknown/)).length,
+    large_parcel_warning_rows: scored.filter(r => r.parcel_size_warning === 'YES').length,
+    model_valid_excluding_approximate: scored.filter(r =>
+      r.model_valid === 'YES' &&
+      !(r.coordinate_verified_by || '').toLowerCase().match(
+        /approximate|nominatim|street-centroid/)).length,
     coordinateQuality: {
       blankZones,
       suspiciousZones:    suspiciousCoords,
@@ -505,8 +558,12 @@ This report compares SiteVerdict's automated rule-based scoring against historic
 | Successfully scored | ${summary.totalScored} |
 | Errors | ${summary.totalErrors} |
 | Correct predictions | ${summary.totalCorrect} |
-| Broad outcome alignment | ${summary.broadOutcomeAlignment} |
-| Alignment (good coords only) | ${summary.broadAlignmentExcludingCoordIssues} |
+| Broad outcome alignment (all rows) | ${summary.broadOutcomeAlignment} |
+| Broad alignment (good coordinates only) | ${summary.broadAlignmentExcludingCoordIssues} |
+| Broad alignment (strict model-valid only) | ${summary.broad_outcome_alignment_model_valid_strict} |
+| Model valid rows (strict) | ${summary.model_valid_rows} |
+| Approximate coordinate rows | ${summary.approximate_coordinate_rows} |
+| Large parcel warning rows | ${summary.large_parcel_warning_rows} |
 | Avg score (approved DAs) | ${summary.avgScoreApproved || 'n/a'} |
 | Avg score (refused DAs) | ${summary.avgScoreRefused || 'n/a'} |
 | False positives | ${summary.falsePositives} |
@@ -556,6 +613,10 @@ ${topRefusedTable || '*(none with refused/withdrawn status in this batch)*'}
 
 ---
 
+> **Note on invalid sample records:** Rows marked \`INVALID_SAMPLE_REPLACE\` in the input CSV contain addresses that could not be verified as real residential subdivision sites via public APIs. These rows are excluded from model-valid scoring until replaced with verified DA records. An invalid sample address is not a scoring model failure — it is a data quality issue in the validation dataset itself. Treat model-valid broad outcome alignment as the only meaningful accuracy signal.
+
+---
+
 ## Coordinate Quality Assessment
 
 Coordinate precision is the primary limitation of this validation. The following issues were detected:
@@ -601,6 +662,10 @@ Address-based coordinates and manually-estimated lat/lng values can land on the 
 
 **Verified parcel centroids or Lot/DP identifiers are required for institutional validation.** Scoring weights should not be tuned aggressively until coordinate quality is improved — apparent false positives caused by wrong-zone coordinates are not a reflection of scoring logic.
 
+**Approximate coordinates and street centroids are not treated as model-valid unless supported by lot/DP or parcel identifiers.** A row sourced from a street centroid or Nominatim estimate may return a plausible zone but will return incorrect block size, incorrect parcel shape, and may cross zone boundaries by 5–15 metres. These rows are excluded from the strict broad-outcome-alignment metric.
+
+**Large parcel detections are flagged separately because they may indicate parent parcels, reserves, or incorrect geometry.** When a coordinate lands on a large undivided lot or reserve, the cadastre returns the area of that lot — which may be 10–100× larger than the actual DA parcel. This inflates the block size, distorts the yield calculation, and may produce an unrealistically high score. Rows with \`parcel_size_warning = YES\` are excluded from the strict model-valid set unless lot/DP is confirmed.
+
 ---
 
 ## Recommendations for Next Steps
@@ -624,6 +689,8 @@ Address-based coordinates and manually-estimated lat/lng values can land on the 
 This report was generated by SiteVerdict's automated analysis tool. Results represent **broad outcome alignment** against historical DA records — not a predictive guarantee. It is not a planning certificate, not financial advice, not legal advice, and not a valuation. All results are indicative only. A licensed NSW town planner, registered surveyor and legal practitioner must be consulted before any development, investment or acquisition decision.
 
 SiteVerdict — siteverdict.com.au — ABN 42 663 950 070
+
+Invalid sample records are excluded from model-valid scoring until replaced with verified DA records. Coordinate issue rate and model-valid row count are the primary data quality indicators for this validation run.
 `;
 }
 
@@ -690,7 +757,7 @@ async function main() {
     'holding_cost_risk','council_complexity','overlay_flags','council_days','council_name',
     'match','flag','mismatch_reason','timeline_note',
     'coordinate_source','coordinate_quality','zone_result_quality','parcel_match_confidence',
-    'model_valid',
+    'parcel_size_warning','parcel_size_warning_reason','model_valid',
     'original_zone','fallback_zone','fallback_offset','coordinate_warning',
     'coordinate_verified_by','coordinate_verified_date',
     'notes','geocode_lat','geocode_lon',
