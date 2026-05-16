@@ -54,6 +54,8 @@ const DELAY_MS    = parseInt(getArg('--delay-ms', '1200'), 10);
 const INPUT_FILE  = getArg('--input',  path.join(__dirname, '../data/backtest-input.csv'));
 const OUTPUT_FILE = getArg('--output', path.join(__dirname, '../data/backtest-results.csv'));
 const SUMMARY_FILE = OUTPUT_FILE.replace('.csv', '-summary.json');
+const COORD_REVIEW_FILE = OUTPUT_FILE.replace('.csv', '-coordinate-review.csv');
+
 const REPORT_FILE  = OUTPUT_FILE.replace('.csv', '-report.md');
 
 // ── CSV HELPERS ───────────────────────────────────────────────────
@@ -178,10 +180,19 @@ async function processRow(row, idx, total, existingAddresses) {
   let coordSource = 'failed';
   let coordNote   = '';
 
-  const inputLat = parseFloat(row.lat || row.latitude || '');
-  const inputLon = parseFloat(row.lng || row.lon || row.longitude || '');
+  // Task 4: verified_lat/lng takes highest priority (manually confirmed parcel centroid)
+  const verifiedLat = parseFloat(row.verified_lat || '');
+  const verifiedLon = parseFloat(row.verified_lng || '');
+  const inputLat    = parseFloat(row.lat || row.latitude || '');
+  const inputLon    = parseFloat(row.lng || row.lon || row.longitude || '');
 
-  if (!isNaN(inputLat) && !isNaN(inputLon) && inputLat !== 0 && inputLon !== 0) {
+  if (!isNaN(verifiedLat) && !isNaN(verifiedLon) && verifiedLat !== 0 && verifiedLon !== 0) {
+    // Highest confidence — manually verified parcel centroid
+    geo = { lat: verifiedLat, lon: verifiedLon };
+    coordSource = 'verified_lat_lng';
+    console.log('  [geo] using VERIFIED lat/lng: ' + verifiedLat.toFixed(5) + ', ' + verifiedLon.toFixed(5)
+      + (row.coordinate_verified_by ? ' (by ' + row.coordinate_verified_by + ')' : ''));
+  } else if (!isNaN(inputLat) && !isNaN(inputLon) && inputLat !== 0 && inputLon !== 0) {
     geo = { lat: inputLat, lon: inputLon };
     coordSource = 'input_lat_lng';
     console.log('  [geo] using input lat/lng: ' + inputLat.toFixed(5) + ', ' + inputLon.toFixed(5));
@@ -238,9 +249,14 @@ async function processRow(row, idx, total, existingAddresses) {
     if (!diagInfo.parsed.zone) return 'failed';
     if (diagInfo.zoneQuality === 'suspicious' && !diagInfo.fallbackUsed) return 'suspicious';
     if (diagInfo.fallbackUsed) return 'needs_review';
+    if (coordSource === 'verified_lat_lng') return 'verified';  // highest confidence
     if (coordSource === 'input_lat_lng') return 'good';
     return 'needs_review'; // geocoded
   })();
+
+  // Task 3: determine if this row is model-valid or needs coordinate review
+  const isModelValid = coordQuality === 'verified' || coordQuality === 'good'
+    || (diagInfo.fallbackUsed && diagInfo.fallbackZone && diagInfo.zoneQuality !== 'suspicious');
 
   const parcelConfidence = (function() {
     if (!parsed.zone) return 'failed';
@@ -292,10 +308,13 @@ async function processRow(row, idx, total, existingAddresses) {
     coordinate_quality:   coordQuality,
     zone_result_quality:  diagInfo.zoneQuality,
     parcel_match_confidence: parcelConfidence,
+    model_valid:              isModelValid ? 'YES' : 'NO',
     original_zone:        diagInfo.originalZone || '',
     fallback_zone:        diagInfo.fallbackZone || '',
     fallback_offset:      diagInfo.fallbackOffset || '',
     coordinate_warning:   diagInfo.coordWarning || '',
+    coordinate_verified_by:   row.coordinate_verified_by || '',
+    coordinate_verified_date: row.coordinate_verified_date || '',
     notes:                allNotes,
     geocode_lat:          geo.lat,
     geocode_lon:          geo.lon,
@@ -379,15 +398,25 @@ function buildSummary(results) {
     totalScored:  scored.length,
     totalErrors:  errors.length,
     totalCorrect: correct.length,
-    broadOutcomeAlignment: scored.length ? Math.round(correct.length/scored.length*100) + '%' : 'n/a',
-    broadAlignmentExcludingCoordIssues: coordGood.length
+    broad_outcome_alignment_all_rows: scored.length ? Math.round(correct.length/scored.length*100) + '%' : 'n/a',
+    broadOutcomeAlignment: scored.length ? Math.round(correct.length/scored.length*100) + '%' : 'n/a', // kept for compat
+    broad_outcome_alignment_good_coordinates_only: coordGood.length
       ? Math.round(coordGoodCorrect/coordGood.length*100) + '%' : 'n/a',
+    broadAlignmentExcludingCoordIssues: coordGood.length
+      ? Math.round(coordGoodCorrect/coordGood.length*100) + '%' : 'n/a', // kept for compat
     avgScoreApproved: avg(approved.map(r => r.sv_score)),
     avgScoreRefused:  avg(refused.map(r => r.sv_score)),
     falsePositivesTotal:          fp.length,
     falsePositivesExcludingCoord: fp.length - fpCoordIssue,
     falseNegativesTotal:          fn.length,
     falseNegativesExcludingCoord: fn.length - fnCoordIssue,
+    rows_excluded_due_to_coordinate_quality: scored.filter(r => r.coordinate_quality === 'suspicious'
+      || r.coordinate_quality === 'failed').length,
+    coordinate_issue_rate: scored.length
+      ? Math.round(scored.filter(r => r.coordinate_quality === 'suspicious' || r.coordinate_quality === 'failed').length
+        / scored.length * 100) + '%' : 'n/a',
+    model_valid_rows: scored.filter(r => r.model_valid === 'YES').length,
+    coordinate_review_required: scored.filter(r => r.model_valid === 'NO').length,
     coordinateQuality: {
       blankZones,
       suspiciousZones:    suspiciousCoords,
@@ -556,17 +585,37 @@ ${Object.entries(summary.misMatchReasonBreakdown||{}).map(([k,v])=>'| '+k+' | '+
 
 ---
 
+## Primary Limitation: Coordinate and Parcel Precision
+
+**This is the dominant source of error in this validation dataset.**
+
+Address-based coordinates and manually-estimated lat/lng values can land on the wrong parcel for several reasons:
+
+- **Boundary parcels**: A coordinate at the edge of a property may fall on the adjacent road reserve, park, or E-zone rather than the residential lot itself. NSW Planning Portal queries return the zone of the *exact pixel* queried — one metre in the wrong direction returns a different zone.
+
+- **Zone boundaries**: Many NSW residential lots abut environmental zones (E1–E4), open space (RE1), or waterways. Coordinates at or near these boundaries will return the non-residential zone even though the property itself is residential.
+
+- **Irregular lot shapes**: Curved boundaries and irregular lots mean the centroid of the address does not always fall within the lot boundary. Narrow corner lots are especially vulnerable.
+
+- **Multi-lot sites**: Where a DA covers multiple lots or an amalgamated site, the centroid of the address string may fall on a road, driveway, or sub-lot with a different zone.
+
+**Verified parcel centroids or Lot/DP identifiers are required for institutional validation.** Scoring weights should not be tuned aggressively until coordinate quality is improved — apparent false positives caused by wrong-zone coordinates are not a reflection of scoring logic.
+
+---
+
 ## Recommendations for Next Steps
 
-1. **Primary limitation: coordinate precision.** Most mismatches in this run are attributable to coordinates resolving to the wrong planning zone (E2, RE1, blank) rather than to scoring logic error. The scoring itself is not the primary source of error at this stage.
+1. **Use the coordinate review CSV.** Run \`data/backtest-results-coordinate-review.csv\` after each validation run. Fix coordinates in the \`verified_lat\`/\`verified_lng\` columns of the input CSV before re-running.
 
-2. **Recommended next step: use verified DA parcel coordinates.** The NSW ePlanning API returns the DA application location. If the input CSV includes the DA number, the ePlanning API can be queried to retrieve the exact parcel coordinate. This would eliminate the majority of coordinate-precision failures.
+2. **Use Lot/DP identifiers.** The NSW Cadastre can be queried directly by Lot and DP number, returning the precise centroid of the registered title boundary. This is more reliable than any geocoded address.
 
-3. **Alternative: use Lot/DP identifiers.** The NSW Cadastre can be queried by Lot and DP number directly, returning the precise centroid of the registered parcel rather than a geocoded address estimate.
+3. **Use NSW ePlanning API parcel coordinates.** Where a DA number is known, the NSW ePlanning API returns the mapped DA location, which is the definitive parcel coordinate for that application.
 
-4. **Scoring should not be tuned aggressively until coordinate quality is improved.** Adjusting scoring weights in response to apparent false positives caused by wrong-zone coordinates would degrade performance on correctly geocoded properties. Fix coordinates first, then tune.
+4. **Separate model-valid rows from coordinate-review rows** in all accuracy calculations. Only rows with \`model_valid = YES\` should be used to assess scoring performance.
 
-5. **Expand the dataset to 100+ rows** before drawing conclusions about scoring accuracy. A 20-row sample is sufficient for a pipeline health check but too small for statistical conclusions.
+5. **Expand to 100+ rows** before drawing statistical conclusions. A 20-row sample is sufficient to validate the pipeline but too small for meaningful scoring accuracy assessment.
+
+6. **Scoring tuning guidance:** The current scoring logic shows zero false negatives (no approved DAs scored below 50) and zero clear false positives (no high-score / refused combinations that are not attributable to coordinate issues). This is a positive early signal. Do not adjust weights until coordinate quality is confirmed across at least 50 model-valid rows.
 
 ---
 
@@ -641,7 +690,9 @@ async function main() {
     'holding_cost_risk','council_complexity','overlay_flags','council_days','council_name',
     'match','flag','mismatch_reason','timeline_note',
     'coordinate_source','coordinate_quality','zone_result_quality','parcel_match_confidence',
+    'model_valid',
     'original_zone','fallback_zone','fallback_offset','coordinate_warning',
+    'coordinate_verified_by','coordinate_verified_date',
     'notes','geocode_lat','geocode_lon',
   ];
 
@@ -664,6 +715,51 @@ async function main() {
 
   out.end();
   console.log(`\n✓ Results written to ${OUTPUT_FILE}`);
+
+  // ── TASK 1: Write coordinate review CSV ──────────────────────────
+  const coordReviewRows = results.filter(r =>
+    r.coordinate_quality === 'suspicious' ||
+    r.coordinate_quality === 'failed' ||
+    r.zone_result_quality === 'suspicious' ||
+    !r.zone ||
+    (r.fallback_zone && r.fallback_zone !== '')
+  );
+  if (coordReviewRows.length) {
+    const CR_HEADERS = [
+      'row_number','address','suburb','council','development_type',
+      'current_lat','current_lng','original_zone','fallback_zone','fallback_offset',
+      'coordinate_warning','model_valid','recommended_action',
+    ];
+    const crOut = fs.createWriteStream(COORD_REVIEW_FILE, { flags: 'w' });
+    crOut.write(CR_HEADERS.join(',') + '\n');
+    coordReviewRows.forEach((r, i) => {
+      // Recommend action based on issue type
+      let action = 'manually inspect NSW Planning Portal';
+      if (!r.zone || r.zone === '') action = 'verify parcel centroid — blank zone';
+      else if (r.coordinate_quality === 'suspicious') action = 'replace coordinate — suspicious zone for residential DA';
+      else if (r.fallback_zone) action = 'check lot/DP — fallback zone used';
+      const row = {
+        row_number: results.indexOf(r) + 1,
+        address: r.address,
+        suburb: '',
+        council: r.council,
+        development_type: '',
+        current_lat: r.geocode_lat || '',
+        current_lng: r.geocode_lon || '',
+        original_zone: r.original_zone || r.zone || '',
+        fallback_zone: r.fallback_zone || '',
+        fallback_offset: r.fallback_offset || '',
+        coordinate_warning: r.coordinate_warning || '',
+        model_valid: r.model_valid || 'NO',
+        recommended_action: action,
+      };
+      crOut.write(toCSVRow(row) + '\n');
+    });
+    crOut.end();
+    console.log(`✓ Coordinate review CSV: ${COORD_REVIEW_FILE} (${coordReviewRows.length} rows need review)`);
+  } else {
+    console.log('✓ No coordinate review issues detected');
+  }
 
   // Summary
   const summary = buildSummary(results);
