@@ -120,17 +120,34 @@ function compareResult(svResult, row, diagInfo) {
   // ── Mismatch reason classification (Task 4) ──────────────────────
   let misMatchReason = '';
   if (flag !== 'CORRECT') {
-    const zq   = diagInfo && diagInfo.zoneQuality;
-    const zone = svResult.zone || '';
-    if (!zone)                   misMatchReason = 'blank_zone';
-    else if (zq === 'suspicious' || zq === 'recovered')
-                                 misMatchReason = 'suspicious_zone';
-    else if (zq === 'recovered') misMatchReason = 'coordinate_precision_issue';
-    else if (diagInfo && diagInfo.fallbackUsed)
-                                 misMatchReason = 'coordinate_precision_issue';
+    const zq        = diagInfo && diagInfo.zoneQuality;
+    const zone      = svResult.zone || '';
+    const rowNotes  = (row.notes || '').toLowerCase();
+    const devT      = (row.development_type || '').toLowerCase();
+    // Coordinate failures
+    if (!zone)                              misMatchReason = 'blank_zone';
+    else if (zq === 'suspicious')           misMatchReason = 'suspicious_zone';
+    else if (zq === 'recovered' || (diagInfo && diagInfo.fallbackUsed))
+                                            misMatchReason = 'coordinate_precision_issue';
+    // Model-gap classifications — detect from notes or dev type
+    else if ((flag === 'FALSE_POSITIVE' || flag === 'FALSE_NEGATIVE') &&
+             (rowNotes.includes('riparian') || rowNotes.includes('watercourse')))
+                                            misMatchReason = 'unmodelled_riparian_constraint';
+    else if ((flag === 'FALSE_POSITIVE' || flag === 'FALSE_NEGATIVE') &&
+             rowNotes.includes('flood') && rowNotes.includes('model gap'))
+                                            misMatchReason = 'unmodelled_flood_detail';
+    else if ((flag === 'FALSE_POSITIVE' || flag === 'FALSE_NEGATIVE') &&
+             rowNotes.includes('height constraint'))
+                                            misMatchReason = 'unmodelled_height_constraint';
+    else if ((flag === 'FALSE_POSITIVE' || flag === 'FALSE_NEGATIVE') &&
+             rowNotes.includes('earthworks') && rowNotes.includes('model gap'))
+                                            misMatchReason = 'unmodelled_earthworks_constraint';
+    else if ((flag === 'FALSE_POSITIVE' || flag === 'FALSE_NEGATIVE') &&
+             rowNotes.includes('complex') && rowNotes.includes('refusal'))
+                                            misMatchReason = 'complex_design_refusal';
     else if (flag === 'FALSE_POSITIVE' || flag === 'FALSE_NEGATIVE')
-                                 misMatchReason = 'scoring_logic_issue';
-    else                         misMatchReason = 'insufficient_data';
+                                            misMatchReason = 'scoring_logic_issue';
+    else                                    misMatchReason = 'insufficient_data';
   }
 
   let timelineNote = '';
@@ -257,7 +274,7 @@ async function processRow(row, idx, total, existingAddresses) {
   // Task 3: determine if this row is model-valid or needs coordinate review
   // Task 1: strict model_valid — approximate/street-centroid sources not valid
   // unless lot/DP or parcel_id is also confirmed.
-  const RELIABLE_VERIFIED_BY = ['planning-portal','planning-portal-manual','six-maps-manual','eplanning-da-record','cadastral-centroid','lot-dp-verified'];
+  const RELIABLE_VERIFIED_BY = ['planning-portal','planning-portal-manual','six-maps-manual','eplanning-da-record','cadastral-centroid','lot-dp-verified','nsw-cadastre','cadastre-lot','official-lot-query'];
   const verifiedByVal = (row.coordinate_verified_by || '').toLowerCase();
   const verifiedByReliable = RELIABLE_VERIFIED_BY.some(s => verifiedByVal.includes(s));
   const approximateSource = ['approximate','nominatim','street-centroid','google','unknown']
@@ -287,8 +304,13 @@ async function processRow(row, idx, total, existingAddresses) {
   const devTypeLower = (row.development_type || '').toLowerCase();
   const isSmallResidential = ['subdivision','dual','dwelling','residential','townhouse','granny']
     .some(kw => devTypeLower.includes(kw));
-  const isLargeSubdiv = devTypeLower.includes('large') ||
-    parseInt(row.lots_or_dwellings || '0', 10) >= 10;
+  const LARGE_DEV_KEYWORDS = [
+    'large','multi dwelling','multi-dwelling','townhouse','town house',
+    'strata','apartment','residential flat','medium density',
+  ];
+  const isLargeSubdiv =
+    LARGE_DEV_KEYWORDS.some(kw => devTypeLower.includes(kw)) ||
+    parseInt(row.lots_or_dwellings || '0', 10) >= 5;
   const blockSizeWarning = (function() {
     if (!parsed.block) return '';
     if (isSmallResidential && !isLargeSubdiv && parsed.block > 5000)
@@ -299,7 +321,14 @@ async function processRow(row, idx, total, existingAddresses) {
   })();
   const parcelSizeWarning = !!blockSizeWarning;
   // If parcel size is suspicious and coordinate is approximate, force model_valid off
-  const isModelValidFinal = isModelValid && !(parcelSizeWarning && approximateSource && !hasLotDp);
+  // Large parcel warning should NOT exclude model_valid when:
+  // - dev type is multi-dwelling/strata/townhouse (large block is plausible), OR
+  // - coordinate is fully verified AND lot/DP confirmed
+  const parcelWarningExcludesRow =
+    parcelSizeWarning &&
+    !isLargeSubdiv &&        // not a large-dev type
+    (approximateSource || !hasLotDp);  // AND coord is approximate or lot unconfirmed
+  const isModelValidFinal = isModelValid && !parcelWarningExcludesRow;
 
   // ── Score ─────────────────────────────────────────────────────────
   const sv = scoreProperty(parsed);
@@ -455,6 +484,16 @@ function buildSummary(results) {
     falsePositivesExcludingCoord: fp.length - fpCoordIssue,
     falseNegativesTotal:          fn.length,
     falseNegativesExcludingCoord: fn.length - fnCoordIssue,
+    // Task 3: model-gap breakdown
+    model_gap_false_positives:
+      fp.filter(r => r.mismatch_reason && r.mismatch_reason.startsWith('unmodelled')).length,
+    coordinate_false_positives:
+      fp.filter(r => ['blank_zone','suspicious_zone','coordinate_precision_issue']
+        .includes(r.mismatch_reason)).length,
+    scoring_logic_false_positives:
+      fp.filter(r => r.mismatch_reason === 'scoring_logic_issue').length,
+    known_unmodelled_constraint_rows:
+      scored.filter(r => r.mismatch_reason && r.mismatch_reason.startsWith('unmodelled')).length,
     rows_excluded_due_to_coordinate_quality: scored.filter(r => r.coordinate_quality === 'suspicious'
       || r.coordinate_quality === 'failed').length,
     coordinate_issue_rate: scored.length
@@ -643,6 +682,40 @@ Coordinate precision is the primary limitation of this validation. The following
 | Reason | Count |
 |---|---|
 ${Object.entries(summary.misMatchReasonBreakdown||{}).map(([k,v])=>'| '+k+' | '+v+' |').join('\n') || '| (no mismatches) | — |'}
+
+---
+
+## Known Model Gaps Identified
+
+The following rows produced a mismatch attributable to planning constraints that SiteVerdict does not currently model, rather than to scoring logic errors:
+
+${(() => {
+  const gapRows = results.filter(r => r.mismatch_reason && r.mismatch_reason.startsWith('unmodelled'));
+  if (!gapRows.length) return '_No model-gap mismatches detected in this run._';
+  return gapRows.map(r => {
+    const addr = r.address || '';
+    const da   = r.da_number || r.sv_score;
+    const score = r.sv_score || '?';
+    const band  = r.sv_band  || '?';
+    const reason = r.mismatch_reason || '?';
+    const notes = (r.notes || '').slice(0,200);
+    return [
+      `**${addr}** — DA: ${da}`,
+      `Score: ${score} (${band}) | Real outcome: ${r.real_da_status || 'unknown'} | Mismatch reason: ${reason}`,
+      `Notes: ${notes}`,
+      '**Recommendation:** verify and add relevant constraint layer before institutional scoring claims.',
+    ].join('\n');
+  }).join('\n\n');
+})()}
+
+### Row 15 — DA-2022/1205, 42 Bassett Street, Fairy Meadow (Documented)
+
+- **DA:** DA-2022/1205 | **Address:** 42 Bassett Street, Fairy Meadow NSW 2519
+- **Outcome:** Refused unanimously by Wollongong Local Planning Panel, 4 June 2024
+- **SiteVerdict score:** 85 (STRONG) — model-gap false positive
+- **Refusal reasons:** Riparian corridor and 20m watercourse buffer (Clause 7.4 WLEP 2009), flooding (Clause 5.21), building height (Clause 4.3), earthworks (Clause 7.6), stormwater
+- **Why model scored high:** Zone R2, no EPI Flood flag at parcel centroid, no heritage. The riparian/watercourse constraint is not captured by the NSW EPI Flood Planning Area layer. SiteVerdict does not query riparian land corridors as a separate overlay.
+- **Recommendation:** Add a riparian/watercourse buffer query to the overlay detection logic before making institutional accuracy claims. NSW Planning Portal Layer 7 (Riparian Land and Watercourses) may be a suitable source. This is a data-layer gap, not a scoring-weight issue — do not reduce global scores to compensate.
 
 ---
 

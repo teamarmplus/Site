@@ -87,7 +87,6 @@ footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-c
     <a href="index.html">Site Check</a>
     <a href="hot-list.html" class="active">&#128293; Properties</a>
     <a href="services.html">Services</a>
-    <a href="register-trader.html">Register</a>
   </div>
   <button class="nav-cta" onclick="window.location.href='index.html'">Check a site</button>
 </nav>
@@ -103,12 +102,23 @@ footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-c
   <div style="display:flex;align-items:center;gap:10px">
     <div class="db-date" id="today-date"></div>
     <div class="db-count" id="site-count"></div>
+    <div class="db-count" id="market-note" style="font-size:.7rem"></div>
   </div>
   <div class="db-source">NSW Planning Portal &middot; NSW ePlanning API &middot; Manual curation</div>
 </div>
 
 <div class="sites" id="sites-container">
   <div style="text-align:center;padding:32px;color:var(--muted)">Loading...</div>
+</div>
+
+<!-- Services CTA -->
+<div style="max-width:860px;margin:0 auto 16px;padding:0 5%">
+  <div style="background:linear-gradient(135deg,rgba(200,168,75,.1),rgba(200,168,75,.04));border:1px solid rgba(200,168,75,.28);border-radius:16px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div style="font-size:.82rem;color:var(--text);line-height:1.6">
+      <span style="font-weight:600">Need help with a site?</span> Free quotes for driveways, retaining walls, drainage and excavation in Sydney and surrounds.
+    </div>
+    <a href="services.html" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#000;font-size:.78rem;font-weight:700;padding:9px 16px;border-radius:10px;text-decoration:none;white-space:nowrap;flex-shrink:0">Request free quote &#8594;</a>
+  </div>
 </div>
 
 <div class="how">
@@ -145,7 +155,7 @@ function goCheck(btn){
   window.location.href="index.html?addr="+encodeURIComponent(addr);
 }
 function goServices(){
-  window.open("https://web.whatsapp.com/send?phone=61402623628&text=Hi+SiteVerdict+I+saw+a+property+on+the+list+and+want+to+chat","_blank");
+  window.open("https://wa.me/61402623628?text=Hi%2C+I+saw+a+property+on+the+SiteVerdict+list+and+would+like+to+discuss.","_blank");
 }
 
 document.getElementById("today-date").textContent=(new Date).toLocaleDateString("en-AU",{weekday:"long",day:"numeric",month:"long",year:"numeric"});

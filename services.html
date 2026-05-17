@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Services — SiteVerdict</title>
-<meta name="description" content="Get a quote for any property or construction service. Driveway, retaining wall, drainage, subdivision, OC coordination and more. Verified professionals. Free to enquire.">
+<title>Free Quote — Driveways, Retaining Walls & Civil Works · Sydney Home Improve</title>
+<meta name="description" content="Request a free quote for driveways, retaining walls, drainage, excavation, landscaping and civil works in Sydney and surrounds. Send your address and photos. Handled by Sydney Home Improve.">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -19,8 +19,6 @@
 body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
 a{color:inherit;text-decoration:none}
 button,input,select,textarea{font-family:inherit}
-
-/* NAV */
 nav{display:flex;align-items:center;justify-content:space-between;padding:14px 5%;border-bottom:1px solid var(--border);background:rgba(7,8,10,.94);backdrop-filter:blur(20px);position:sticky;top:0;z-index:200}
 .logo{font-family:"Instrument Serif",serif;font-size:1.1rem;display:flex;align-items:center;gap:10px}
 .logo-dot{width:7px;height:7px;border-radius:50%;background:var(--gold)}
@@ -29,85 +27,90 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 5
 .nav-links a:hover{color:var(--text)}
 .nav-links a.active{color:var(--gold)}
 @media(max-width:700px){.nav-links{display:none}}
-
-/* HERO */
-.hero{padding:52px 5% 36px;max-width:860px;margin:0 auto;text-align:center}
-h1{font-family:"Instrument Serif",serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:400;line-height:1.08;margin-bottom:12px;letter-spacing:-.02em}
+.cta-banner{background:linear-gradient(135deg,rgba(200,168,75,.12),rgba(200,168,75,.04));border-bottom:1px solid var(--goldm);padding:18px 5%;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.cta-banner-left{display:flex;flex-direction:column;gap:3px}
+.cta-banner-headline{font-size:.94rem;font-weight:600;color:var(--text)}
+.cta-banner-sub{font-size:.75rem;color:var(--muted);line-height:1.5}
+.cta-banner-btn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#000;font-size:.85rem;font-weight:700;padding:11px 20px;border-radius:var(--r2);border:none;cursor:pointer;white-space:nowrap;text-decoration:none;flex-shrink:0;transition:opacity .15s}
+.cta-banner-btn:hover{opacity:.88}
+@media(max-width:600px){.cta-banner{padding:14px 5%}.cta-banner-btn{width:100%;justify-content:center}}
+.hero{padding:48px 5% 28px;max-width:860px;margin:0 auto;text-align:center}
+h1{font-family:"Instrument Serif",serif;font-size:clamp(1.9rem,5vw,3rem);font-weight:400;line-height:1.1;margin-bottom:10px;letter-spacing:-.02em}
 h1 em{font-style:italic;color:var(--gold)}
-.hero-sub{font-size:.92rem;color:var(--muted);line-height:1.9;max-width:480px;margin:0 auto 32px}
-.how-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin-bottom:0}
-.how-step{display:flex;align-items:center;gap:6px}
-.hs-n{width:20px;height:20px;border-radius:50%;background:var(--goldl);border:1px solid var(--goldm);color:var(--gold);font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.how-arr{color:var(--muted2)}
+.hero-sub{font-size:.9rem;color:var(--muted);line-height:1.9;max-width:520px;margin:0 auto 24px}
+.hero-bullets{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;font-size:.75rem;color:var(--muted)}
+.hb{display:flex;align-items:center;gap:5px}
+.hb-dot{width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0}
+.hb-sep{color:var(--muted2);font-size:.6rem}
 
-/* SERVICES GRID */
-.page{max-width:860px;margin:0 auto;padding:40px 5% 64px}
+.near-section{max-width:860px;margin:0 auto;padding:10px 5% 8px}
+.near-card{background:linear-gradient(135deg,rgba(200,168,75,.09),rgba(62,207,142,.035));border:1px solid var(--goldm);border-radius:var(--r3);padding:22px;display:grid;grid-template-columns:1.25fr .75fr;gap:18px;align-items:center}
+.near-kicker{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:8px}
+.near-title{font-family:"Instrument Serif",serif;font-size:1.45rem;font-weight:400;line-height:1.2;margin-bottom:8px;color:var(--text)}
+.near-copy{font-size:.82rem;color:var(--muted);line-height:1.8;margin-bottom:12px}
+.near-list{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:.72rem;color:var(--muted)}
+.near-list span{display:flex;gap:6px;align-items:center}
+.near-list span:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0}
+.near-actions{display:flex;flex-direction:column;gap:8px}
+.near-btn{width:100%;border:none;border-radius:var(--r2);padding:12px 16px;font-size:.86rem;font-weight:700;cursor:pointer;text-align:center}
+.near-btn.primary{background:var(--gold);color:#000}
+.near-btn.secondary{background:transparent;color:var(--text);border:1px solid var(--border2)}
+.near-disclaimer{font-size:.62rem;color:var(--muted2);line-height:1.6;margin-top:8px}
+@media(max-width:700px){.near-card{grid-template-columns:1fr}.near-list{grid-template-columns:1fr}.near-actions{flex-direction:column}}
+
+.page{max-width:860px;margin:0 auto;padding:32px 5% 64px}
+.section-intro{font-size:.8rem;color:var(--muted);line-height:1.7;margin-bottom:16px;padding:12px 16px;background:var(--bg2);border-radius:var(--r);border-left:2px solid var(--goldm)}
 .cat-label{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.cat-label.primary{color:var(--gold)}
 .cat-line{flex:1;height:1px;background:var(--border)}
 .services{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:32px}
+.services.primary-grid{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
 .svc-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;user-select:none}
 .svc-card:hover{border-color:var(--border2);transform:translateY(-2px)}
-.svc-card.selected{border-color:var(--goldm);background:linear-gradient(135deg,var(--goldl),var(--bg2))}
-.svc-card.selected::after{content:"✓";position:absolute;top:10px;right:12px;font-size:.75rem;color:var(--gold);font-weight:700}
+.svc-card.primary-card{padding:20px;border-color:rgba(200,168,75,.15)}
+.svc-card.primary-card:hover{border-color:var(--goldm);background:linear-gradient(135deg,rgba(200,168,75,.05),var(--bg2))}
 .svc-icon{font-size:1.4rem;margin-bottom:10px}
+.svc-card.primary-card .svc-icon{font-size:1.6rem;margin-bottom:12px}
 .svc-name{font-size:.88rem;font-weight:500;color:var(--text);margin-bottom:4px}
+.svc-card.primary-card .svc-name{font-size:.95rem;font-weight:600}
 .svc-when{font-size:.72rem;color:var(--muted);line-height:1.6}
 .svc-tag{display:inline-block;font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:2px 7px;border-radius:4px;margin-top:6px}
 .t-fast{background:var(--greenl);color:var(--green);border:1px solid var(--greenb)}
 .t-dev{background:rgba(91,156,242,.08);color:#5b9cf2;border:1px solid rgba(91,156,242,.2)}
 .t-comp{background:rgba(245,158,11,.08);color:#f59e0b;border:1px solid rgba(245,158,11,.2)}
-
-/* BRIEF FORM */
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.brief-title{font-family:"Instrument Serif",serif;font-size:1.3rem;font-weight:400;margin-bottom:4px}
-.brief-sub{font-size:.82rem;color:var(--muted);margin-bottom:22px;line-height:1.7}
-.selected-services{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
-.ss-tag{display:flex;align-items:center;gap:5px;background:var(--goldl);border:1px solid var(--goldm);color:var(--gold);font-size:.72rem;font-weight:500;padding:4px 10px;border-radius:var(--r)}
-.ss-x{cursor:pointer;opacity:.7;font-size:.8rem}
-.ss-x:hover{opacity:1}
-
-.form-row{margin-bottom:16px}
-.form-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.form-label{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;display:block}
-.form-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:11px 14px;color:var(--text);font-size:.88rem;outline:none;transition:.2s}
-.form-input:focus{border-color:var(--goldm);box-shadow:0 0 0 3px rgba(200,168,75,.05)}
-.form-input::placeholder{color:var(--muted2)}
-select.form-input{cursor:pointer}
-textarea.form-input{resize:vertical;min-height:90px;line-height:1.6}
-.form-note{font-size:.68rem;color:var(--muted);margin-top:4px;line-height:1.6}
-
-.submit-btn{width:100%;background:var(--gold);color:#000;border:none;border-radius:var(--r2);padding:14px;font-size:.92rem;font-weight:600;cursor:pointer;transition:opacity .15s;margin-top:4px}
-.submit-btn:hover{opacity:.88}
-.submit-btn:disabled{opacity:.5;cursor:default}
-
-/* SUCCESS */
-.success-box{display:none;text-align:center;padding:32px}
-.success-box.show{display:block;animation:fadeUp .3s ease}
-.success-icon{font-size:2.5rem;margin-bottom:12px}
-.success-title{font-family:"Instrument Serif",serif;font-size:1.4rem;margin-bottom:8px}
-.success-text{font-size:.84rem;color:var(--muted);line-height:1.9;margin-bottom:16px}
-.success-ref{font-family:"DM Mono",monospace;font-size:.8rem;color:var(--gold);background:var(--goldl);border:1px solid var(--goldm);padding:6px 14px;border-radius:var(--r);display:inline-block}
-
-/* TRUST BAR */
-.trust{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg2);padding:16px 5%;display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:0}
+.more-services-toggle{font-size:.78rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:28px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg2);width:100%}
+.more-services-toggle:hover{color:var(--text);border-color:var(--border2)}
+.toggle-arrow{transition:transform .2s;font-size:.7rem;margin-left:auto}
+.toggle-arrow.open{transform:rotate(180deg)}
+.more-grid{display:none}
+.more-grid.open{display:block}
+.how-section{max-width:860px;margin:0 auto;padding:36px 5% 0}
+.how-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:36px}
+.how-step-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center}
+.hs-n{width:24px;height:24px;border-radius:50%;background:var(--goldl);border:1px solid var(--goldm);color:var(--gold);font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 8px}
+.hs-label{font-size:.75rem;color:var(--text);font-weight:500;margin-bottom:3px}
+.hs-sub{font-size:.65rem;color:var(--muted);line-height:1.5}
+.trust{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg2);padding:16px 5%;display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap}
 .ti{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--muted)}
 .ti-dot{width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0}
-
 footer{border-top:1px solid var(--border);padding:20px 5%;font-size:.62rem;color:var(--muted2);line-height:1.8;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
-
 @media(max-width:600px){
   .services{grid-template-columns:1fr 1fr}
-  .form-two{grid-template-columns:1fr}
+  .services.primary-grid{grid-template-columns:1fr 1fr}
+  .how-steps{grid-template-columns:1fr 1fr}
   .trust{gap:12px}
 }
-@media(max-width:380px){.services{grid-template-columns:1fr}}
+@media(max-width:380px){
+  .services{grid-template-columns:1fr}
+  .services.primary-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
 
 <nav>
   <a href="index.html"><div class="logo"><span class="logo-dot"></span>SiteVerdict</div></a>
-  <div class="nl nav-links">
+  <div class="nav-links">
     <a href="index.html">Site Check</a>
     <a href="hot-list.html">&#128293; Hot list</a>
     <a href="services.html" class="active">Services</a>
@@ -115,236 +118,363 @@ footer{border-top:1px solid var(--border);padding:20px 5%;font-size:.62rem;color
   </div>
 </nav>
 
+<div class="cta-banner">
+  <div class="cta-banner-left">
+    <div class="cta-banner-headline">Request a free quote</div>
+    <div class="cta-banner-sub">Sydney and surrounds &middot; Send your address and photos &middot; We respond within 2 hours</div>
+  </div>
+  <a href="https://wa.me/61402623628?text=Hi%2C%20I%27d%20like%20a%20free%20quote.%20I%20can%20send%20the%20address%2C%20photos%20and%20job%20details." class="cta-banner-btn" target="_blank">&#128172;&nbsp; WhatsApp us now</a>
+</div>
+
 <div class="hero">
   <h1>What do you need<br><em>done?</em></h1>
-  <div class="hero-sub">Select a service below. Tell us about the job. We connect you with the right verified professional for your area. <strong>Free to enquire. No obligation.</strong></div>
-  <div class="how-row">
-    <div class="how-step"><span class="hs-n">1</span>Select services</div>
-    <span class="how-arr">→</span>
-    <div class="how-step"><span class="hs-n">2</span>Describe the job</div>
-    <span class="how-arr">→</span>
-    <div class="how-step"><span class="hs-n">3</span>We connect you</div>
-    <span class="how-arr">→</span>
-    <div class="how-step"><span class="hs-n">4</span>Get quoted</div>
+  <div class="hero-sub">Select a service, tell us about the job, and we handle the rest. Coordinated through Sydney Home Improve or matched with a verified professional. <strong>Free to enquire. No obligation.</strong></div>
+  <div class="hero-bullets">
+    <div class="hb"><span class="hb-dot"></span>Free quote request</div>
+    <span class="hb-sep">·</span>
+    <div class="hb"><span class="hb-dot"></span>Sydney and surrounds</div>
+    <span class="hb-sep">·</span>
+    <div class="hb"><span class="hb-dot"></span>Send address and photos</div>
+    <span class="hb-sep">·</span>
+    <div class="hb"><span class="hb-dot"></span>No obligation</div>
+  </div>
+</div>
+
+<div class="how-section">
+  <div class="cat-label">How it works <div class="cat-line"></div></div>
+  <div class="how-steps">
+    <div class="how-step-card"><div class="hs-n">1</div><div class="hs-label">Select service</div><div class="hs-sub">Pick what you need from the list below</div></div>
+    <div class="how-step-card"><div class="hs-n">2</div><div class="hs-label">Send details</div><div class="hs-sub">Address, photos, and preferred timing via WhatsApp</div></div>
+    <div class="how-step-card"><div class="hs-n">3</div><div class="hs-label">We review</div><div class="hs-sub">Handled by Sydney Home Improve or matched with verified trades</div></div>
+    <div class="how-step-card"><div class="hs-n">4</div><div class="hs-label">Get quoted</div><div class="hs-sub">A real quote based on your site — no obligation to proceed</div></div>
+  </div>
+</div>
+
+<div class="near-section">
+  <div class="near-card">
+    <div>
+      <div class="near-kicker">For builders &amp; owners near completion</div>
+      <div class="near-title">External works before handover or OC</div>
+      <div class="near-copy">If a project is close to completion, Sydney Home Improve can help quote practical outside works that often hold up handover, occupation certificate or final presentation.</div>
+      <div class="near-list">
+        <span>Driveways &amp; concrete paths</span>
+        <span>Stormwater &amp; drainage fixes</span>
+        <span>Retaining walls &amp; excavation</span>
+        <span>Turf, landscaping &amp; site clean-up</span>
+      </div>
+      <div class="near-disclaimer">Some enquiries may be handled by Sydney Home Improve or matched with verified professionals. Any referral arrangement should be disclosed transparently.</div>
+    </div>
+    <div class="near-actions">
+      <button class="near-btn primary" onclick="openEnquiry('Final external works before OC')">Request fast quote &rarr;</button>
+      <button class="near-btn secondary" onclick="openEnquiry('Builder referral / client external works')">Builder referral enquiry</button>
+    </div>
   </div>
 </div>
 
 <div class="page">
 
-  <!-- CONSTRUCTION -->
-  <div class="cat-label">Construction <div class="cat-line"></div></div>
-  <div class="services" id="grid-construction">
+  <div class="cat-label primary">&#9733; Most requested <div class="cat-line"></div></div>
+  <div class="section-intro">
+    These are the jobs we handle most often through Sydney Home Improve. Send your address and photos via WhatsApp and we will respond within 2 hours. Quotes are based on real scope — no prices are given until we have enough information about your site.
+  </div>
+  <div class="services primary-grid">
 
-    <div class="svc-card" onclick="openEnquiry('Driveway')">
+    <div class="svc-card primary-card" onclick="openEnquiry('Driveway')">
       <div class="svc-icon">&#127964;</div>
       <div class="svc-name">Driveway</div>
-      <div class="svc-when">Concrete, exposed aggregate or pavers. New install or replacement.</div>
+      <div class="svc-when">Concrete, exposed aggregate, or pavers. New install or full replacement. Send address and a photo of the current driveway or site.</div>
       <span class="svc-tag t-fast">Fast turnaround</span>
     </div>
 
-    <div class="svc-card" onclick="openEnquiry('Retaining wall')">
+    <div class="svc-card primary-card" onclick="openEnquiry('Retaining wall')">
       <div class="svc-icon">&#129521;</div>
       <div class="svc-name">Retaining wall</div>
-      <div class="svc-when">Sloped block, council requirement, or post-earthworks stabilisation.</div>
+      <div class="svc-when">Sloped block, council requirement, or post-earthworks stabilisation. Tell us the height, length, and slope — photos help a lot.</div>
       <span class="svc-tag t-fast">Fast turnaround</span>
     </div>
 
-    <div class="svc-card" onclick="openEnquiry('Drainage & stormwater')">
+    <div class="svc-card primary-card" onclick="openEnquiry('Drainage & stormwater')">
       <div class="svc-icon">&#128167;</div>
       <div class="svc-name">Drainage &amp; stormwater</div>
-      <div class="svc-when">OSD installation, poor drainage fix, or subdivision drainage package.</div>
+      <div class="svc-when">Poor drainage fix, OSD installation, or subdivision drainage package. Photos of the problem area or DA drainage plan welcome.</div>
       <span class="svc-tag t-fast">Fast turnaround</span>
     </div>
 
-    <div class="svc-card" onclick="openEnquiry('Landscaping & turf')">
+    <div class="svc-card primary-card" onclick="openEnquiry('Excavation & earthworks')">
+      <div class="svc-icon">&#128691;</div>
+      <div class="svc-name">Excavation &amp; earthworks</div>
+      <div class="svc-when">Site preparation, cut and fill, or subdivision earthworks. Tell us the address and approximate scope — we will assess from there.</div>
+      <span class="svc-tag t-fast">Fast turnaround</span>
+    </div>
+
+    <div class="svc-card primary-card" onclick="openEnquiry('Landscaping & turf')">
       <div class="svc-icon">&#127807;</div>
       <div class="svc-name">Landscaping &amp; turf</div>
-      <div class="svc-when">Final OC requirement, property preparation, or new development finish.</div>
+      <div class="svc-when">Final OC requirement, property preparation, or development finish. Send address and area in m&sup2; if known. Photos welcome.</div>
       <span class="svc-tag t-fast">Fast turnaround</span>
     </div>
 
-    <div class="svc-card" onclick="openEnquiry('Concrete & paving')">
+    <div class="svc-card primary-card" onclick="openEnquiry('Concrete & paving')">
       <div class="svc-icon">&#9723;</div>
       <div class="svc-name">Concrete &amp; paving</div>
-      <div class="svc-when">Paths, patios, car pads, slab. Part of OC checklist or subdivision finish.</div>
-      <span class="svc-tag t-fast">Fast turnaround</span>
-    </div>
-
-    <div class="svc-card" onclick="openEnquiry('Earthworks & excavation')">
-      <div class="svc-icon">&#128691;</div>
-      <div class="svc-name">Earthworks &amp; excavation</div>
-      <div class="svc-when">Site preparation, cut and fill, subdivision earthworks package.</div>
-      <span class="svc-tag t-fast">Fast turnaround</span>
-    </div>
-
-    <div class="svc-card" onclick="openEnquiry('Civil construction')">
-      <div class="svc-icon">&#127945;</div>
-      <div class="svc-name">Civil construction</div>
-      <div class="svc-when">Road works, kerb, drainage, water and sewer after DA approval.</div>
-      <span class="svc-tag t-fast">Fast turnaround</span>
-    </div>
-
-    <div class="svc-card" onclick="openEnquiry('Structural construction')">
-      <div class="svc-icon">&#127959;</div>
-      <div class="svc-name">Structural construction</div>
-      <div class="svc-when">Structural build works — foundations, slabs, frames, retaining structures.</div>
+      <div class="svc-when">Paths, patios, car pads, slab. OC checklist or subdivision finish. Photos and rough dimensions help us quote more accurately.</div>
       <span class="svc-tag t-fast">Fast turnaround</span>
     </div>
 
   </div>
 
-  <!-- DEVELOPMENT -->
-  <div class="cat-label">Development <div class="cat-line"></div></div>
-  <div class="services" id="grid-development">
+  <button class="more-services-toggle" onclick="toggleMore(this)">
+    <span>Show more services &mdash; civil, development &amp; compliance</span>
+    <span class="toggle-arrow" id="more-arrow">&#9660;</span>
+  </button>
 
-    <div class="svc-card" onclick="openEnquiry('Licensed surveyor')">
-      <div class="svc-icon">&#128207;</div>
-      <div class="svc-name">Licensed surveyor</div>
-      <div class="svc-when">Survey plan before DA lodgement. Subdivision certificate after approval.</div>
-      <span class="svc-tag t-dev">Development</span>
+  <div class="more-grid" id="more-services">
+
+    <div class="cat-label">Civil construction <div class="cat-line"></div></div>
+    <div class="services" style="margin-bottom:28px">
+      <div class="svc-card" onclick="openEnquiry('Civil construction')">
+        <div class="svc-icon">&#127945;</div>
+        <div class="svc-name">Civil construction</div>
+        <div class="svc-when">Road works, kerb, drainage, water and sewer after DA approval.</div>
+        <span class="svc-tag t-fast">Fast turnaround</span>
+      </div>
+      <div class="svc-card" onclick="openEnquiry('Structural construction')">
+        <div class="svc-icon">&#127959;</div>
+        <div class="svc-name">Structural construction</div>
+        <div class="svc-when">Foundations, slabs, frames, retaining structures.</div>
+        <span class="svc-tag t-fast">Fast turnaround</span>
+      </div>
     </div>
 
-    <div class="svc-card" onclick="openEnquiry('Town planner')">
-      <div class="svc-icon">&#127959;</div>
-      <div class="svc-name">Town planner</div>
-      <div class="svc-when">DA preparation, heritage overlay, council negotiation, LEP advice.</div>
-      <span class="svc-tag t-dev">Development</span>
+    <div class="cat-label">Development <div class="cat-line"></div></div>
+    <div class="services" style="margin-bottom:28px">
+      <div class="svc-card" onclick="openEnquiry('Licensed surveyor')">
+        <div class="svc-icon">&#128207;</div>
+        <div class="svc-name">Licensed surveyor</div>
+        <div class="svc-when">Survey plan before DA lodgement. Subdivision certificate after approval.</div>
+        <span class="svc-tag t-dev">Development</span>
+      </div>
+      <div class="svc-card" onclick="openEnquiry('Town planner')">
+        <div class="svc-icon">&#127759;</div>
+        <div class="svc-name">Town planner</div>
+        <div class="svc-when">DA preparation, heritage overlay, council negotiation, LEP advice.</div>
+        <span class="svc-tag t-dev">Development</span>
+      </div>
+      <div class="svc-card" onclick="openEnquiry('Civil engineering design')">
+        <div class="svc-icon">&#128739;</div>
+        <div class="svc-name">Civil engineering design</div>
+        <div class="svc-when">Subdivision civil design — road, drainage, OSD, services, engineering cert.</div>
+        <span class="svc-tag t-dev">Development</span>
+      </div>
+      <div class="svc-card" onclick="openEnquiry('Structural engineering design')">
+        <div class="svc-icon">&#128736;</div>
+        <div class="svc-name">Structural engineering design</div>
+        <div class="svc-when">Footings, slabs, framing, retaining wall design and certification.</div>
+        <span class="svc-tag t-dev">Development</span>
+      </div>
+      <div class="svc-card" onclick="openEnquiry('Hydraulic design')">
+        <div class="svc-icon">&#128009;</div>
+        <div class="svc-name">Hydraulic design</div>
+        <div class="svc-when">OSD design, stormwater management plan, required by council for subdivision DA.</div>
+        <span class="svc-tag t-dev">Development</span>
+      </div>
+      <div class="svc-card" onclick="openEnquiry('Geotechnical report')">
+        <div class="svc-icon">&#128270;</div>
+        <div class="svc-name">Geotechnical report</div>
+        <div class="svc-when">Soil classification required by council for subdivision DA or new build.</div>
+        <span class="svc-tag t-dev">Development</span>
+      </div>
+      <div class="svc-card" onclick="openEnquiry('Heritage assessment')">
+        <div class="svc-icon">&#127963;</div>
+        <div class="svc-name">Heritage assessment</div>
+        <div class="svc-when">Required when heritage overlay is confirmed on your property. Clause 5.10.</div>
+        <span class="svc-tag t-dev">Development</span>
+      </div>
     </div>
 
-    <div class="svc-card" onclick="openEnquiry('Civil engineering design')">
-      <div class="svc-icon">&#128739;</div>
-      <div class="svc-name">Civil engineering design</div>
-      <div class="svc-when">Subdivision civil design — road, drainage, OSD, services, engineering cert.</div>
-      <span class="svc-tag t-dev">Development</span>
-    </div>
-
-    <div class="svc-card" onclick="openEnquiry('Structural engineering design')">
-      <div class="svc-icon">&#128736;</div>
-      <div class="svc-name">Structural engineering design</div>
-      <div class="svc-when">Structural design and certification — footings, slabs, framing, retaining walls.</div>
-      <span class="svc-tag t-dev">Development</span>
-    </div>
-
-    <div class="svc-card" onclick="openEnquiry('Hydraulic design')">
-      <div class="svc-icon">&#128009;</div>
-      <div class="svc-name">Hydraulic design</div>
-      <div class="svc-when">OSD design, stormwater management plan, required by council for subdivision DA.</div>
-      <span class="svc-tag t-dev">Development</span>
-    </div>
-
-    <div class="svc-card" onclick="openEnquiry('Geotechnical report')">
-      <div class="svc-icon">&#128270;</div>
-      <div class="svc-name">Geotechnical report</div>
-      <div class="svc-when">Soil classification required by council for subdivision DA or new build.</div>
-      <span class="svc-tag t-dev">Development</span>
-    </div>
-
-    <div class="svc-card" onclick="openEnquiry('Heritage assessment')">
-      <div class="svc-icon">&#127963;</div>
-      <div class="svc-name">Heritage assessment</div>
-      <div class="svc-when">Required when heritage overlay confirmed on your property. Clause 5.10.</div>
-      <span class="svc-tag t-dev">Development</span>
+    <div class="cat-label">Compliance <div class="cat-line"></div></div>
+    <div class="services" style="margin-bottom:0">
+      <div class="svc-card" onclick="openEnquiry('Occupation Certificate')">
+        <div class="svc-icon">&#128196;</div>
+        <div class="svc-name">Occupation Certificate</div>
+        <div class="svc-when">Final OC before moving in or settling. Every new home needs one.</div>
+        <span class="svc-tag t-comp">Compliance</span>
+      </div>
+      <div class="svc-card" onclick="openEnquiry('Building certification')">
+        <div class="svc-icon">&#128203;</div>
+        <div class="svc-name">Building certification</div>
+        <div class="svc-when">Construction certificate, stage inspections, compliance certificate.</div>
+        <span class="svc-tag t-comp">Compliance</span>
+      </div>
+      <div class="svc-card" onclick="openEnquiry('Subdivision certificate')">
+        <div class="svc-icon">&#128221;</div>
+        <div class="svc-name">Subdivision certificate</div>
+        <div class="svc-when">After civil works complete. Required before Land Registry issues new titles.</div>
+        <span class="svc-tag t-comp">Compliance</span>
+      </div>
+      <div class="svc-card" onclick="openEnquiry('Drainage compliance certificate')">
+        <div class="svc-icon">&#10003;</div>
+        <div class="svc-name">Drainage compliance</div>
+        <div class="svc-when">Stormwater sign-off required for OC. OSD compliance certificate.</div>
+        <span class="svc-tag t-comp">Compliance</span>
+      </div>
     </div>
 
   </div>
-
-  <!-- COMPLIANCE -->
-  <div class="cat-label">Compliance <div class="cat-line"></div></div>
-  <div class="services" id="grid-compliance">
-
-    <div class="svc-card" onclick="openEnquiry('Occupation Certificate')">
-      <div class="svc-icon">&#128196;</div>
-      <div class="svc-name">Occupation Certificate</div>
-      <div class="svc-when">Final OC before moving in. Every new home needs one. Builders running late.</div>
-      <span class="svc-tag t-comp">Compliance</span>
-    </div>
-
-    <div class="svc-card" onclick="openEnquiry('Building certification')">
-      <div class="svc-icon">&#128203;</div>
-      <div class="svc-name">Building certification</div>
-      <div class="svc-when">Construction certificate, stage inspections, compliance certificate.</div>
-      <span class="svc-tag t-comp">Compliance</span>
-    </div>
-
-    <div class="svc-card" onclick="openEnquiry('Subdivision certificate')">
-      <div class="svc-icon">&#128221;</div>
-      <div class="svc-name">Subdivision certificate</div>
-      <div class="svc-when">After civil works complete. Required before Land Registry issues new titles.</div>
-      <span class="svc-tag t-comp">Compliance</span>
-    </div>
-
-    <div class="svc-card" onclick="openEnquiry('Drainage compliance certificate')">
-      <div class="svc-icon">&#10003;</div>
-      <div class="svc-name">Drainage compliance</div>
-      <div class="svc-when">Stormwater sign-off required for OC. OSD compliance certificate.</div>
-      <span class="svc-tag t-comp">Compliance</span>
-    </div>
-
-  </div>
-
-  <!-- BRIEF FORM -->
 
 </div>
 
 <div class="trust">
-  <div class="ti"><span class="ti-dot"></span>Verified professionals only</div>
-  <div class="ti"><span class="ti-dot"></span>Matched to your council area</div>
-  <div class="ti"><span class="ti-dot"></span>NSW &middot; Sydney and surrounds</div>
+  <div class="ti"><span class="ti-dot"></span>Handled by Sydney Home Improve</div>
+  <div class="ti"><span class="ti-dot"></span>Sydney and surrounds</div>
+  <div class="ti"><span class="ti-dot"></span>Send address and photos</div>
   <div class="ti"><span class="ti-dot"></span>Free to enquire &middot; No obligation</div>
   <div class="ti"><span class="ti-dot"></span>Response within 2 hours</div>
 </div>
 
 <footer>
-  <div>SiteVerdict &middot; ABN 42 663 950 070 &middot; <a href="terms.html" style="color:inherit">Terms</a></div>
-  <div><a href="https://wa.me/61402623628" style="color:inherit">Chat with us</a> &middot; All services by verified licensed professionals.</div>
+  <div>SiteVerdict &middot; Services coordinated by Sydney Home Improve &middot; <a href="terms.html" style="color:inherit">Terms</a></div>
+  <div><a href="https://wa.me/61402623628" style="color:inherit">WhatsApp 0402 623 628</a> &middot; ABN 42 663 950 070</div>
 </footer>
 
-
-</html>
 <!-- ENQUIRY MODAL -->
-<div id="eq-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:20px;max-width:400px;width:100%;padding:28px">
-    <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:6px">Free enquiry</div>
+<div id="eq-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:20px;max-width:420px;width:100%;padding:28px;margin:auto">
+
+    <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:4px">Free quote request</div>
     <div id="eq-title" style="font-family:'Instrument Serif',serif;font-size:1.3rem;font-weight:400;margin-bottom:4px"></div>
-    <div style="font-size:.76rem;color:var(--muted);margin-bottom:20px">We respond within 2 hours &middot; No obligation &middot; Free to enquire</div>
+    <div style="font-size:.74rem;color:var(--muted);margin-bottom:22px;line-height:1.6">Sydney and surrounds &middot; Handled by Sydney Home Improve &middot; No obligation</div>
 
-    <div style="margin-bottom:10px">
-      <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">Your name</label>
-      <input id="eq-name" type="text" placeholder="First and last name" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:11px 13px;color:var(--text);font-size:.86rem;outline:none;font-family:inherit">
+    <div style="margin-bottom:12px">
+      <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">Your name <span style="color:#e05252">*</span></label>
+      <input id="eq-name" type="text" placeholder="First and last name" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-size:.88rem;outline:none;font-family:inherit">
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+    <div style="margin-bottom:12px">
+      <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">Phone number <span style="color:#e05252">*</span></label>
+      <input id="eq-phone" type="tel" placeholder="04xx xxx xxx" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-size:.88rem;outline:none;font-family:inherit">
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">Property address <span style="color:#e05252">*</span></label>
+      <input id="eq-addr" type="text" placeholder="Street address, suburb NSW" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-size:.88rem;outline:none;font-family:inherit">
+      <div style="font-size:.64rem;color:var(--muted2);margin-top:4px">We need this to assess the job and quote accurately.</div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">Preferred timing</label>
+      <select id="eq-timing" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-size:.88rem;outline:none;font-family:inherit;cursor:pointer">
+        <option value="">Select timing</option>
+        <option>As soon as possible</option>
+        <option>Within 2 weeks</option>
+        <option>Within a month</option>
+        <option>Planning stage — no rush</option>
+      </select>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
       <div>
-        <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">Phone <span style="color:var(--red)">*</span></label>
-        <input id="eq-phone" type="tel" placeholder="04xx xxx xxx" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:11px 13px;color:var(--text);font-size:.86rem;outline:none;font-family:inherit">
+        <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">I am</label>
+        <select id="eq-role" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-size:.88rem;outline:none;font-family:inherit;cursor:pointer">
+          <option value="">Select role</option>
+          <option>Owner</option>
+          <option>Builder</option>
+          <option>Developer</option>
+          <option>Investor</option>
+          <option>Agent / broker</option>
+          <option>Other</option>
+        </select>
       </div>
       <div>
-        <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">Email <span style="color:var(--red)">*</span></label>
-        <input id="eq-email" type="email" placeholder="your@email.com" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:11px 13px;color:var(--text);font-size:.86rem;outline:none;font-family:inherit">
+        <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">OC / handover deadline</label>
+        <input id="eq-deadline" type="text" placeholder="e.g. 2 weeks, end of month" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-size:.88rem;outline:none;font-family:inherit">
       </div>
     </div>
 
-    <div style="margin-bottom:10px">
-      <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">Property address</label>
-      <input id="eq-addr" type="text" placeholder="Street address, suburb NSW" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:11px 13px;color:var(--text);font-size:.86rem;outline:none;font-family:inherit">
+    <div style="margin-bottom:14px">
+      <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">Job description <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <textarea id="eq-note" placeholder="Size, slope, any relevant detail. The more you share, the better the quote." rows="3" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-size:.86rem;outline:none;font-family:inherit;resize:none;line-height:1.6"></textarea>
     </div>
 
-    <div style="margin-bottom:10px">
-      <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">Attach plans <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional &mdash; PDF, images, drawings)</span></label>
-      <input id="eq-files" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.dwg,.doc,.docx" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:9px 13px;color:var(--muted);font-size:.8rem;cursor:pointer;font-family:inherit">
-      <div style="font-size:.62rem;color:var(--muted2);margin-top:4px">Files will be sent to your email for forwarding &mdash; WhatsApp confirms the enquiry</div>
+    <div style="margin-bottom:20px;background:rgba(200,168,75,.06);border:1px solid var(--goldm);border-radius:var(--r);padding:10px 14px">
+      <div style="font-size:.72rem;color:var(--gold);font-weight:600;margin-bottom:3px">&#128247; Send photos via WhatsApp after submitting</div>
+      <div style="font-size:.65rem;color:var(--muted);line-height:1.6">Photos of the site help us give a more accurate quote. After your message opens in WhatsApp, attach photos directly in the chat.</div>
     </div>
 
-    <div style="margin-bottom:18px">
-      <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">Quick note <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
-      <textarea id="eq-note" placeholder="Block size, slope, anything useful..." rows="2" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:11px 13px;color:var(--text);font-size:.86rem;outline:none;font-family:inherit;resize:none;line-height:1.6"></textarea>
+    <button onclick="sendEnquiry()" style="width:100%;background:var(--gold);color:#000;border:none;border-radius:12px;padding:14px;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px">Open WhatsApp &rarr;</button>
+    <div style="text-align:center;font-size:.64rem;color:var(--muted2);line-height:1.8">
+      Pre-filled message ready to send &middot; Add photos in the chat<br>
+      <span onclick="closeEnquiry()" style="cursor:pointer;text-decoration:underline">Cancel</span>
     </div>
 
-    <button onclick="sendEnquiry()" style="width:100%;background:var(--gold);color:#000;border:none;border-radius:12px;padding:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px">Send enquiry &rarr;</button>
-    <button onclick="sendEmail()" style="width:100%;background:none;border:1px solid var(--border2);color:var(--muted);border-radius:12px;padding:11px;font-size:.82rem;cursor:pointer;font-family:inherit;margin-bottom:8px">Send via Email instead</button>
-    <div style="text-align:center;font-size:.64rem;color:var(--muted2)">WhatsApp opens pre-filled &middot; <span onclick="closeEnquiry()" style="cursor:pointer;text-decoration:underline">Cancel</span></div>
   </div>
 </div>
 
-<script>var _svc="";function openEnquiry(e){_svc=e,document.getElementById("eq-title").textContent=e,document.getElementById("eq-modal").style.display="flex",setTimeout(function(){document.getElementById("eq-name").focus()},100)}function closeEnquiry(){document.getElementById("eq-modal").style.display="none",["eq-name","eq-phone","eq-email","eq-addr","eq-note"].forEach(function(e){document.getElementById(e).value=""}),document.getElementById("eq-files").value=""}function sendEnquiry(){var e=document.getElementById("eq-name").value.trim(),t=document.getElementById("eq-phone").value.trim(),n=document.getElementById("eq-email").value.trim(),o=document.getElementById("eq-addr").value.trim(),m=document.getElementById("eq-note").value.trim();if(e)if(t)if(n)if(o){var l="Hi SiteVerdict\n\nService: "+_svc+"\nName: "+e+"\nPhone: "+t+(n?"\nEmail: "+n:"")+"\nProperty: "+o+(m?"\nNote: "+m:"")+(document.getElementById("eq-files").files.length?"\nFiles: "+document.getElementById("eq-files").files.length+" file(s) attached — will send to your email":"")+"\n\nPlease connect me with the right professional.";window.open("https://web.whatsapp.com/send?phone=61402623628&text="+encodeURIComponent(l),"_blank"),closeEnquiry()}else document.getElementById("eq-addr").focus();else document.getElementById("eq-email").focus();else document.getElementById("eq-phone").focus();else document.getElementById("eq-name").focus()}function sendEmail(){var e=document.getElementById("eq-name").value.trim(),t=document.getElementById("eq-phone").value.trim(),n=document.getElementById("eq-email").value.trim(),o=document.getElementById("eq-addr").value.trim(),m=document.getElementById("eq-note").value.trim();if(e)if(o){var l="Enquiry: "+_svc,d="Service: "+_svc+"\nName: "+e+(t?"\nPhone: "+t:"")+(n?"\nEmail: "+n:"")+"\nProperty: "+o+(m?"\nNote: "+m:"")+"\n\nPlease connect me with the right professional.";window.location.href="mailto:hello@siteverdict.com.au?subject="+encodeURIComponent(l)+"&body="+encodeURIComponent(d),closeEnquiry()}else document.getElementById("eq-addr").focus();else document.getElementById("eq-name").focus()}document.getElementById("eq-modal").addEventListener("click",function(e){e.target===this&&closeEnquiry()});</script>
+<script>
+var _svc = "";
+
+function openEnquiry(service) {
+  _svc = service;
+  document.getElementById("eq-title").textContent = service;
+  document.getElementById("eq-modal").style.display = "flex";
+  setTimeout(function(){ document.getElementById("eq-name").focus(); }, 100);
+}
+
+function closeEnquiry() {
+  document.getElementById("eq-modal").style.display = "none";
+  ["eq-name","eq-phone","eq-addr","eq-note","eq-deadline"].forEach(function(id){
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("eq-timing").value = "";
+  document.getElementById("eq-role").value = "";
+}
+
+function sendEnquiry() {
+  var name   = document.getElementById("eq-name").value.trim();
+  var phone  = document.getElementById("eq-phone").value.trim();
+  var addr   = document.getElementById("eq-addr").value.trim();
+  var timing = document.getElementById("eq-timing").value.trim();
+  var role   = document.getElementById("eq-role").value.trim();
+  var deadline = document.getElementById("eq-deadline").value.trim();
+  var note   = document.getElementById("eq-note").value.trim();
+
+  if (!name)  { document.getElementById("eq-name").focus();  return; }
+  if (!phone) { document.getElementById("eq-phone").focus(); return; }
+  if (!addr)  { document.getElementById("eq-addr").focus();  return; }
+
+  var lines = [
+    "Hi, I\u2019d like a free quote for: " + _svc,
+    "",
+    "Name: " + name,
+    "Phone: " + phone,
+    "Address: " + addr,
+  ];
+  if (role) lines.push("I am: " + role);
+  if (timing) lines.push("Timing: " + timing);
+  if (deadline) lines.push("OC / handover deadline: " + deadline);
+  if (note)   lines.push("Details: " + note);
+  lines.push("", "I\u2019ll send photos in the chat if helpful.");
+  lines.push("Please let me know the next step for a quote.");
+
+  var waUrl = "https://wa.me/61402623628?text=" + encodeURIComponent(lines.join("\n"));
+  window.open(waUrl, "_blank");
+  closeEnquiry();
+}
+
+function toggleMore(el) {
+  var grid  = document.getElementById("more-services");
+  var arrow = document.getElementById("more-arrow");
+  var isOpen = grid.classList.contains("open");
+  grid.classList.toggle("open", !isOpen);
+  arrow.classList.toggle("open", !isOpen);
+  el.querySelector("span:first-child").textContent = isOpen
+    ? "Show more services \u2014 civil, development & compliance"
+    : "Hide additional services";
+}
+
+document.getElementById("eq-modal").addEventListener("click", function(e) {
+  if (e.target === this) closeEnquiry();
+});
+</script>
 </body>
+</html>
