@@ -42,22 +42,6 @@ h1 em{font-style:italic;color:var(--gold)}
 .hb{display:flex;align-items:center;gap:5px}
 .hb-dot{width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0}
 .hb-sep{color:var(--muted2);font-size:.6rem}
-
-.near-section{max-width:860px;margin:0 auto;padding:10px 5% 8px}
-.near-card{background:linear-gradient(135deg,rgba(200,168,75,.09),rgba(62,207,142,.035));border:1px solid var(--goldm);border-radius:var(--r3);padding:22px;display:grid;grid-template-columns:1.25fr .75fr;gap:18px;align-items:center}
-.near-kicker{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:8px}
-.near-title{font-family:"Instrument Serif",serif;font-size:1.45rem;font-weight:400;line-height:1.2;margin-bottom:8px;color:var(--text)}
-.near-copy{font-size:.82rem;color:var(--muted);line-height:1.8;margin-bottom:12px}
-.near-list{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:.72rem;color:var(--muted)}
-.near-list span{display:flex;gap:6px;align-items:center}
-.near-list span:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0}
-.near-actions{display:flex;flex-direction:column;gap:8px}
-.near-btn{width:100%;border:none;border-radius:var(--r2);padding:12px 16px;font-size:.86rem;font-weight:700;cursor:pointer;text-align:center}
-.near-btn.primary{background:var(--gold);color:#000}
-.near-btn.secondary{background:transparent;color:var(--text);border:1px solid var(--border2)}
-.near-disclaimer{font-size:.62rem;color:var(--muted2);line-height:1.6;margin-top:8px}
-@media(max-width:700px){.near-card{grid-template-columns:1fr}.near-list{grid-template-columns:1fr}.near-actions{flex-direction:column}}
-
 .page{max-width:860px;margin:0 auto;padding:32px 5% 64px}
 .section-intro{font-size:.8rem;color:var(--muted);line-height:1.7;margin-bottom:16px;padding:12px 16px;background:var(--bg2);border-radius:var(--r);border-left:2px solid var(--goldm)}
 .cat-label{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:10px}
@@ -123,7 +107,7 @@ footer{border-top:1px solid var(--border);padding:20px 5%;font-size:.62rem;color
     <div class="cta-banner-headline">Request a free quote</div>
     <div class="cta-banner-sub">Sydney and surrounds &middot; Send your address and photos &middot; We respond within 2 hours</div>
   </div>
-  <a href="https://wa.me/61402623628?text=Hi%2C%20I%27d%20like%20a%20free%20quote.%20I%20can%20send%20the%20address%2C%20photos%20and%20job%20details." class="cta-banner-btn" target="_blank">&#128172;&nbsp; WhatsApp us now</a>
+  <a href="https://wa.me/61402623628?text=Hi%2C%20I%27d%20like%20a%20free%20quote." class="cta-banner-btn" target="_blank">&#128172;&nbsp; WhatsApp us now</a>
 </div>
 
 <div class="hero">
@@ -147,27 +131,6 @@ footer{border-top:1px solid var(--border);padding:20px 5%;font-size:.62rem;color
     <div class="how-step-card"><div class="hs-n">2</div><div class="hs-label">Send details</div><div class="hs-sub">Address, photos, and preferred timing via WhatsApp</div></div>
     <div class="how-step-card"><div class="hs-n">3</div><div class="hs-label">We review</div><div class="hs-sub">Handled by Sydney Home Improve or matched with verified trades</div></div>
     <div class="how-step-card"><div class="hs-n">4</div><div class="hs-label">Get quoted</div><div class="hs-sub">A real quote based on your site — no obligation to proceed</div></div>
-  </div>
-</div>
-
-<div class="near-section">
-  <div class="near-card">
-    <div>
-      <div class="near-kicker">For builders &amp; owners near completion</div>
-      <div class="near-title">External works before handover or OC</div>
-      <div class="near-copy">If a project is close to completion, Sydney Home Improve can help quote practical outside works that often hold up handover, occupation certificate or final presentation.</div>
-      <div class="near-list">
-        <span>Driveways &amp; concrete paths</span>
-        <span>Stormwater &amp; drainage fixes</span>
-        <span>Retaining walls &amp; excavation</span>
-        <span>Turf, landscaping &amp; site clean-up</span>
-      </div>
-      <div class="near-disclaimer">Some enquiries may be handled by Sydney Home Improve or matched with verified professionals. Any referral arrangement should be disclosed transparently.</div>
-    </div>
-    <div class="near-actions">
-      <button class="near-btn primary" onclick="openEnquiry('Final external works before OC')">Request fast quote &rarr;</button>
-      <button class="near-btn secondary" onclick="openEnquiry('Builder referral / client external works')">Builder referral enquiry</button>
-    </div>
   </div>
 </div>
 
@@ -372,25 +335,6 @@ footer{border-top:1px solid var(--border);padding:20px 5%;font-size:.62rem;color
       </select>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <div>
-        <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">I am</label>
-        <select id="eq-role" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-size:.88rem;outline:none;font-family:inherit;cursor:pointer">
-          <option value="">Select role</option>
-          <option>Owner</option>
-          <option>Builder</option>
-          <option>Developer</option>
-          <option>Investor</option>
-          <option>Agent / broker</option>
-          <option>Other</option>
-        </select>
-      </div>
-      <div>
-        <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">OC / handover deadline</label>
-        <input id="eq-deadline" type="text" placeholder="e.g. 2 weeks, end of month" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-size:.88rem;outline:none;font-family:inherit">
-      </div>
-    </div>
-
     <div style="margin-bottom:14px">
       <label style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:5px">Job description <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
       <textarea id="eq-note" placeholder="Size, slope, any relevant detail. The more you share, the better the quote." rows="3" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-size:.86rem;outline:none;font-family:inherit;resize:none;line-height:1.6"></textarea>
@@ -422,11 +366,10 @@ function openEnquiry(service) {
 
 function closeEnquiry() {
   document.getElementById("eq-modal").style.display = "none";
-  ["eq-name","eq-phone","eq-addr","eq-note","eq-deadline"].forEach(function(id){
+  ["eq-name","eq-phone","eq-addr","eq-note"].forEach(function(id){
     document.getElementById(id).value = "";
   });
   document.getElementById("eq-timing").value = "";
-  document.getElementById("eq-role").value = "";
 }
 
 function sendEnquiry() {
@@ -434,8 +377,6 @@ function sendEnquiry() {
   var phone  = document.getElementById("eq-phone").value.trim();
   var addr   = document.getElementById("eq-addr").value.trim();
   var timing = document.getElementById("eq-timing").value.trim();
-  var role   = document.getElementById("eq-role").value.trim();
-  var deadline = document.getElementById("eq-deadline").value.trim();
   var note   = document.getElementById("eq-note").value.trim();
 
   if (!name)  { document.getElementById("eq-name").focus();  return; }
@@ -449,12 +390,9 @@ function sendEnquiry() {
     "Phone: " + phone,
     "Address: " + addr,
   ];
-  if (role) lines.push("I am: " + role);
   if (timing) lines.push("Timing: " + timing);
-  if (deadline) lines.push("OC / handover deadline: " + deadline);
   if (note)   lines.push("Details: " + note);
   lines.push("", "I\u2019ll send photos in the chat if helpful.");
-  lines.push("Please let me know the next step for a quote.");
 
   var waUrl = "https://wa.me/61402623628?text=" + encodeURIComponent(lines.join("\n"));
   window.open(waUrl, "_blank");

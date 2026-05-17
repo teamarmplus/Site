@@ -143,86 +143,158 @@ function escapeHTML(s){
   if(!s)return'';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-function fmt(t){return t>=1e6?"$"+(t/1e6).toFixed(1)+"M":"$"+(t/1e3).toFixed(0)+"K"}
-function ago(t){
-  if(!t)return"recently";
-  var e=Math.round((new Date-new Date(t))/864e5);
-  return e<1?"today":1===e?"yesterday":e<30?e+"d ago":e<365?Math.round(e/30)+"mo ago":Math.round(e/365)+"y ago";
-}
-// Task 1: clean data-addr approach
+function fmt(t){return t>=1e6?'$'+(t/1e6).toFixed(1)+'M':'$'+(t/1e3).toFixed(0)+'K'}
 function goCheck(btn){
-  var addr=decodeURIComponent(btn.getAttribute("data-addr")||"");
-  window.location.href="index.html?addr="+encodeURIComponent(addr);
+  var addr=decodeURIComponent(btn.getAttribute('data-addr')||'');
+  window.location.href='index.html?addr='+encodeURIComponent(addr);
 }
 function goServices(){
-  window.open("https://wa.me/61402623628?text=Hi%2C+I+saw+a+property+on+the+SiteVerdict+list+and+would+like+to+discuss.","_blank");
+  window.open('https://wa.me/61402623628?text=Hi%2C+I+saw+a+property+on+the+SiteVerdict+list+and+would+like+to+discuss.','_blank');
 }
 
-document.getElementById("today-date").textContent=(new Date).toLocaleDateString("en-AU",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+// Static fallback cards — shown when live API is unavailable
+var FALLBACK_SITES = [
+  {
+    address: '14 Redfern Street, Redfern NSW 2016',
+    council:  'City of Sydney',
+    score:    78,
+    status:   'Approved',
+    lots:     2,
+    description: 'Torrens title two-lot subdivision, R1 zone, 920m\u00b2 block.',
+    decision_date: '2024-09-12'
+  },
+  {
+    address: '6 Fenton Street, Panania NSW 2213',
+    council:  'Canterbury-Bankstown',
+    score:    71,
+    status:   'Approved',
+    lots:     2,
+    description: 'Two-lot Torrens title subdivision, R2 zone, 650m\u00b2 block.',
+    decision_date: '2024-11-04'
+  },
+  {
+    address: '23 Pacific Street, Newcastle NSW 2300',
+    council:  'Newcastle',
+    score:    65,
+    status:   'Approved',
+    lots:     3,
+    description: 'Three-lot Torrens title subdivision, MU1 zone, heritage precinct.',
+    decision_date: '2024-08-22'
+  },
+  {
+    address: '8 Hillside Drive, Camden NSW 2570',
+    council:  'Camden',
+    score:    70,
+    status:   'Approved',
+    lots:     2,
+    description: 'Dual occupancy and Torrens title subdivision, R2 zone.',
+    decision_date: '2024-10-15'
+  },
+  {
+    address: '39 Wattle Road, Casula NSW 2170',
+    council:  'Liverpool',
+    score:    74,
+    status:   'Approved',
+    lots:     4,
+    description: 'Four-lot Torrens title subdivision, R2 zone, flat block.',
+    decision_date: '2024-07-30'
+  }
+];
+function ago(t){
+  if(!t)return'recently';
+  var e=Math.round((new Date-new Date(t))/864e5);
+  return e<1?'today':1===e?'yesterday':e<30?e+'d ago':e<365?Math.round(e/30)+'mo ago':Math.round(e/365)+'y ago';
+}
 
-var c=document.getElementById("sites-container");
-var mn=document.getElementById("market-note");
+function buildCard(site, idx, total, isFallback){
+  var scoreClass = site.score>=85?'g':'a';
+  var isTop = idx===0 && !isFallback;
+  var safeAddr  = escapeHTML(site.address||'');
+  var safeCounc = escapeHTML(site.council||'');
+  var safeStat  = escapeHTML(site.status||'Approved');
+  var safeDesc  = escapeHTML(site.description||'Residential subdivision DA');
+  return "<div class='sc"+(isTop?' top-site':'')+"'>"
+    +"<div class='rank-bar "+(isTop?'rb-top':'rb-basic')+"'>"
+      +"<span>#"+(idx+1)+" of "+total+(isTop?' \u2014 Top site today':'')+(isFallback?' (example)':'')+"</span>"
+      +"<span style='font-size:.6rem;color:var(--muted2)'>Det. "+ago(site.decision_date)+"</span>"
+    +"</div>"
+    +"<div class='sc-top'><div>"
+      +"<div class='sc-meta'><span class='score-b "+(site.score<80?'amber':'')+"'>\u2605 "+site.score+"/100</span>"
+      +(isFallback?"<span style='font-size:.6rem;color:var(--muted2);margin-left:6px'>Example \u2014 live data loading</span>":"")
+      +"</div>"
+      +"<div class='sc-addr'>"+safeAddr+"</div>"
+      +"<div class='sc-sub'>"+safeCounc+(site.lots?' \u00b7 '+site.lots+' lots':'')+"</div>"
+    +"</div><div class='zone-pill'>NSW</div></div>"
+    +"<div class='sc-data'>"
+      +"<div class='scd'><div class='scd-v g'>"+(site.lots||'?')+"</div><div class='scd-l'>Lots</div></div>"
+      +"<div class='scd'><div class='scd-v'>"+safeStat+"</div><div class='scd-l'>Status</div></div>"
+      +"<div class='scd'><div class='scd-v'>NSW</div><div class='scd-l'>State</div></div>"
+    +"</div>"
+    +"<div style='padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6'>"+safeDesc+"</div>"
+    +"<div class='sc-foot'>"
+      +"<div class='f-left' style='font-size:.72rem;color:var(--muted)'>Check this address or request a quote</div>"
+      +"<div style='display:flex;gap:6px'>"
+        +"<button class='fbtn-out' data-addr='"+encodeURIComponent(site.address||'')+"' onclick='goCheck(this)'>Run site check \u2192</button>"
+        +"<a href='services.html' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Request quote \u2192</a>"
+      +"</div>"
+    +"</div>"
+  +"</div>";
+}
 
-fetch("/.netlify/functions/daleads?mode=hotlist")
+function showFallback(reason){
+  console.error('Hot list fallback triggered:', reason);
+  var c=document.getElementById('sites-container');
+  var mn=document.getElementById('market-note');
+  if(!c) return;
+  // Fallback header message
+  c.innerHTML="<div style='background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.2);"
+    +"border-radius:12px;padding:14px 18px;margin-bottom:14px;font-size:.78rem;line-height:1.7'>"
+    +"<strong style='color:var(--gold)'>Hot list is being refreshed.</strong> "
+    +"In the meantime, run a free Site Check or request a quote. "
+    +"<span style='color:var(--muted2);font-size:.68rem'>Live data will return automatically.</span>"
+  +"</div>";
+  // Render fallback cards
+  FALLBACK_SITES.forEach(function(site, idx){
+    c.innerHTML += buildCard(site, idx, FALLBACK_SITES.length, true);
+  });
+  var sc = document.getElementById('site-count');
+  if(sc){ sc.textContent='Showing example properties \u2014 live data temporarily unavailable'; sc.style.color='var(--muted)'; }
+  if(mn) mn.textContent='';
+}
+document.getElementById('today-date').textContent=(new Date).toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+// Fetch with 12-second timeout
+var fetchTimer = setTimeout(function(){
+  showFallback('fetch timeout after 12s');
+}, 12000);
+
+fetch('/.netlify/functions/daleads?mode=hotlist')
   .then(function(t){
-    if(!t.ok)throw new Error("Function error: "+t.status);
+    clearTimeout(fetchTimer);
+    if(!t.ok) throw new Error('Function error: '+t.status);
     return t.json();
   })
   .then(function(t){
-    var e=t.sites||[],s=t.total_pool||0;
-    document.getElementById("site-count").textContent=e.length+" properties screened from "+s+" recent NSW approved DAs";
-    document.getElementById("site-count").style.color="var(--green)";
+    var c  = document.getElementById('sites-container');
+    var mn = document.getElementById('market-note');
+    if(!c) return;
+    var e=t.sites||[], s=t.total_pool||0;
+    var sc=document.getElementById('site-count');
+    if(sc){ sc.textContent=e.length+' properties screened from '+s+' recent NSW approved DAs'; sc.style.color='var(--green)'; }
     if(!e.length){
       c.innerHTML="<div style='text-align:center;padding:32px;color:var(--muted)'>No data today. Check back tomorrow.</div>";
-      mn.textContent="";
+      if(mn) mn.textContent='';
       return;
     }
     var d=e[0].score||0;
-    mn.textContent=d>=85?"Strong market":d>=70?"Active market":"Steady market";
-    mn.style.color=d>=85?"var(--green)":d>=70?"var(--amber)":"var(--muted)";
-    c.innerHTML="";
-    e.forEach(function(t,s){
-      var scoreClass=t.score>=85?"g":"a";
-      var isTop=s===0;
-      // Task 3: escape all DA Leads text before inserting
-      var safeAddr  = escapeHTML(t.address||"");
-      var safeCounc = escapeHTML(t.council||"");
-      var safeStat  = escapeHTML(t.status||"Approved");
-      var safeDesc  = escapeHTML(t.description||"Residential subdivision DA");
-      var n="<div class='sc"+(isTop?" top-site":"")+"'>"
-        +"<div class='rank-bar "+(isTop?"rb-top":"rb-basic")+"'>"
-          +"<span>#"+(s+1)+" of "+e.length+(isTop?" — Top site today":"")+"</span>"
-          +"<span style='font-size:.6rem;color:var(--muted2)'>Det. "+ago(t.decision_date)+"</span>"
-        +"</div>"
-        +"<div class='sc-top'><div>"
-          +"<div class='sc-meta'><span class='score-b "+(t.score<80?"amber":"")+"'>★ "+t.score+"/100</span></div>"
-          +"<div class='sc-addr'>"+safeAddr+"</div>"
-          +"<div class='sc-sub'>"+safeCounc+(t.lots?" · "+t.lots+" lots":"")+"</div>"
-        +"</div><div class='zone-pill'>NSW</div></div>"
-        +"<div class='sc-data'>"
-          +"<div class='scd'><div class='scd-v g'>"+(t.lots||"?")+"</div><div class='scd-l'>Lots</div></div>"
-          +"<div class='scd'><div class='scd-v'>"+(t.cost?fmt(t.cost):"No data")+"</div><div class='scd-l'>Dev cost</div></div>"
-          +"<div class='scd'><div class='scd-v'>"+(t.cost_per_lot?fmt(t.cost_per_lot):"?")+"</div><div class='scd-l'>Cost/lot</div></div>"
-          +"<div class='scd'><div class='scd-v "+scoreClass+"'>"+safeStat+"</div><div class='scd-l'>Status</div></div>"
-          +"<div class='scd'><div class='scd-v'>NSW</div><div class='scd-l'>State</div></div>"
-        +"</div>"
-        +"<div style='padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6'>"+safeDesc+"</div>"
-        +"<div class='sc-foot'>"
-          +"<div class='f-left' style='font-size:.72rem;color:var(--muted)'>Want a professional to assess this site?</div>"
-          +"<div style='display:flex;gap:6px'>"
-            // Task 1: data-addr stores URL-encoded address; goCheck(this) decodes and navigates
-            +"<button class='fbtn-out' data-addr='"+encodeURIComponent(t.address||"")+"' onclick='goCheck(this)'>Run site check →</button>"
-            +"<button class='fbtn-gold' onclick='goServices()'>Chat with a professional →</button>"
-          +"</div>"
-        +"</div>"
-      +"</div>";
-      c.innerHTML+=n;
-    });
+    if(mn){ mn.textContent=d>=85?'Strong market':d>=70?'Active market':'Steady market'; mn.style.color=d>=85?'var(--green)':d>=70?'var(--amber)':'var(--muted)'; }
+    c.innerHTML='';
+    e.forEach(function(site, idx){ c.innerHTML+=buildCard(site, idx, e.length, false); });
   })
-  .catch(function(t){
-    console.error("DA Leads error:",t);
-    c.innerHTML="<div style='text-align:center;padding:32px;color:var(--muted)'>Could not load today\'s data. Please refresh.</div>";
-    mn.textContent="";
+  .catch(function(err){
+    clearTimeout(fetchTimer);
+    console.error('DA Leads error:', err);
+    showFallback(err && err.message ? err.message : String(err));
   });
 </script>
 </body>
