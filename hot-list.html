@@ -267,8 +267,8 @@ document.getElementById('today-date').textContent=(new Date).toLocaleDateString(
 
 // Fetch with 12-second timeout
 var fetchTimer = setTimeout(function(){
-  showFallback('fetch timeout after 12s');
-}, 12000);
+  showFallback('fetch timeout after 4s');
+}, 4000);
 
 fetch('/.netlify/functions/daleads?mode=hotlist')
   .then(function(t){
