@@ -4,7 +4,8 @@
 # Optional: ANTHROPIC_MODEL (default: claude-sonnet-4-5)
 
 [build]
-  functions = "netlify/functions"
+  publish   = "public"
+  functions = "public/netlify/functions"
 
 [functions]
   node_bundler = "esbuild"
