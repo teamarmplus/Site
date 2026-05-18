@@ -110,7 +110,32 @@ footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-c
 </div>
 
 <div class="sites" id="sites-container">
-  <div style="text-align:center;padding:32px;color:var(--muted)">Loading...</div>
+<div style="background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.2);border-radius:12px;padding:14px 18px;margin-bottom:14px;font-size:.78rem;line-height:1.7" id="fallback-banner">
+  <strong style="color:var(--gold)">Showing example properties.</strong>
+  Hot list is being refreshed. In the meantime, run a free Site Check or request a quote.
+  <span style="color:var(--muted2);font-size:.68rem">Live data will appear automatically.</span>
+</div>
+<div class='sc top-site'>
+<div class='rank-bar rb-top'><span>#1 of 5 &mdash; Example</span><span style='font-size:.6rem;color:var(--muted2)'>Det. recently</span></div>
+<div class='sc-top'><div><div class='sc-meta'><span class='score-b'>★ 78/100</span><span style='font-size:.6rem;color:var(--muted2);margin-left:6px'>Example — live data loading</span></div><div class='sc-addr'>6 Fenton Street, Panania NSW 2213</div><div class='sc-sub'>Canterbury-Bankstown &middot; 2 lots</div></div><div class='zone-pill'>NSW</div></div>
+<div class='sc-data'><div class='scd'><div class='scd-v g'>2</div><div class='scd-l'>Lots</div></div><div class='scd'><div class='scd-v'>Approved</div><div class='scd-l'>Status</div></div><div class='scd'><div class='scd-v'>NSW</div><div class='scd-l'>State</div></div></div>
+<div style='padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6'>Two-lot Torrens title subdivision, R2 zone.</div>
+<div class='sc-foot'><div class='f-left' style='font-size:.72rem;color:var(--muted)'>Check this address or request a quote</div><div style='display:flex;gap:6px'><button class='fbtn-out' data-addr='6%20Fenton%20Street%2C%20Panania%20NSW%202213' onclick='goCheck(this)'>Run site check →</button><a href='services.html' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Request quote →</a></div></div>
+</div>
+<div class='sc'>
+<div class='rank-bar rb-basic'><span>#2 of 5 &mdash; Example</span><span style='font-size:.6rem;color:var(--muted2)'>Det. recently</span></div>
+<div class='sc-top'><div><div class='sc-meta'><span class='score-b amber'>★ 71/100</span><span style='font-size:.6rem;color:var(--muted2);margin-left:6px'>Example — live data loading</span></div><div class='sc-addr'>39 Wattle Road, Casula NSW 2170</div><div class='sc-sub'>Liverpool &middot; 4 lots</div></div><div class='zone-pill'>NSW</div></div>
+<div class='sc-data'><div class='scd'><div class='scd-v g'>4</div><div class='scd-l'>Lots</div></div><div class='scd'><div class='scd-v'>Approved</div><div class='scd-l'>Status</div></div><div class='scd'><div class='scd-v'>NSW</div><div class='scd-l'>State</div></div></div>
+<div style='padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6'>Four-lot Torrens title subdivision, R2 zone.</div>
+<div class='sc-foot'><div class='f-left' style='font-size:.72rem;color:var(--muted)'>Check this address or request a quote</div><div style='display:flex;gap:6px'><button class='fbtn-out' data-addr='39%20Wattle%20Road%2C%20Casula%20NSW%202170' onclick='goCheck(this)'>Run site check →</button><a href='services.html' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Request quote →</a></div></div>
+</div>
+<div class='sc'>
+<div class='rank-bar rb-basic'><span>#3 of 5 &mdash; Example</span><span style='font-size:.6rem;color:var(--muted2)'>Det. recently</span></div>
+<div class='sc-top'><div><div class='sc-meta'><span class='score-b amber'>★ 69/100</span><span style='font-size:.6rem;color:var(--muted2);margin-left:6px'>Example — live data loading</span></div><div class='sc-addr'>12 Smith Street, Penrith NSW 2750</div><div class='sc-sub'>Penrith &middot; 2 lots</div></div><div class='zone-pill'>NSW</div></div>
+<div class='sc-data'><div class='scd'><div class='scd-v g'>2</div><div class='scd-l'>Lots</div></div><div class='scd'><div class='scd-v'>Approved</div><div class='scd-l'>Status</div></div><div class='scd'><div class='scd-v'>NSW</div><div class='scd-l'>State</div></div></div>
+<div style='padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6'>Two-lot Torrens title subdivision, R2 zone, Penrith LGA.</div>
+<div class='sc-foot'><div class='f-left' style='font-size:.72rem;color:var(--muted)'>Check this address or request a quote</div><div style='display:flex;gap:6px'><button class='fbtn-out' data-addr='12%20Smith%20Street%2C%20Penrith%20NSW%202750' onclick='goCheck(this)'>Run site check →</button><a href='services.html' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Request quote →</a></div></div>
+</div>
 </div>
 
 <!-- Services CTA -->
@@ -291,6 +316,7 @@ fetch('/.netlify/functions/daleads?mode=hotlist')
     var d=e[0].score||0;
     if(mn){ mn.textContent=d>=85?'Strong market':d>=70?'Active market':'Steady market'; mn.style.color=d>=85?'var(--green)':d>=70?'var(--amber)':'var(--muted)'; }
     c.innerHTML='';
+    document.getElementById('fallback-banner') && (document.getElementById('fallback-banner').style.display='none');
     e.forEach(function(site, idx){ c.innerHTML+=buildCard(site, idx, e.length, false); });
   })
   .catch(function(err){
