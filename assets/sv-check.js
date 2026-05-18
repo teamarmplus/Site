@@ -9,9 +9,18 @@
 (function(){
   try{
     var p=new URLSearchParams(window.location.search).get('addr');
-    if(p){var el=document.getElementById('addr');if(el)el.value=p;}
+    if(p){var el=document.getElementById('addr');if(el){el.value=p;setTimeout(function(){runCheck();},120);}}
   }catch(e){}
 })();
+
+// ── OPPORTUNITY INTELLIGENCE (INTERNAL NOTE — NOT PUBLIC UI) ─────────
+// High-value sites (score >= 80, n >= 4, or large/complex block) should
+// be stored as SiteVerdict Opportunity Intelligence for internal use only.
+// DO NOT label these as 'buy list', 'investment advice', or 'land banking'.
+// DO NOT publish them as public recommendations.
+// These are planning-intelligence records, not financial opinions.
+// Use only to support professional referrals and lender-ready report requests.
+// ─────────────────────────────────────────────────────────────────────────
 
 // ── REPORT GATE ──────────────────────────────────────
 var GATE_KEY='sv_reports_used';
@@ -289,7 +298,7 @@ function srcBadge(type, text){
 // Never use lot count alone to determine verdict wording.
 function verdictLabelFromScore(score){
   if(score>=80) return 'Strong development opportunity';
-  if(score>=65) return 'Review opportunity — professional verification required';
+  if(score>=65) return 'High-value review opportunity — professional verification required';
   if(score>=50) return 'Moderate potential — key constraints to verify';
   if(score>=35) return 'Limited potential — proceed carefully';
   return 'Low development potential';
@@ -403,6 +412,10 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
       +'<div class="vkpi"><div class="vkpi-v" style="color:'+riskColor+'">'+riskLabel+'</div><div class="vkpi-l">Risk level</div></div>'
       +'<div class="vkpi"><div class="vkpi-v b">'+timeline+'</div><div class="vkpi-l">Timeline est.</div></div>'
     +'</div>'
+    +(n>=4 || (block&&block>=2000) ?
+      '<div style="margin-top:12px;padding:10px 14px;background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.2);border-radius:8px;font-size:.72rem;color:var(--muted);line-height:1.7">'
+      +'<strong style="color:var(--gold)">&#9432; Higher-level review may be required.</strong> This site may require a professional review due to its potential scale, complexity or value. Request a professional review before making any decision.'
+      +'</div>' : '')
   +'</div>';
 }
 
@@ -691,7 +704,7 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
     // CTA — service enquiry
     +'<div class="cta-box">'
       +'<div class="cta-title">Need practical help with this site?</div>'
-      +'<div class="cta-sub">Request a free quote for driveway, retaining wall, drainage, concrete, excavation or landscaping. Handled by Sydney Home Improve or matched with verified professionals. No obligation.</div>'
+      +'<div class="cta-sub">Need practical help with this site? Request a quote for civil works, external works, drainage, driveway, retaining walls, excavation, landscaping or professional support. Handled directly or matched with trusted professionals.</div>'
       +'<div class="cta-btns">'
         +'<button class="btn btn-gold" onclick="window.location.href=\'services.html\'">Request free quote \u2192</button>'
         +'<button class="btn btn-outline btn-sm" onclick="chatPro()">Chat with us \u2192</button>'
@@ -874,7 +887,7 @@ function buildProVerification(){
       +'<div><div style="font-weight:500;color:var(--text);margin-bottom:4px">&#9888; Requires licensed professional</div>'
         +'Lot boundaries &middot; Title easements &middot; Slope &amp; earthworks &middot; Sewer &amp; water capacity &middot; Tree preservation &middot; DCP frontage controls &middot; Dwelling position &middot; Driveway access &middot; Council pre-DA feedback &middot; SEPP exact applicability</div>'
     +'</div>'
-    +'<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(200,168,75,.15);font-size:.68rem;color:var(--muted2)">This is an automated government data check only. Not a planning certificate. Not legal advice. Not financial advice. A licensed town planner, surveyor, civil engineer and solicitor must be engaged before any investment or development decision.</div>'
+    +'<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(200,168,75,.15);font-size:.68rem;color:var(--muted2)">This is an automated government data check only. Not a planning certificate. Not legal advice. Not financial advice. A licensed town planner, surveyor, civil engineer and solicitor must be engaged before any investment or development decision. Where referral arrangements exist, they are disclosed transparently before any client commits to services.</div>'
   +'</div>';
 }
 

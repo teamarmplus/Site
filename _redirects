@@ -1,2 +1,3 @@
-/tools/* /404.html 404
-/data/* /404.html 404
+# Block internal tool and data paths from public access
+/tools/*   404  1
+/data/*    404  1
