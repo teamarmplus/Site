@@ -1,0 +1,167 @@
+/* SiteVerdict — Print / PDF Styles v2.1 */
+@media print {
+
+  /* ── HIDE INTERACTIVE ELEMENTS ─ */
+  nav, footer, .run-btn, #auto-lookup-btn,
+  .cta-box, .gate-box, .cta-btns, .gate-btns,
+  #status, .st-bar, .form-card, .hero,
+  .modal-overlay, .hero-platform-badge, .trust-row,
+  .example-wrap, #result-skeleton, .loading-status,
+  #block-lookup-status, .btn, button:not(.print-only),
+  .hero-tagline { display: none !important; }
+
+  /* ── PAGE SETUP ─────────────────── */
+  @page {
+    margin: 18mm 16mm 22mm 16mm;
+    size: A4 portrait;
+  }
+  @page :first { margin-top: 22mm; }
+
+  /* ── PRINT BASE ─────────────────── */
+  *, *::before, *::after {
+    background: #fff !important;
+    color: #111 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    font-family: "DM Sans", Georgia, serif;
+    font-size: 9.5pt;
+    line-height: 1.55;
+    color: #111;
+    background: #fff;
+  }
+
+  /* ── PRINT HEADER ───────────────── */
+  .result-wrap::before {
+    content: "SiteVerdict Development Intelligence Report  ·  siteverdict.com.au  ·  ABN 42 663 950 070";
+    display: block;
+    font-size: 7pt;
+    color: #888;
+    border-bottom: 1pt solid #ddd;
+    padding-bottom: 6pt;
+    margin-bottom: 14pt;
+    font-family: "DM Mono", monospace;
+  }
+
+  /* ── PRINT FOOTER ───────────────── */
+  .result-wrap::after {
+    content: "Automated data check only. Not a planning certificate. Not legal or financial advice. Verify all data with a licensed NSW town planner before any decision.";
+    display: block;
+    font-size: 7pt;
+    color: #888;
+    border-top: 1pt solid #ddd;
+    padding-top: 6pt;
+    margin-top: 14pt;
+  }
+
+  /* ── LAYOUT ─────────────────────── */
+  .result-wrap { max-width: 100%; padding: 0; }
+  #result { opacity: 1 !important; transform: none !important; }
+  .rcard { border: 1pt solid #ccc; border-radius: 0 !important; }
+
+  /* ── SECTION BORDERS ────────────── */
+  .rsec {
+    padding: 10pt 14pt !important;
+    border-bottom: 1pt solid #eee !important;
+    page-break-inside: avoid;
+  }
+  .rsec:last-child { border: none !important; }
+
+  /* ── TYPOGRAPHY ─────────────────── */
+  .rsec-title {
+    font-size: 7pt !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #444 !important;
+    margin-bottom: 8pt !important;
+    border-bottom: 1pt solid #eee;
+    padding-bottom: 4pt;
+  }
+  .card-val { font-size: 9pt !important; font-weight: 600 !important; }
+  .card-lbl { font-size: 6.5pt !important; color: #666 !important; }
+  .card-sub { font-size: 7.5pt !important; color: #555 !important; }
+  .ctrl-val  { font-size: 9pt !important; }
+  .ctrl-lbl  { font-size: 6.5pt !important; color: #666 !important; }
+  .ov-title  { font-size: 8pt !important; }
+  .ov-desc   { font-size: 7.5pt !important; color: #555 !important; }
+
+  /* ── RESULT HEADER ──────────────── */
+  .rh { padding: 12pt 14pt !important; }
+  .rh-addr { font-size: 11pt !important; }
+  .rh-meta { font-size: 7.5pt !important; }
+  .lots-big { font-size: 18pt !important; }
+  .sig-row  { margin-bottom: 3pt !important; }
+
+  /* ── EXECUTIVE VERDICT ──────────── */
+  .verdict-section { padding: 10pt 14pt !important; page-break-after: avoid; }
+  .vs-score-num { font-size: 18pt !important; }
+  .vs-summary { font-size: 8pt !important; line-height: 1.5 !important; }
+  .vs-verdict-text { font-size: 9pt !important; }
+  .verdict-kpis { grid-template-columns: repeat(4,1fr) !important; }
+  .vkpi { padding: 6pt 8pt !important; border: 1pt solid #eee !important; }
+  .vkpi-v { font-size: 8pt !important; }
+  .vkpi-l { font-size: 6pt !important; }
+  .verdict-callouts { grid-template-columns: 1fr 1fr !important; }
+  .vc-text { font-size: 7.5pt !important; }
+
+  /* ── SCORECARD ──────────────────── */
+  .scorecard-grid { grid-template-columns: 1fr 1fr !important; }
+  .sc-item { padding: 6pt 8pt !important; border: 1pt solid #eee !important; }
+  .sci-label { font-size: 7.5pt !important; }
+  .sci-score { font-size: 10pt !important; }
+  .sci-bar { display: none !important; }
+
+  /* ── GRIDS ──────────────────────── */
+  .ctrl-grid { grid-template-columns: repeat(3,1fr) !important; }
+  .stats-row { grid-template-columns: repeat(4,1fr) !important; }
+  .infra-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* ── OVERLAYS ───────────────────── */
+  .ov { padding: 5pt 8pt !important; page-break-inside: avoid; }
+  .ov.ok { background: #f6fffa !important; border-color: #b8e6d0 !important; }
+  .ov.warn { background: #fffbf2 !important; border-color: #f0d080 !important; }
+  .ov-title.ok { color: #1a7a4a !important; }
+  .ov-title.warn { color: #8a5c00 !important; }
+
+  /* ── COMPARABLES ────────────────── */
+  .comp { background: #fafafa !important; border-color: #ddd !important; }
+
+  /* ── TABLES ─────────────────────── */
+  table { border-collapse: collapse !important; width: 100% !important; font-size: 7.5pt !important; }
+  th { background: #f4f4f4 !important; color: #444 !important; padding: 4pt 6pt !important; border: 1pt solid #ddd !important; font-size: 6.5pt !important; }
+  td { padding: 4pt 6pt !important; border-bottom: 1pt solid #eee !important; }
+  .table-scroll { overflow: visible !important; }
+
+  /* ── WHY THIS MATTERS ───────────── */
+  .whtm { background: #f9f6ee !important; border-left-color: #c8a84b !important; font-size: 7pt !important; padding: 4pt 8pt !important; }
+
+  /* ── RISK REGISTER ──────────────── */
+  .risk-badge { border: 1pt solid !important; padding: 1pt 4pt !important; font-size: 6pt !important; }
+
+  /* ── FINANCIAL ASSUMPTIONS ──────── */
+  .fi { border: 1pt solid #ccc !important; padding: 4pt 6pt !important; font-size: 7.5pt !important; }
+
+  /* ── HIDE ANIMATION/INTERACTION ─── */
+  .skeleton, .loading-dot, .ec-live-dot,
+  input[type=range], #result-skeleton { display: none !important; }
+
+  /* ── PAGE BREAKS ────────────────── */
+  .verdict-section { page-break-before: avoid; page-break-after: avoid; }
+  .rsec { page-break-inside: avoid; }
+  .ov { page-break-inside: avoid; }
+  .sc-item { page-break-inside: avoid; }
+  .comp { page-break-inside: avoid; }
+
+  /* ── SOURCE TRANSPARENCY ────────── */
+  .tag, .src-badge { border: 1pt solid !important; font-size: 6pt !important; }
+  .tag-live { color: #1a7a4a !important; border-color: #b8e6d0 !important; }
+  .tag-est  { color: #8a5c00 !important; border-color: #e0c060 !important; }
+
+  /* ── SHOW PRINT-SPECIFIC ELEMENTS ── */
+  .print-only { display: block !important; }
+}

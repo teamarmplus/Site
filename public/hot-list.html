@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Properties to Watch — SiteVerdict · NSW Development Intelligence</title>
+<meta name="description" content="Properties currently on the market in NSW — pre-screened for subdivision potential using live government data. Free.">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080a;--bg2:#0f1118;--bg3:#161820;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.13);--text:#eeedf0;--muted:#6b6b78;--muted2:#3f3f48;--gold:#c8a84b;--goldl:rgba(200,168,75,.1);--goldm:rgba(200,168,75,.28);--green:#3ecf8e;--greenl:rgba(62,207,142,.08);--greenb:rgba(62,207,142,.22);--amber:#f59e0b;--red:#f26b5b;--r:10px;--r2:16px;--r3:24px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+nav{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:13px 5%;border-bottom:1px solid var(--border);background:rgba(7,8,10,.94);backdrop-filter:blur(24px)}
+.logo{font-family:"Instrument Serif",serif;font-size:1.05rem;display:flex;align-items:center;gap:9px}
+.logo-mark{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.nl{display:flex;gap:2px;font-size:.74rem}.nl a{padding:6px 12px;border-radius:8px;color:var(--muted)}.nl a:hover,.nl a.active{color:var(--text)}
+.nav-cta{background:var(--gold);color:#000;border:none;border-radius:var(--r);padding:7px 16px;font-size:.74rem;font-weight:600}
+@media(max-width:680px){.nl{display:none}}
+.hero{max-width:860px;margin:0 auto;padding:40px 5% 16px;text-align:center}
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:.64rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;background:var(--greenl);border:1px solid var(--greenb);color:var(--green);padding:4px 13px;border-radius:14px;margin-bottom:14px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+h1{font-family:"Instrument Serif",serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:400;margin-bottom:10px;letter-spacing:-.02em}
+h1 em{font-style:italic;color:var(--gold)}
+.hero-sub{font-size:.84rem;color:var(--muted);max-width:520px;margin:0 auto 6px;line-height:1.9}
+.hero-note{font-size:.72rem;color:var(--muted2);max-width:500px;margin:0 auto 24px;padding:8px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r)}
+.datebar{max-width:860px;margin:0 auto;padding:0 5% 12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.db-date{font-size:.72rem;color:var(--muted);font-family:"DM Mono",monospace}
+.db-count{font-size:.72rem;font-weight:500}
+.db-source{font-size:.64rem;color:var(--muted2)}
+/* CARDS */
+.sites{max-width:860px;margin:0 auto;padding:0 5% 28px;display:flex;flex-direction:column;gap:10px}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.sc.top-site{border-color:var(--goldm)}
+.rank-bar{padding:5px 14px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;display:flex;justify-content:space-between;align-items:center}
+.rb-top{background:linear-gradient(90deg,rgba(200,168,75,.12),transparent);color:var(--gold)}
+.rb-basic{background:var(--bg3);color:var(--muted)}
+.sc-top{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 14px 8px;align-items:start}
+.sc-meta{display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap}
+.score-b{font-size:.72rem;font-weight:700;font-family:"DM Mono",monospace;padding:3px 9px;border-radius:5px;background:var(--greenl);color:var(--green);border:1px solid var(--greenb)}
+.score-b.amber{background:rgba(245,158,11,.1);color:var(--amber);border-color:rgba(245,158,11,.2)}
+.status-tag{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:2px 7px;border-radius:4px}
+.st-sale{background:rgba(91,156,242,.1);color:#5b9cf2;border:1px solid rgba(91,156,242,.2)}
+.st-recent{background:var(--greenl);color:var(--green);border:1px solid var(--greenb)}
+.sc-addr{font-size:.92rem;font-weight:500;font-family:"DM Mono",monospace;margin-bottom:2px;line-height:1.3}
+.sc-sub{font-size:.7rem;color:var(--muted)}
+.zone-pill{font-size:.62rem;padding:3px 8px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);color:var(--muted)}
+/* DATA ROW */
+.sc-data{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border-top:1px solid var(--border)}
+.scd{background:var(--bg2);padding:8px;text-align:center}
+.scd-v{font-size:.86rem;font-weight:600;font-family:"DM Mono",monospace;margin-bottom:1px}
+.scd-v.g{color:var(--green)}.scd-v.a{color:var(--amber)}.scd-v.r{color:var(--red)}
+.scd-l{font-size:.56rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+/* CHECKS ROW */
+.sc-checks{padding:8px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ck-item{font-size:.66rem;display:flex;align-items:center;gap:3px}
+.ck-ok{color:var(--green)}.ck-warn{color:var(--amber)}.ck-na{color:var(--muted2)}
+/* SCORE BAR */
+.sc-scorebar{padding:6px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-label{font-size:.62rem;color:var(--muted);white-space:nowrap}
+.sb-bar{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.sb-fill{height:100%;border-radius:3px}
+.sb-pct{font-size:.66rem;font-weight:600;font-family:"DM Mono",monospace;white-space:nowrap}
+/* FOOT */
+.sc-foot{padding:9px 14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.f-note{font-size:.72rem;color:var(--muted)}
+.fbtn-gold{background:var(--gold);color:#000;border:none;border-radius:var(--r);padding:6px 13px;font-size:.72rem;font-weight:600}
+.fbtn-out{background:none;border:1px solid var(--border2);color:var(--muted);border-radius:var(--r);padding:6px 13px;font-size:.72rem}
+/* HOW */
+.how{max-width:860px;margin:0 auto 28px;padding:0 5%}
+.how-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r3);padding:20px 24px}
+.how-title{font-size:.76rem;font-weight:600;margin-bottom:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em}
+.how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.how-step{font-size:.76rem;color:var(--muted);line-height:1.7}
+.hs-n{font-size:1.2rem;font-weight:600;color:var(--gold);font-family:"Instrument Serif",serif;margin-bottom:4px}
+.hs-t{font-weight:500;color:var(--text);margin-bottom:3px}
+footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:.6rem;color:var(--muted2)}
+@media(max-width:600px){.sc-data{grid-template-columns:repeat(3,1fr)}.how-steps{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html"><div class="logo"><span class="logo-mark"></span>SiteVerdict</div></a>
+  <div class="nl">
+    <a href="index.html">Site Check</a>
+    <a href="hot-list.html" class="active">&#128293; Hot list</a>
+    <a href="services.html">Services</a>
+    <a href="finance.html">Finance</a>
+    <a href="full-report.html">Full report</a>
+  </div>
+  <button class="nav-cta" onclick="window.location.href='index.html'">Check a site</button>
+</nav>
+
+<div class="hero">
+  <div class="pill"><span class="dot"></span>Pre-screened daily &middot; Live government data</div>
+  <h1>NSW properties worth <em>checking</em></h1>
+  <div class="hero-sub">Properties on the market — pre-screened for subdivision potential using 16+ government data checks. Free. No account needed.</div>
+  <div class="hero-note">&#128270; Each property has been run through our automated tool — zone, overlays, DA timeline and LEP lot count checked against NSW Planning Portal. Check any address yourself on the <a href="index.html" style="color:var(--gold)">Site Check</a> page.</div>
+</div>
+
+<div class="datebar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="db-date" id="today-date"></div>
+    <div class="db-count" id="site-count"></div>
+    <div class="db-count" id="market-note" style="font-size:.7rem"></div>
+  </div>
+  <div class="db-source">NSW Planning Portal &middot; NSW ePlanning API &middot; Manual curation</div>
+</div>
+
+<div class="sites" id="sites-container">
+
+<!-- Hot list disclaimer -->
+<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px 16px;margin-bottom:12px;font-size:.65rem;color:var(--muted2);line-height:1.7">
+&#9432;&nbsp; <strong style="color:var(--muted)">Hot List disclaimer</strong> &mdash; Items are preliminary screening signals only. Not legal, planning, financial, valuation or investment advice. Professional verification is required before any decision.
+</div>
+
+<!-- Fallback banner -->
+<div style="background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.2);border-radius:12px;padding:14px 18px;margin-bottom:14px;font-size:.78rem;line-height:1.7" id="fallback-banner">
+  <strong style="color:var(--gold)">Hot list is being refreshed.</strong>
+  In the meantime, run a free Site Check or request a quote. <span style="color:var(--muted2);font-size:.68rem">Live data will appear automatically.</span>
+</div>
+
+<!-- CATEGORY LABEL: Site potential -->
+<div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:4px 0 10px;display:flex;align-items:center;gap:10px">
+  &#128269; Site potential opportunities <div style="flex:1;height:1px;background:rgba(255,255,255,.06)"></div>
+  <span style="font-size:.58rem;font-weight:400;color:var(--muted2)">No DA approval confirmed &middot; Preliminary screening only</span>
+</div>
+
+<!-- Site potential card 1 -->
+<div class="sc top-site">
+<div class="rank-bar rb-top"><span>#1 &mdash; Potential site opportunity</span><span style="font-size:.6rem;color:var(--muted2)">Preliminary &middot; No DA confirmed</span></div>
+<div class="sc-top"><div>
+  <div class="sc-meta">
+    <span class="score-b">&#9733; 78/100</span>
+    <span style="font-size:.6rem;color:var(--muted2);margin-left:6px;background:rgba(91,156,242,.1);color:#5b9cf2;border:1px solid rgba(91,156,242,.2);padding:1px 6px;border-radius:4px">High-value review opportunity</span>
+  </div>
+  <div class="sc-addr">6 Fenton Street, Panania NSW 2213</div>
+  <div class="sc-sub">Canterbury-Bankstown &middot; R2 zone &middot; ~282m&#178; &middot; No DA lodged</div>
+</div><div class="zone-pill">R2</div></div>
+<div class="sc-data">
+  <div class="scd"><div class="scd-v g">2</div><div class="scd-l">Est. lots</div></div>
+  <div class="scd"><div class="scd-v a">~282m&#178;</div><div class="scd-l">Block</div></div>
+  <div class="scd"><div class="scd-v">None</div><div class="scd-l">DA status</div></div>
+</div>
+<div style="padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6">R2 zone &middot; Min lot 449m&#178; &middot; No overlays detected &middot; Professional verification required before any decision.</div>
+<div class="sc-foot">
+  <div style="font-size:.7rem;color:var(--muted2);font-style:italic">No DA approval confirmed. Preliminary only.</div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <button class="fbtn-out" data-addr="6%20Fenton%20Street%2C%20Panania%20NSW%202213" onclick="goCheck(this)">Run site check &#8594;</button>
+    <a href="full-report.html" class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report &#8594;</a>
+    <a href="services.html" class="fbtn-out" style="text-decoration:none;display:inline-flex;align-items:center">Professional review</a>
+  </div>
+</div>
+</div>
+
+<!-- Site potential card 2 -->
+<div class="sc">
+<div class="rank-bar rb-basic"><span>#2 &mdash; Potential site opportunity</span><span style="font-size:.6rem;color:var(--muted2)">Preliminary &middot; No DA confirmed</span></div>
+<div class="sc-top"><div>
+  <div class="sc-meta">
+    <span class="score-b amber">&#9733; 71/100</span>
+    <span style="font-size:.6rem;margin-left:6px;background:rgba(91,156,242,.1);color:#5b9cf2;border:1px solid rgba(91,156,242,.2);padding:1px 6px;border-radius:4px">Development potential detected</span>
+  </div>
+  <div class="sc-addr">39 Wattle Road, Casula NSW 2170</div>
+  <div class="sc-sub">Liverpool &middot; R2 zone &middot; Large block &middot; No DA lodged</div>
+</div><div class="zone-pill">R2</div></div>
+<div class="sc-data">
+  <div class="scd"><div class="scd-v g">4</div><div class="scd-l">Est. lots</div></div>
+  <div class="scd"><div class="scd-v a">~1400m&#178;</div><div class="scd-l">Block</div></div>
+  <div class="scd"><div class="scd-v">None</div><div class="scd-l">DA status</div></div>
+</div>
+<div style="padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6">R2 zone &middot; Large block may support 4-lot subdivision pathway &middot; Professional review required.</div>
+<div class="sc-foot">
+  <div style="font-size:.7rem;color:var(--muted2);font-style:italic">No DA approval confirmed. Preliminary only.</div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <button class="fbtn-out" data-addr="39%20Wattle%20Road%2C%20Casula%20NSW%202170" onclick="goCheck(this)">Run site check &#8594;</button>
+    <a href="full-report.html" class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report &#8594;</a>
+    <a href="finance.html" class="fbtn-out" style="text-decoration:none;display:inline-flex;align-items:center">Finance support</a>
+  </div>
+</div>
+</div>
+
+<!-- CATEGORY LABEL: Approved / near-completion -->
+<div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:20px 0 10px;display:flex;align-items:center;gap:10px">
+  &#10003; Approved DA &amp; near-completion opportunities <div style="flex:1;height:1px;background:rgba(255,255,255,.06)"></div>
+  <span style="font-size:.58rem;font-weight:400;color:var(--muted2)">External works &middot; Services &middot; Subdivision completion</span>
+</div>
+
+<!-- Approved DA card 1 -->
+<div class="sc">
+<div class="rank-bar rb-basic"><span>#3 &mdash; Approved DA &middot; External works needed</span><span style="font-size:.6rem;color:var(--muted2)">Det. recently</span></div>
+<div class="sc-top"><div>
+  <div class="sc-meta"><span class="score-b">&#9733; 74/100</span></div>
+  <div class="sc-addr">12 Smith Street, Penrith NSW 2750</div>
+  <div class="sc-sub">Penrith &middot; 2 lots &middot; Approved DA &middot; Works required</div>
+</div><div class="zone-pill">NSW</div></div>
+<div class="sc-data">
+  <div class="scd"><div class="scd-v g">2</div><div class="scd-l">Lots</div></div>
+  <div class="scd"><div class="scd-v g">Approved</div><div class="scd-l">DA status</div></div>
+  <div class="scd"><div class="scd-v">NSW</div><div class="scd-l">State</div></div>
+</div>
+<div style="padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6">DA approved two-lot Torrens title subdivision. External works including driveway, drainage and landscaping required for OC.</div>
+<div class="sc-foot">
+  <div style="font-size:.72rem;color:var(--muted)">External works or quote required?</div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <button class="fbtn-out" data-addr="12%20Smith%20Street%2C%20Penrith%20NSW%202750" onclick="goCheck(this)">Run site check &#8594;</button>
+    <a href="services.html" class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request quote &#8594;</a>
+  </div>
+</div>
+</div>
+
+<!-- Approved DA card 2 -->
+<div class="sc">
+<div class="rank-bar rb-basic"><span>#4 &mdash; Near OC &middot; Subdivision completion</span><span style="font-size:.6rem;color:var(--muted2)">Det. recently</span></div>
+<div class="sc-top"><div>
+  <div class="sc-meta"><span class="score-b amber">&#9733; 68/100</span></div>
+  <div class="sc-addr">23 Pacific Street, Newcastle NSW 2300</div>
+  <div class="sc-sub">Newcastle &middot; 3 lots &middot; Approved DA &middot; Near OC</div>
+</div><div class="zone-pill">NSW</div></div>
+<div class="sc-data">
+  <div class="scd"><div class="scd-v g">3</div><div class="scd-l">Lots</div></div>
+  <div class="scd"><div class="scd-v g">Approved</div><div class="scd-l">DA status</div></div>
+  <div class="scd"><div class="scd-v">NSW</div><div class="scd-l">State</div></div>
+</div>
+<div style="padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6">Three-lot Torrens title subdivision approaching OC. External works, landscaping and drainage compliance needed.</div>
+<div class="sc-foot">
+  <div style="font-size:.72rem;color:var(--muted)">External works or quote required?</div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <button class="fbtn-out" data-addr="23%20Pacific%20Street%2C%20Newcastle%20NSW%202300" onclick="goCheck(this)">Run site check &#8594;</button>
+    <a href="services.html" class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request quote &#8594;</a>
+  </div>
+</div>
+</div>
+
+</div>
+
+<!-- Services CTA -->
+<div style="max-width:860px;margin:0 auto 16px;padding:0 5%">
+  <div style="background:linear-gradient(135deg,rgba(200,168,75,.1),rgba(200,168,75,.04));border:1px solid rgba(200,168,75,.28);border-radius:16px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div style="font-size:.82rem;color:var(--text);line-height:1.6">
+      <span style="font-weight:600">Need help with a site?</span> Free quotes for driveways, retaining walls, drainage and excavation in Sydney and surrounds.
+    </div>
+    <a href="services.html" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#000;font-size:.78rem;font-weight:700;padding:9px 16px;border-radius:10px;text-decoration:none;white-space:nowrap;flex-shrink:0">Request free quote &#8594;</a>
+  </div>
+</div>
+
+<div class="how">
+  <div class="how-box">
+    <div class="how-title">How this works</div>
+    <div class="how-steps">
+      <div class="how-step"><div class="hs-n">1</div><div class="hs-t">We find the property</div>Properties currently listed for sale are manually curated and run through our 16+ government check.</div>
+      <div class="how-step"><div class="hs-n">2</div><div class="hs-t">We score it</div>Zone, overlays, min lot size, DA timeline and comparable DAs scored automatically against live government data.</div>
+      <div class="how-step"><div class="hs-n">3</div><div class="hs-t">You decide</div>Score tells you if it is worth spending money on a professional assessment. Site Check any address yourself &mdash; free.</div>
+    </div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted2)">Automated score is indicative only. Based on government data checks &mdash; does not account for slope, easements, shape or site-specific conditions. A licensed town planner must confirm feasibility before any decision.</div>
+  </div>
+</div>
+
+<footer>
+  <div>SiteVerdict &middot; ABN 42 663 950 070</div>
+  <div>NSW Planning Portal &middot; NSW ePlanning API &middot; <a href="https://wa.me/61402623628" style="color:inherit">Chat with us</a> &middot; <a href="terms.html" style="color:inherit">Terms</a></div>
+</footer>
+
+<script>
+function escapeHTML(s){
+  if(!s)return'';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function fmt(t){return t>=1e6?'$'+(t/1e6).toFixed(1)+'M':'$'+(t/1e3).toFixed(0)+'K'}
+function goCheck(btn){
+  var addr=decodeURIComponent(btn.getAttribute('data-addr')||'');
+  window.location.href='index.html?addr='+encodeURIComponent(addr);
+}
+function goServices(){
+  window.open('https://wa.me/61402623628?text=Hi%2C+I+saw+a+property+on+the+SiteVerdict+list+and+would+like+to+discuss.','_blank');
+}
+
+// Static fallback cards — shown when live API is unavailable
+var FALLBACK_SITES = [
+  {
+    address: '14 Redfern Street, Redfern NSW 2016',
+    council:  'City of Sydney',
+    score:    78,
+    status:   'Approved',
+    lots:     2,
+    description: 'Torrens title two-lot subdivision, R1 zone, 920m\u00b2 block.',
+    decision_date: '2024-09-12'
+  },
+  {
+    address: '6 Fenton Street, Panania NSW 2213',
+    council:  'Canterbury-Bankstown',
+    score:    71,
+    status:   'Approved',
+    lots:     2,
+    description: 'Two-lot Torrens title subdivision, R2 zone, 650m\u00b2 block.',
+    decision_date: '2024-11-04'
+  },
+  {
+    address: '23 Pacific Street, Newcastle NSW 2300',
+    council:  'Newcastle',
+    score:    65,
+    status:   'Approved',
+    lots:     3,
+    description: 'Three-lot Torrens title subdivision, MU1 zone, heritage precinct.',
+    decision_date: '2024-08-22'
+  },
+  {
+    address: '8 Hillside Drive, Camden NSW 2570',
+    council:  'Camden',
+    score:    70,
+    status:   'Approved',
+    lots:     2,
+    description: 'Dual occupancy and Torrens title subdivision, R2 zone.',
+    decision_date: '2024-10-15'
+  },
+  {
+    address: '39 Wattle Road, Casula NSW 2170',
+    council:  'Liverpool',
+    score:    74,
+    status:   'Approved',
+    lots:     4,
+    description: 'Four-lot Torrens title subdivision, R2 zone, flat block.',
+    decision_date: '2024-07-30'
+  }
+];
+function ago(t){
+  if(!t)return'recently';
+  var e=Math.round((new Date-new Date(t))/864e5);
+  return e<1?'today':1===e?'yesterday':e<30?e+'d ago':e<365?Math.round(e/30)+'mo ago':Math.round(e/365)+'y ago';
+}
+
+function buildCard(site, idx, total, isFallback){
+  var scoreClass = site.score>=85?'g':'a';
+  var isTop = idx===0 && !isFallback;
+  var safeAddr  = escapeHTML(site.address||'');
+  var safeCounc = escapeHTML(site.council||'');
+  var safeStat  = escapeHTML(site.status||'Approved');
+  var safeDesc  = escapeHTML(site.description||'Residential subdivision DA');
+  return "<div class='sc"+(isTop?' top-site':'')+"'>"
+    +"<div class='rank-bar "+(isTop?'rb-top':'rb-basic')+"'>"
+      +"<span>#"+(idx+1)+" of "+total+(isTop?' \u2014 Top site today':'')+(isFallback?' (example)':'')+"</span>"
+      +"<span style='font-size:.6rem;color:var(--muted2)'>Det. "+ago(site.decision_date)+"</span>"
+    +"</div>"
+    +"<div class='sc-top'><div>"
+      +"<div class='sc-meta'><span class='score-b "+(site.score<80?'amber':'')+"'>\u2605 "+site.score+"/100</span>"
+      +(isFallback?"<span style='font-size:.6rem;color:var(--muted2);margin-left:6px'>Example \u2014 live data loading</span>":"")
+      +"</div>"
+      +"<div class='sc-addr'>"+safeAddr+"</div>"
+      +"<div class='sc-sub'>"+safeCounc+(site.lots?' \u00b7 '+site.lots+' lots':'')+"</div>"
+    +"</div><div class='zone-pill'>NSW</div></div>"
+    +"<div class='sc-data'>"
+      +"<div class='scd'><div class='scd-v g'>"+(site.lots||'?')+"</div><div class='scd-l'>Lots</div></div>"
+      +"<div class='scd'><div class='scd-v'>"+safeStat+"</div><div class='scd-l'>Status</div></div>"
+      +"<div class='scd'><div class='scd-v'>NSW</div><div class='scd-l'>State</div></div>"
+    +"</div>"
+    +"<div style='padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6'>"+safeDesc+"</div>"
+    +"<div class='sc-foot'>"
+      +"<div class='f-left' style='font-size:.72rem;color:var(--muted)'>Check this address or request a quote</div>"
+      +"<div style='display:flex;gap:6px'>"
+        +"<button class='fbtn-out' data-addr='"+encodeURIComponent(site.address||'')+"' onclick='goCheck(this)'>Run site check \u2192</button>"
+        +"<a href='services.html' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Request quote \u2192</a>"
+      +"</div>"
+    +"</div>"
+  +"</div>";
+}
+
+function showFallback(reason){
+  console.error('Hot list fallback triggered:', reason);
+  var c=document.getElementById('sites-container');
+  var mn=document.getElementById('market-note');
+  if(!c) return;
+  // Fallback header message
+  c.innerHTML="<div style='background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.2);"
+    +"border-radius:12px;padding:14px 18px;margin-bottom:14px;font-size:.78rem;line-height:1.7'>"
+    +"<strong style='color:var(--gold)'>Hot list is being refreshed.</strong> "
+    +"In the meantime, run a free Site Check or request a quote. "
+    +"<span style='color:var(--muted2);font-size:.68rem'>Live data will return automatically.</span>"
+  +"</div>";
+  // Render fallback cards
+  FALLBACK_SITES.forEach(function(site, idx){
+    c.innerHTML += buildCard(site, idx, FALLBACK_SITES.length, true);
+  });
+  var sc = document.getElementById('site-count');
+  if(sc){ sc.textContent='Showing example properties \u2014 live data temporarily unavailable'; sc.style.color='var(--muted)'; }
+  if(mn) mn.textContent='';
+}
+document.getElementById('today-date').textContent=(new Date).toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+// Fetch with 12-second timeout
+var fetchTimer = setTimeout(function(){
+  showFallback('fetch timeout after 4s');
+}, 4000);
+
+fetch('/.netlify/functions/daleads?mode=hotlist')
+  .then(function(t){
+    clearTimeout(fetchTimer);
+    if(!t.ok) throw new Error('Function error: '+t.status);
+    return t.json();
+  })
+  .then(function(t){
+    var c  = document.getElementById('sites-container');
+    var mn = document.getElementById('market-note');
+    if(!c) return;
+    var e=t.sites||[], s=t.total_pool||0;
+    var sc=document.getElementById('site-count');
+    if(sc){ sc.textContent=e.length+' properties screened from '+s+' recent NSW approved DAs'; sc.style.color='var(--green)'; }
+    if(!e.length){
+      c.innerHTML="<div style='text-align:center;padding:32px;color:var(--muted)'>No data today. Check back tomorrow.</div>";
+      if(mn) mn.textContent='';
+      return;
+    }
+    var d=e[0].score||0;
+    if(mn){ mn.textContent=d>=85?'Strong market':d>=70?'Active market':'Steady market'; mn.style.color=d>=85?'var(--green)':d>=70?'var(--amber)':'var(--muted)'; }
+    c.innerHTML='';
+    document.getElementById('fallback-banner') && (document.getElementById('fallback-banner').style.display='none');
+    e.forEach(function(site, idx){ c.innerHTML+=buildCard(site, idx, e.length, false); });
+  })
+  .catch(function(err){
+    clearTimeout(fetchTimer);
+    console.error('DA Leads error:', err);
+    showFallback(err && err.message ? err.message : String(err));
+  });
+</script>
+</body>
+</html>

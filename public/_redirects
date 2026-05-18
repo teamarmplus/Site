@@ -1,0 +1,19 @@
+# ── Block internal paths — forced 404 (! overrides static files) ──
+/tools              /404.html  404!
+/tools/*            /404.html  404!
+/data               /404.html  404!
+/data/*             /404.html  404!
+/docs               /404.html  404!
+/docs/*             /404.html  404!
+/.env               /404.html  404!
+/.env.*             /404.html  404!
+/*.key              /404.html  404!
+/*.pem              /404.html  404!
+/register-trader.html  /404.html  404!
+
+# ── Clean URLs ─────────────────────────────────────────────────────
+/hot-list           /hot-list.html      200
+/services           /services.html      200
+/finance            /finance.html       200
+/terms              /terms.html         200
+/full-report        /full-report.html   200
