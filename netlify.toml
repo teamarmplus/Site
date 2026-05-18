@@ -5,6 +5,17 @@
 
 [build]
   functions = "netlify/functions"
+  # Ignore local-only directories — these are handled by _redirects
+  # but excluding from deploy is the safe belt-and-suspenders approach
+  ignore = "echo 'no build step'"
 
 [functions]
   node_bundler = "esbuild"
+
+# Headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
