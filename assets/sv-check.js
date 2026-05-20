@@ -222,7 +222,7 @@ async function autoLookupBlock(){
     statusEl.innerHTML='<span style="color:var(--muted)">Could not auto-detect block size. Please enter it manually.</span>';
     btn.style.display="";
   }
-}async function runCheck(){var e=document.getElementById("addr").value.trim(),t=parseFloat(document.getElementById("block").value),a=document.getElementById("front"),r=a&&a.value?parseFloat(a.value):15;if(e){var s=!t||t<100,n=document.getElementById("run-btn");n.disabled=!0,n.textContent="Checking...";var i=document.getElementById("result");i.innerHTML="",i.classList.remove("show");var o=document.getElementById("block-lookup-status");o&&(o.textContent=""),setSt("Finding your address...");try{var _geo=await geocodeAddress(e);if(!_geo)return setSt("Address not found. Please check and try again. Include suburb and postcode."),n.disabled=!1,void(n.textContent="Check this property →");var v=_geo.lat,u=_geo.lon,m=20037508.34*u/180,p=Math.log(Math.tan((90+v)*Math.PI/360))/(Math.PI/180)*20037508.34/180,g=encodeURIComponent(JSON.stringify({x:m,y:p,spatialReference:{wkid:102100}})),y="https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer";setSt("Checking zone, heritage, flood and overlays...");var[f,h,b,L,S,R,A,E,w,P,C,I]=await Promise.all([fetch(y+"/11/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,SYM_CODE,LGA_NAME&returnGeometry=false&f=json"),fetch(y+"/14/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LOT_SIZE&returnGeometry=false&f=json"),fetch(y+"/8/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=H_NAME,H_ID,LEGIS_REF_CLAUSE&returnGeometry=false&f=json"),fetch(y+"/4/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=FSR_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/7/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=HEIGHT_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Flood_Planning_Area/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json"),fetch(y+"/16/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=RESERVE_TYPE,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/18/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/15/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,ACID_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/17/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/13/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Bush_Fire_Prone_Land/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})}))]),[N,k,x,M,U,T,B,D,H,F,_,O]=await Promise.all([f.json(),h.json(),b.json(),L.json(),S.json(),R.json(),A.json(),E.json(),w.json(),P.json(),C.json(),I.json()]),j=B.features&&B.features.length?B.features[0].attributes.RESERVE_TYPE||B.features[0].attributes.LAY_CLASS||"Yes":null,z=D.features&&D.features.length>0,G=H.features&&H.features.length?H.features[0].attributes.ACID_CLASS||H.features[0].attributes.LAY_CLASS||"Yes":null,W=F.features&&F.features.length>0,q=_.features&&_.features.length>0,Y=O.features&&O.features.length>0,Z="",K="",V="";if(N.features&&N.features.length){var $=N.features[0].attributes;Z=$.SYM_CODE||"",K=$.LAY_CLASS||"",V=$.LGA_NAME||""}var X={R1:450,R2:450,R3:400,R4:350,R5:2e3,R6:450,RU1:4e3,RU2:4e3,RU3:4e3,RU4:2e3,RU5:2e3,RU6:4e3,E3:2e3,E4:500,C4:400,UR:500,MU1:400,MU2:400,SP1:2e3,SP2:4e3},Q=!1,J=X[Z]||450;if(k.features&&k.features.length&&k.features[0].attributes.LOT_SIZE){var ee=k.features[0].attributes.LOT_SIZE;ee>=({R1:50,R2:50,R3:50,R4:50,R5:100,R6:100,RU1:500,RU2:500,RU3:500,RU4:500,RU5:500,RU6:500,E4:100}[Z]||50)?(J=ee,Q=!0):(Q=!1,J=X[Z]||450,console.warn("Min lot size sanity fail: "+ee+"m² for zone "+Z+" — using zone default"))}var te=["R1","R2","R3","R4","R5","R6","RU1","RU2","RU3","RU4","RU5","RU6","E4","E3","C4","UR","MU1","MU2","B4","SP1","SP2"].indexOf(Z)>-1,ae=null;if(x.features&&x.features.length){var re=x.features[0].attributes;ae={name:re.H_NAME,clause:re.LEGIS_REF_CLAUSE}}var se=M.features&&M.features.length?M.features[0].attributes.FSR_MAX||M.features[0].attributes.LAY_CLASS:null,ne=U.features&&U.features.length?U.features[0].attributes.HEIGHT_MAX||U.features[0].attributes.LAY_CLASS:null,ie=T.features&&T.features.length>0;setSt("Loading infrastructure and comparable projects...");var oe=gc(V),le=(oe&&oe.name,fetch("/.netlify/functions/daleads?mode=comps&council="+encodeURIComponent(V||"")+"&lat="+v+"&lng="+u).catch(()=>null)),de=fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent('[out:json];(node["railway"~"station|halt"](around:5000,'+v+","+u+');node["amenity"~"hospital"](around:5000,'+v+","+u+');node["shop"~"supermarket"](around:2000,'+v+","+u+"););out;")}).catch(()=>null),[ce,ve]=await Promise.all([le,de]),ue=[];if(ce)try{var me=await ce.json();for(var pe of me.comps||[])if(ue.push({addr:pe.address||"",lots:pe.lots||2,cost:pe.cost||0,days:pe.days||0}),ue.length>=3)break}catch(e){console.warn("DA Leads comps parse failed",e);ue=[];}var ge={transport:[],health:[],shopping:[]};if(ve)try{var ye=await ve.json();for(var fe of ye.elements||[]){var he=fe.tags||{},be=he.name;if(be){var Le=Math.round(1110*Math.sqrt(Math.pow((fe.lat||0)-v,2)+Math.pow((fe.lon||0)-u,2)))/10,Se=he.railway?"transport":"hospital"==he.amenity?"health":"shopping";ge[Se].length<3&&ge[Se].push({name:be,dist:Le})}}}catch(e){}var seppStation400=null,seppStation800=null,seppLightRail800=null;(ge.transport||[]).forEach(function(_st){if(_st.dist<=0.4&&!seppStation400)seppStation400=_st;if(_st.dist<=0.8&&!seppStation800)seppStation800=_st;});setSt("");var Re=calcLots(t,r,J,Z);s&&(Re=0),renderResult(e,Z,K,V,J,t,r,Re,oe,ae,ie,se,ne,ge,ue,j,z,te,Q,G,W,q,Y,seppStation400,seppStation800,seppLightRail800,s)}catch(e){console.error("SiteVerdict runCheck failed:",e);setSt("Something went wrong: "+(e&&e.message?e.message:"Unknown error. Check browser console."));}n.disabled=!1,n.textContent="Check this property →"}else setSt("Please enter a property address.")}
+}async function runCheck(){var e=document.getElementById("addr").value.trim(),t=parseFloat(document.getElementById("block").value),a=document.getElementById("front"),r=a&&a.value?parseFloat(a.value):15;if(e){var s=!t||t<100,n=document.getElementById("run-btn");n.disabled=!0,n.textContent="Checking...";var i=document.getElementById("result");i.innerHTML="",i.classList.remove("show");var o=document.getElementById("block-lookup-status");o&&(o.textContent=""),setSt("Finding your address...");try{var _geo=await geocodeAddress(e);if(!_geo)return setSt("Address not found. Please check and try again. Include suburb and postcode."),n.disabled=!1,void(n.textContent="Check this property →");var v=_geo.lat,u=_geo.lon,m=20037508.34*u/180,p=Math.log(Math.tan((90+v)*Math.PI/360))/(Math.PI/180)*20037508.34/180,g=encodeURIComponent(JSON.stringify({x:m,y:p,spatialReference:{wkid:102100}})),y="https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer";setSt("Checking zone, heritage, flood and overlays...");var[f,h,b,L,S,R,A,E,w,P,C,I]=await Promise.all([fetch(y+"/11/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,SYM_CODE,LGA_NAME&returnGeometry=false&f=json"),fetch(y+"/14/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LOT_SIZE&returnGeometry=false&f=json"),fetch(y+"/8/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=H_NAME,H_ID,LEGIS_REF_CLAUSE&returnGeometry=false&f=json"),fetch(y+"/4/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=FSR_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/7/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=HEIGHT_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Flood_Planning_Area/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json"),fetch(y+"/16/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=RESERVE_TYPE,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/18/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/15/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,ACID_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/17/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/13/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Bush_Fire_Prone_Land/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})}))]),[N,k,x,M,U,T,B,D,H,F,_,O]=await Promise.all([f.json(),h.json(),b.json(),L.json(),S.json(),R.json(),A.json(),E.json(),w.json(),P.json(),C.json(),I.json()]),j=B.features&&B.features.length?B.features[0].attributes.RESERVE_TYPE||B.features[0].attributes.LAY_CLASS||"Yes":null,z=D.features&&D.features.length>0,G=H.features&&H.features.length?H.features[0].attributes.ACID_CLASS||H.features[0].attributes.LAY_CLASS||"Yes":null,W=F.features&&F.features.length>0,q=_.features&&_.features.length>0,Y=O.features&&O.features.length>0,Z="",K="",V="";if(N.features&&N.features.length){var $=N.features[0].attributes;Z=$.SYM_CODE||"",K=$.LAY_CLASS||"",V=$.LGA_NAME||""}var X={R1:450,R2:450,R3:400,R4:350,R5:2e3,R6:450,RU1:4e3,RU2:4e3,RU3:4e3,RU4:2e3,RU5:2e3,RU6:4e3,E3:2e3,E4:500,C4:400,UR:500,MU1:400,MU2:400,SP1:2e3,SP2:4e3},Q=!1,J=X[Z]||450;if(k.features&&k.features.length&&k.features[0].attributes.LOT_SIZE){var ee=k.features[0].attributes.LOT_SIZE;ee>=({R1:50,R2:50,R3:50,R4:50,R5:100,R6:100,RU1:500,RU2:500,RU3:500,RU4:500,RU5:500,RU6:500,E4:100}[Z]||50)?(J=ee,Q=!0):(Q=!1,J=X[Z]||450,console.warn("Min lot size sanity fail: "+ee+"m² for zone "+Z+" — using zone default"))}var te=["R1","R2","R3","R4","R5","R6","RU1","RU2","RU3","RU4","RU5","RU6","E4","E3","C4","UR","MU1","MU2","B4","SP1","SP2"].indexOf(Z)>-1,ae=null;if(x.features&&x.features.length){var re=x.features[0].attributes;ae={name:re.H_NAME,clause:re.LEGIS_REF_CLAUSE}}var se=M.features&&M.features.length?M.features[0].attributes.FSR_MAX||M.features[0].attributes.LAY_CLASS:null,ne=U.features&&U.features.length?U.features[0].attributes.HEIGHT_MAX||U.features[0].attributes.LAY_CLASS:null,ie=T.features&&T.features.length>0;setSt("Loading infrastructure and comparable projects...");var oe=gc(V),le=(oe&&oe.name,fetch("/.netlify/functions/daleads?mode=comps&council="+encodeURIComponent(V||"")+"&lat="+v+"&lng="+u).catch(()=>null)),de=fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent('[out:json];(node["railway"~"station|halt"](around:5000,'+v+","+u+');node["amenity"~"hospital"](around:5000,'+v+","+u+');node["shop"~"supermarket"](around:2000,'+v+","+u+"););out;")}).catch(()=>null),[ce,ve]=await Promise.all([le,de]),ue=[];if(ce)try{var me=await ce.json();for(var pe of me.comps||[])if(ue.push({addr:pe.address||"",lots:pe.lots||2,cost:pe.cost||0,days:pe.days||0}),ue.length>=3)break}catch(e){console.warn("DA Leads comps parse failed",e);ue=[];}var ge={transport:[],health:[],shopping:[]};if(ve)try{var ye=await ve.json();for(var fe of ye.elements||[]){var he=fe.tags||{},be=he.name;if(be){var Le=Math.round(1110*Math.sqrt(Math.pow((fe.lat||0)-v,2)+Math.pow((fe.lon||0)-u,2)))/10,Se=he.railway?"transport":"hospital"==he.amenity?"health":"shopping";ge[Se].length<3&&ge[Se].push({name:be,dist:Le})}}}catch(e){}var seppStation400=null,seppStation800=null,seppLightRail800=null;(ge.transport||[]).forEach(function(_st){if(_st.dist<=0.4&&!seppStation400)seppStation400=_st;if(_st.dist<=0.8&&!seppStation800)seppStation800=_st;});setSt("");var Re=calcLots(t,r,J,Z);s&&(Re=0),renderResult(e,Z,K,V,J,t,r,Re,oe,ae,ie,se,ne,ge,ue,j,z,te,Q,G,W,q,Y,seppStation400,seppStation800,seppLightRail800,s,s?'auto-detected':'manual')}catch(e){console.error("SiteVerdict runCheck failed:",e);setSt("Something went wrong: "+(e&&e.message?e.message:"Unknown error. Check browser console."));}n.disabled=!1,n.textContent="Check this property →"}else setSt("Please enter a property address.")}
 
 
 
@@ -328,7 +328,7 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
     verdictColor='var(--green)';
     verdictRange='Strong';
   }else if(overallScore>=65){
-    verdict='Review opportunity — professional verification required';
+    verdict='High-value review opportunity — professional verification required';
     verdictColor='var(--amber)';
     verdictRange='Review opportunity';
   }else if(overallScore>=50){
@@ -382,6 +382,59 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
     approvalPct>=60?'Conditional \u2014 standard DA pathway, council assessment required':
     'Uncertain \u2014 overlays or zoning constraints may complicate approval';
 
+
+  // ── TASK 3+4 (updated): site_potential_tier + opportunity_reason ──
+  var site_potential_tier, opportunity_reason, red_flags = [];
+
+  // Collect red flags
+  if(heritage)    red_flags.push('Heritage overlay');
+  if(flood)       red_flags.push('Flood planning area');
+  if(bushfire)    red_flags.push('Bushfire prone land');
+  if(!zone)       red_flags.push('Zone not detected');
+  if(zone==='E2'||zone==='RE1'||zone==='RU1') red_flags.push('Non-residential or environmental zone');
+
+  var strongZone    = zone&&(['R3','R4','MU1','B1','B2','B4'].indexOf(zone)>-1);
+  var largeBlock    = block&&block>=1200;
+  var veryLargeBlock= block&&block>=2000;
+  var missing_data  = !zone || !block;
+
+  if(missing_data || red_flags.length>=2){
+    site_potential_tier = 'Complex professional review required';
+    opportunity_reason  = red_flags.length>=2
+      ? 'Multiple overlays or data issues detected. Professional verification required before any decision.'
+      : 'Zone or block size not confirmed. Professional verification required.';
+  } else if(n>=9 || (strongZone&&zone==='R4'&&n>=6) || (zone==='MU1'&&n>=6)){
+    // Tier 3: High-entry / complex
+    site_potential_tier = 'High-entry / complex opportunity';
+    opportunity_reason  = (zone||'Unknown')+' zone with estimated '+n+'+ dwelling / lot potential. Experienced developers, capital partners and consultant team required.';
+  } else if(n>=4 || (strongZone && n>=3) || (veryLargeBlock && strongZone)){
+    // Tier 2: Medium opportunity
+    site_potential_tier = 'Medium opportunity — delivery and finance review';
+    opportunity_reason  = strongZone
+      ? (zone||'Unknown')+' zone with estimated '+n+(n>=4?' dwelling / lot':' dwelling')+' potential. Finance support and professional review likely useful.'
+      : 'Large block ('+block+'m²) with estimated '+n+'-lot subdivision potential. Civil works and finance support likely needed.';
+  } else if(n>=3 || (largeBlock && n>=2)){
+    // Tier 2: Medium (smaller end)
+    site_potential_tier = 'Medium opportunity — delivery and finance review';
+    opportunity_reason  = n>=3
+      ? 'Possible '+n+'-lot subdivision pathway — verify minimum lot size and overlays. Finance support may be useful.'
+      : 'Large block may support '+n+'-lot subdivision. Confirm LEP minimum lot size with a licensed surveyor.';
+  } else if(n>=2){
+    // Tier 1: Entry / 2-lot or dual occupancy
+    site_potential_tier = 'Entry opportunity — small subdivision review';
+    opportunity_reason  = 'Possible 2-lot subdivision or dual occupancy pathway. Good entry-level opportunity for homeowners, small builders and local investors. Confirm LEP controls, frontage and servicing.';
+  } else {
+    // Tier 1: Entry / granny flat / secondary dwelling
+    site_potential_tier = 'Entry opportunity — granny flat / secondary dwelling pathway';
+    opportunity_reason  = 'Block size may support granny flat, secondary dwelling or small duplex. High-demand pathway for homeowners and small builders. Confirm with a licensed town planner.';
+  }
+
+  // Override: do not call anything High-entry/complex without meaningful scale
+  if(site_potential_tier==='High-entry / complex opportunity' && n<6){
+    site_potential_tier = 'Medium opportunity — delivery and finance review';
+  }
+
+
   return '<div class="verdict-section">'
     +'<div class="vs-header">'
       +'<div class="vs-left">'
@@ -397,7 +450,8 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
           +'<div class="vc-item"><div class="vc-label">&#9652; Hidden upside</div><div class="vc-text">'+hiddenUpside+'</div></div>'
           +'<div class="vc-item"><div class="vc-label">&#9660; Primary risk</div><div class="vc-text">'+primaryRisk+'</div></div>'
           +'<div class="vc-item"><div class="vc-label">&#9654; Approval outlook</div><div class="vc-text">'+outlook+'</div></div>'
-          +'<div class="vc-item"><div class="vc-label">&#9203; Strategy</div><div class="vc-text">'+(n>=4?'Secure under option. Confirm sewer, BVM and DCP frontage before exchanging.':n===3?'Pre-DA meeting recommended. Commission surveyor and town planner before any offer.':n>=2?'Indicative 2-lot pathway — confirm LEP controls, frontage, access, easements and servicing with a licensed planner and surveyor before any offer.':overallScore>=50?'Block size not confirmed. If subdivision is a goal, engage a town planner to assess LEP controls, frontage and DCP requirements.':'Duplex or secondary dwelling may be viable. Full Torrens subdivision unlikely given site constraints — confirm with a licensed town planner.')+'</div></div>'
+          +(opportunity_reason?'<div class="vc-item" style="border-left:2px solid var(--blue);padding-left:8px"><div class="vc-label" style="color:var(--blue)">&#8505; Ranking reason</div><div class="vc-text">'+opportunity_reason+'</div></div>':'')
+      +'<div class="vc-item"><div class="vc-label">&#9203; Strategy</div><div class="vc-text">'+(n>=4?'Secure under option. Confirm sewer, BVM and DCP frontage before exchanging.':n===3?'Pre-DA meeting recommended. Commission surveyor and town planner before any offer.':n>=2?'Indicative 2-lot pathway — confirm LEP controls, frontage, access, easements and servicing with a licensed planner and surveyor before any offer.':overallScore>=50?'Block size not confirmed. If subdivision is a goal, engage a town planner to assess LEP controls, frontage and DCP requirements.':'Duplex or secondary dwelling may be viable. Full Torrens subdivision unlikely given site constraints — confirm with a licensed town planner.')+'</div></div>'
         +'</div>'
       +'</div>'
       +'<div class="vs-right">'
@@ -411,6 +465,7 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
       +'<div class="vkpi"><div class="vkpi-v a">'+(n>=2?n+' lots':'—')+'</div><div class="vkpi-l">LEP lot estimate</div></div>'
       +'<div class="vkpi"><div class="vkpi-v" style="color:'+riskColor+'">'+riskLabel+'</div><div class="vkpi-l">Risk level</div></div>'
       +'<div class="vkpi"><div class="vkpi-v b">'+timeline+'</div><div class="vkpi-l">Timeline est.</div></div>'
+    +'<div class="vkpi" style="grid-column:span 2"><div class="vkpi-v" style="font-size:.65rem;color:var(--blue)">'+site_potential_tier+'</div><div class="vkpi-l">Site potential tier</div></div>'
     +'</div>'
     +(n>=4 || (block&&block>=2000) ?
       '<div style="margin-top:12px;padding:10px 14px;background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.2);border-radius:8px;font-size:.72rem;color:var(--muted);line-height:1.7">'
@@ -534,7 +589,7 @@ function calcCouncilComplexity(cm){
 // Sets innerHTML on #result with the full report card structure.
 // All enhancement sections (verdict, scorecard etc) are added by
 // the renderResult wrapper AFTER this function runs.
-function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,overallScore){
+function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,overallScore,blockSource){
   var resultEl=document.getElementById('result');
   if(!resultEl) return;
 
@@ -660,6 +715,41 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
       +'<div class="sr"><div class="sr-v">'+esc(blockDisp,20)+'</div><div class="sr-l">Block size</div></div>'
     +'</div>'
 
+
+    // Data confidence section
+    +'<div class="rsec" style="background:rgba(255,255,255,.02)">'
+      +'<div class="rsec-title">Data confidence <span class="tag tag-live" style="background:transparent;border-color:rgba(255,255,255,.1);color:var(--muted)">&#9432; What we checked &middot; What needs professional review</span></div>'
+      +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:.72rem">'
+        // Block size
+        +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'
+          +'<div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2);margin-bottom:4px">Block size</div>'
+          +'<div style="font-weight:600;color:var(--text)">'+(block?block+'m\u00b2':'Not provided')+'</div>'
+          +'<div style="margin-top:3px;font-size:.65rem;color:'+(blockSource==='auto-detected'?'var(--green)':'var(--amber)')+'">'
+            +(blockSource==='auto-detected'
+              ?'\u2713 Auto-detected (NSW Cadastre)'
+              :(block?'\u26a0 Manually entered \u2014 verify against title':'Enter block size for better results'))+'</div>'
+        +'</div>'
+        // Zone
+        +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'
+          +'<div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2);margin-bottom:4px">Zone</div>'
+          +'<div style="font-weight:600;color:var(--text)">'+(zone||'Unknown')+'</div>'
+          +'<div style="margin-top:3px;font-size:.65rem;color:'+(zone&&zone!=='E2'&&zone!=='RE1'?'var(--green)':'var(--amber)')+'">'
+            +(zone?'\u2713 Live from NSW Planning Portal':'\u2717 Zone not detected \u2014 enter address in full')+'</div>'
+        +'</div>'
+        // Lot count
+        +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'
+          +'<div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2);margin-bottom:4px">Est. lot count</div>'
+          +'<div style="font-weight:600;color:var(--text)">'+(n>=2?n+' lots (est.)':'Below threshold')+'</div>'
+          +'<div style="margin-top:3px;font-size:.65rem;color:var(--muted2)">Estimated \u2014 licensed surveyor must confirm</div>'
+        +'</div>'
+      +'</div>'
+      +'<div style="margin-top:8px;font-size:.64rem;color:var(--muted2);line-height:1.7">'
+        +'<strong style="color:var(--muted)">Not yet fully modelled:</strong> '
+        +'Slope &amp; earthworks &middot; Riparian / watercourse corridors &middot; Detailed flood depth &middot; Easements &middot; Title boundaries &middot; Sewer capacity &middot; Tree preservation orders. '
+        +'These require a licensed professional.'
+      +'</div>'
+    +'</div>'
+    +
     // Planning controls
     +'<div class="rsec">'
       +'<div class="rsec-title">Planning controls <span class="tag tag-live">&#9679; NSW Planning Portal \u00b7 live</span></div>'
@@ -683,14 +773,64 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
         +ovRow('Bushfire prone land',!bushfire,'NSW RFS Bush Fire Prone Land')
         +ovRow('Acid sulfate soils',!acidSulfate,'Layer 15 \u00b7 NSW Planning Portal')
         +ovRow('Contaminated land',!contaminated,'Layer 17 \u00b7 NSW Planning Portal')
-        +ovRow('Riparian corridor',!riparian,'Layer 13 \u00b7 NSW Planning Portal')
+        +ovRow('Riparian / watercourse',!riparian,'Layer 13 \u00b7 NSW Planning Portal','Indicators only \u2014 watercourse buffers not yet fully modelled. Professional verification required.')
         +ovRow('Land reservation',!landReserve,'Layer 16 \u00b7 NSW Planning Portal',landReserve?'Reserved: '+esc(String(landReserve),40):'')
         +ovRow('Foreshore building line',!foreshore,'Layer 18 \u00b7 NSW Planning Portal')
         +seppNote
       +'</div>'
     +'</div>'
 
-    // Comparables (if any)
+
+    // Risk register
+    +'<div class="rsec">'
+      +'<div class="rsec-title">Risk register <span class="tag" style="background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.1);color:var(--muted)">Site-specific risks</span></div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.72rem">'
+        +'<div style="padding:8px 10px;border-radius:8px;background:var(--bg3)">'
+          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:3px">Heritage</div>'
+          +'<div style="color:'+(heritage?'var(--amber)':'var(--green)')+';font-weight:500">'+(heritage?'⚠ Heritage overlay detected':'✓ No heritage overlay')+'</div>'
+          +(heritage?'<div style="font-size:.63rem;color:var(--muted);margin-top:2px">Impact Statement required. Licensed professional must assess.</div>':'')
+        +'</div>'
+        +'<div style="padding:8px 10px;border-radius:8px;background:var(--bg3)">'
+          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:3px">Flood</div>'
+          +'<div style="color:'+(flood?'var(--amber)':'var(--green)')+';font-weight:500">'+(flood?'⚠ Flood planning area detected':'✓ No flood planning area')+'</div>'
+          +(flood?'<div style="font-size:.63rem;color:var(--muted);margin-top:2px">Hydraulic assessment required. Detailed flood depth not yet modelled.</div>':'')
+        +'</div>'
+        +'<div style="padding:8px 10px;border-radius:8px;background:var(--bg3)">'
+          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:3px">Bushfire</div>'
+          +'<div style="color:'+(bushfire?'var(--amber)':'var(--green)')+';font-weight:500">'+(bushfire?'⚠ Bushfire prone land':'✓ Not bushfire prone')+'</div>'
+          +(bushfire?'<div style="font-size:.63rem;color:var(--muted);margin-top:2px">Bushfire Assessment Report likely required.</div>':'')
+        +'</div>'
+        +'<div style="padding:8px 10px;border-radius:8px;background:var(--bg3)">'
+          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:3px">Riparian / watercourse</div>'
+          +'<div style="color:var(--muted);font-weight:500">'+(riparian?'⚠ Indicator detected':'— Indicator not detected')+'</div>'
+          +'<div style="font-size:.63rem;color:var(--muted2);margin-top:2px">Not yet fully modelled. Watercourse buffers require professional verification.</div>'
+        +'</div>'
+        +'<div style="padding:8px 10px;border-radius:8px;background:var(--bg3)">'
+          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:3px">Slope &amp; earthworks</div>'
+          +'<div style="color:var(--muted);font-weight:500">— Not yet modelled</div>'
+          +'<div style="font-size:.63rem;color:var(--muted2);margin-top:2px">Slope and earthworks risk requires site inspection and geotechnical assessment.</div>'
+        +'</div>'
+        +(zone==='E2'||zone==='RE1'||zone==='RU1'?'<div style="padding:8px 10px;border-radius:8px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2)"><div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:3px">Zone warning</div><div style="color:var(--amber);font-weight:500">⚠ Non-residential zone detected</div><div style="font-size:.63rem;color:var(--muted);margin-top:2px">Zone may restrict residential development. Confirm zoning with council.</div></div>':'')
+      +'</div>'
+    +'</div>'
+
+    // Development pathway
+    +'<div class="rsec" style="background:rgba(91,156,242,.03);border-color:rgba(91,156,242,.15)">'
+      +'<div class="rsec-title" style="color:#5b9cf2">Development pathway <span class="tag" style="background:rgba(91,156,242,.08);border-color:rgba(91,156,242,.2);color:#5b9cf2">Estimated \u2014 professional verification required</span></div>'
+      +'<div style="font-size:.76rem;color:var(--muted);line-height:1.8;margin-bottom:10px">'
+        +(n>=4?'<strong style="color:var(--text)">Multi-lot Torrens title subdivision pathway detected.</strong> '+zone+' zone with '+n+'-lot LEP yield estimate. Scaled civil works, engineering and multiple DA conditions likely. Town planner, civil engineer and licensed surveyor required.':
+          n===3?'<strong style="color:var(--text)">3-lot subdivision pathway possible.</strong> Pre-DA council meeting recommended. Town planner and licensed surveyor required before any decision.':
+          n===2?'<strong style="color:var(--text)">2-lot subdivision or dual occupancy pathway may be viable.</strong> Confirm LEP controls, frontage, access, easements and servicing with a licensed planner and surveyor.':
+          zone==='R3'?'<strong style="color:var(--text)">Medium density zone (R3).</strong> Townhouse or multi-dwelling development may be permissible. Town planner review required to assess DCP controls.':
+          '<strong style="color:var(--text)">Single dwelling or secondary dwelling pathway only.</strong> Block size or zoning does not support Torrens title subdivision under current LEP minimum lot size.')
+      +'</div>'
+      +'<div style="font-size:.67rem;color:var(--muted2);padding:8px 10px;background:rgba(255,255,255,.02);border-radius:6px;line-height:1.7">'
+        +'<strong style="color:var(--muted)">Important:</strong> No DA approval is confirmed. This is a preliminary screening signal only. '
+        +'Professional verification is required before any purchase, finance or development decision.'
+      +'</div>'
+    +'</div>'
+
+        // Comparables (if any)
     +(compHtml?'<div class="rsec"><div class="rsec-title">Comparable DAs \u2014 same council <span class="tag tag-live">&#9679; DA Leads API</span></div>'+compHtml+'</div>':'')
 
     // Infrastructure
@@ -698,16 +838,25 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
 
     // Disclaimer
     +'<div style="margin:20px 0 0;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;font-size:.66rem;color:var(--muted);line-height:1.8">'
-      +'<strong style="color:var(--muted2)">Disclaimer</strong> — This report is generated from publicly available government data sources including NSW Planning Portal, NSW ePlanning API, and OpenStreetMap. It is indicative only and does not constitute professional planning, legal or financial advice. Scores and feasibility assessments do not guarantee development approval. Site-specific conditions including slope, easements, lot shape, Council DCP controls and servicing capacity are not fully assessed. A licensed town planner or surveyor must confirm feasibility before any decision. No guaranteed prices or outcomes are implied.'
+      +'<strong style="color:var(--muted2)">Disclaimer</strong> — This report is generated from publicly available government data sources including NSW Planning Portal, NSW ePlanning API, and OpenStreetMap. It is indicative only and does not constitute professional planning, legal or financial advice. Scores and feasibility assessments do not guarantee development approval. Site-specific conditions including slope, earthworks, easements, lot shape, Council DCP controls and servicing capacity are not fully assessed. Riparian / watercourse corridor buffers and detailed flood depth are not yet fully modelled — professional verification is required. A licensed town planner, surveyor, civil engineer and solicitor must confirm feasibility before any purchase, finance or development decision. No guaranteed prices, profits or outcomes are implied.'
     +'</div>'
 
-    // CTA — service enquiry
+    // CTA — next steps
     +'<div class="cta-box">'
-      +'<div class="cta-title">Need practical help with this site?</div>'
-      +'<div class="cta-sub">Need practical help with this site? Request a quote for civil works, external works, drainage, driveway, retaining walls, excavation, landscaping or professional support. Handled directly or matched with trusted professionals.</div>'
+      +'<div class="cta-title">What to do next with this site?</div>'
+      +(overallScore>=65
+        ?(n>=4||(block&&block>=2000)
+          ?'<div class="cta-sub">This site may support a higher-value development pathway. A Full Report gives a structured planning-risk picture before you spend on professionals or finance decisions.</div>'
+          :'<div class="cta-sub">This site shows development potential. Run a Full Report or request professional review before making any decision. No DA approval confirmed — preliminary screening only.</div>')
+        :'<div class="cta-sub">Need practical help with this site? Request a quote for civil works, external works, drainage, driveway, retaining walls, excavation, landscaping or professional support. Handled directly or matched with trusted professionals.</div>')
       +'<div class="cta-btns">'
-        +'<button class="btn btn-gold" onclick="window.location.href=\'services.html\'">Request free quote \u2192</button>'
-        +'<button class="btn btn-outline btn-sm" onclick="chatPro()">Chat with us \u2192</button>'
+        +(overallScore>=65
+          ?'<a href="full-report.html" class="btn btn-gold" style="text-decoration:none">Unlock full report →</a>'
+           +'<button class="btn btn-outline btn-sm" onclick="window.location.href=\'services.html\'">Request professional review →</button>'
+           +'<a href="finance.html" class="btn btn-outline btn-sm" style="text-decoration:none;margin-top:4px">Finance &amp; lender support</a>'
+          :'<button class="btn btn-gold" onclick="window.location.href=\'services.html\'">Request quote →</button>'
+           +'<button class="btn btn-outline btn-sm" onclick="chatPro()">Chat with us →</button>'
+        )
       +'</div>'
     +'</div>'
   +'</div>';
@@ -883,7 +1032,7 @@ function buildProVerification(){
     +'<div class="rsec-title" style="color:var(--gold)">&#9888; Professional verification required</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:.74rem;color:var(--muted);line-height:1.9">'
       +'<div><div style="font-weight:500;color:var(--text);margin-bottom:4px">&#10003; Confirmed via 16+ live data sources</div>'
-        +'Zone &middot; Min lot size &middot; Heritage &middot; Flood &middot; Bushfire &middot; Acid sulfate &middot; Contaminated land &middot; Riparian &middot; Land reservation &middot; Foreshore &middot; FSR &middot; Height &middot; SEPP 2024 proximity &middot; DA timeline (34 councils) &middot; Block size (cadastre) &middot; Comparable DAs (DA Leads API)</div>'
+        +'Zone &middot; Min lot size &middot; Heritage &middot; Flood &middot; Bushfire &middot; Acid sulfate &middot; Contaminated land &middot; Riparian / watercourse indicators (where available) &middot; Land reservation &middot; Foreshore &middot; FSR &middot; Height &middot; SEPP 2024 proximity &middot; DA timeline (34 councils) &middot; Block size (cadastre) &middot; Comparable DAs (DA Leads API)</div>'
       +'<div><div style="font-weight:500;color:var(--text);margin-bottom:4px">&#9888; Requires licensed professional</div>'
         +'Lot boundaries &middot; Title easements &middot; Slope &amp; earthworks &middot; Sewer &amp; water capacity &middot; Tree preservation &middot; DCP frontage controls &middot; Dwelling position &middot; Driveway access &middot; Council pre-DA feedback &middot; SEPP exact applicability</div>'
     +'</div>'
@@ -892,7 +1041,7 @@ function buildProVerification(){
 }
 
 // ── UPDATED renderResult WRAPPER ────────────────────
-function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount){
+function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,blockSource){
   // Calculate scores
   var ps =calcPlanningStrength(zone,mls,mlsReal,heritage,fsr,height,zoneAllows);
   var ov =calcOverlayRisk(heritage,flood,bushfire,acidSulfate,contaminated,riparian,landReserve,foreshore);
@@ -906,7 +1055,7 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
 
   // Run inner renderer (sets innerHTML on #result)
   try{
-    _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,overall);
+    _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,overall,blockSource);
   }catch(e){console.error("_renderResultInner failed:",e); return;}
 
   var resultEl=document.getElementById('result');
