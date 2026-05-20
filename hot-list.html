@@ -78,26 +78,44 @@ h1 em{font-style:italic;color:var(--gold)}
 .hs-t{font-weight:500;color:var(--text);margin-bottom:3px}
 footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:.6rem;color:var(--muted2)}
 @media(max-width:600px){.sc-data{grid-template-columns:repeat(3,1fr)}.how-steps{grid-template-columns:1fr}}
+
+/* Hot List section headers */
+.hl-section-header{padding:14px 0 10px;border-top:2px solid var(--border2);margin-bottom:10px}
+.hl-section-title{font-family:"Instrument Serif",serif;font-size:1.05rem;font-weight:400;margin-bottom:4px}
+.hl-section-sub{font-size:.7rem;color:var(--muted);line-height:1.6}
+.hl-beta-tag{background:var(--goldl);color:var(--gold);border:1px solid var(--goldm);padding:1px 7px;border-radius:4px;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.hl-badge{font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:4px;margin-left:6px}
+.hl-badge-blue{background:rgba(91,156,242,.1);color:#5b9cf2;border:1px solid rgba(91,156,242,.2)}
+.hl-badge-green{background:var(--greenl);color:var(--green);border:1px solid var(--greenb)}
+.hl-none{color:var(--muted2)!important}
+.sc-notes{padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6}
+.sc-confidence{font-size:.68rem;color:var(--muted2)}
+.sc-btns{display:flex;gap:6px;flex-wrap:wrap}
+.fbtn-out2{background:none;color:var(--muted);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:.72rem;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap}
+.fbtn-out2:hover{color:var(--text);border-color:var(--border2)}
+
+.hl-quality-note{font-size:.68rem;color:var(--muted2);line-height:1.7;padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;margin-top:8px}
+.fbtn-out2{background:none;color:var(--muted);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:.72rem;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center}
 </style>
 </head>
 <body>
 <nav>
-  <a href="index.html"><div class="logo"><span class="logo-mark"></span>SiteVerdict</div></a>
+  <a href='/'><div class="logo"><span class="logo-mark"></span>SiteVerdict</div></a>
   <div class="nl">
-    <a href="index.html">Site Check</a>
-    <a href="hot-list.html" class="active">&#128293; Hot list</a>
-    <a href="services.html">Services</a>
-    <a href="finance.html">Finance</a>
-    <a href="index.html">Full report</a>
+    <a href='/'>Site Check</a>
+    <a class='active' href='/hot-list'>&#128293; Hot list</a>
+    <a href='/services'>Services</a>
+    <a href='/finance'>Finance</a>
+    <a href='/full-report'>Full report</a>
   </div>
   <button class="nav-cta" onclick="window.location.href='index.html'">Check a site</button>
 </nav>
 
 <div class="hero">
-  <div class="pill"><span class="dot"></span>Pre-screened daily &middot; Live government data</div>
+  <div class="pill"><span class="dot"></span>Updated regularly during beta &middot; Live government data</div>
   <h1>NSW properties worth <em>checking</em></h1>
   <div class="hero-sub">Properties on the market — pre-screened for subdivision potential using 16+ government data checks. Free. No account needed.</div>
-  <div class="hero-note">&#128270; Each property has been run through our automated tool — zone, overlays, DA timeline and LEP lot count checked against NSW Planning Portal. Check any address yourself on the <a href="index.html" style="color:var(--gold)">Site Check</a> page.</div>
+  <div class="hero-note">&#128270; Each property has been run through our automated tool — zone, overlays, DA timeline and LEP lot count checked against NSW Planning Portal. Check any address yourself on the <a href='/' style='color:var(--gold)'>Site Check</a> page.</div>
 </div>
 
 <div class="datebar">
@@ -110,32 +128,323 @@ footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-c
 </div>
 
 <div class="sites" id="sites-container">
-<div style="background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.2);border-radius:12px;padding:14px 18px;margin-bottom:14px;font-size:.78rem;line-height:1.7" id="fallback-banner">
-  <strong style="color:var(--gold)">Showing example properties.</strong>
-  Hot list is being refreshed. In the meantime, run a free Site Check or request a quote.
-  <span style="color:var(--muted2);font-size:.68rem">Live data will appear automatically.</span>
+
+<!-- ═══ SECTION 1: SITE POTENTIAL ═══════════════════════════════ -->
+<div class="hl-section-header" id="section-potential">
+  <div class="hl-section-title">&#128269; Today&rsquo;s Site Potential</div>
+  <div class="hl-section-sub">Pre-DA opportunities for further review &middot; No DA approval confirmed &middot; Professional verification required &middot; <span class="hl-beta-tag">Updated regularly during beta</span></div>
+  <div class="hl-quality-note">Exact addresses are available through Full Report or Professional Review. Site Potential cards are prioritised for meaningful scale &mdash; usually 3+ lot potential, multi-dwelling potential, larger blocks or stronger zoning. Smaller sites can be checked with the free Site Check but are not prioritised here.</div>
 </div>
-<div class='sc top-site'>
-<div class='rank-bar rb-top'><span>#1 of 5 &mdash; Example</span><span style='font-size:.6rem;color:var(--muted2)'>Det. recently</span></div>
-<div class='sc-top'><div><div class='sc-meta'><span class='score-b'>★ 78/100</span><span style='font-size:.6rem;color:var(--muted2);margin-left:6px'>Example — live data loading</span></div><div class='sc-addr'>6 Fenton Street, Panania NSW 2213</div><div class='sc-sub'>Canterbury-Bankstown &middot; 2 lots</div></div><div class='zone-pill'>NSW</div></div>
-<div class='sc-data'><div class='scd'><div class='scd-v g'>2</div><div class='scd-l'>Lots</div></div><div class='scd'><div class='scd-v'>Approved</div><div class='scd-l'>Status</div></div><div class='scd'><div class='scd-v'>NSW</div><div class='scd-l'>State</div></div></div>
-<div style='padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6'>Two-lot Torrens title subdivision, R2 zone.</div>
-<div class='sc-foot'><div class='f-left' style='font-size:.72rem;color:var(--muted)'>Check this address or request a quote</div><div style='display:flex;gap:6px'><button class='fbtn-out' data-addr='6%20Fenton%20Street%2C%20Panania%20NSW%202213' onclick='goCheck(this)'>Run site check →</button><a href='services.html' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Request quote →</a></div></div>
+
+<div id="potential-cards">
+
+<!-- POTENTIAL CARD 1 — Entry / granny flat + dual occ -->
+<div class="sc top-site">
+  <div class="rank-bar rb-top"><span>Site potential &middot; #1 of 5</span><span style="font-size:.6rem;color:var(--muted2)">Preliminary screening signal</span></div>
+  <div class="sc-top"><div>
+    <div class="sc-meta">
+      <span class="score-b">&#9733; 74/100</span>
+      <span class="hl-badge hl-badge-blue">Entry opportunity &mdash; high-demand pathway</span>
+    </div>
+    <div class="sc-addr">Blacktown, Blacktown Council <span style="font-size:.63rem;color:var(--muted2);font-weight:400">&#8212; Exact address hidden in beta</span></div>
+    <div class="sc-sub">Blacktown &middot; R2 zone &middot; ~650m&#178; &middot; Granny flat / dual occupancy potential</div>
+  </div><div class="zone-pill">R2</div></div>
+  <div class="sc-data">
+    <div class="scd"><div class="scd-v a">1&ndash;2</div><div class="scd-l">Est. dwellings</div></div>
+    <div class="scd"><div class="scd-v a">~650m&#178;</div><div class="scd-l">Block</div></div>
+    <div class="scd"><div class="scd-v hl-none">None</div><div class="scd-l">DA status</div></div>
+  </div>
+  <div class="sc-notes"><strong>Granny flat or secondary dwelling pathway likely. R2 zone with block supporting dual occupancy review.</strong> High-demand pathway for homeowners and small builders. <strong>No DA lodged or approved. Professional verification required.</strong></div>
+  <div class="sc-foot">
+    <div class="sc-confidence">Tier: <span style="color:var(--muted)">Entry opportunity &middot; Professional verification required</span></div>
+    <div class="sc-btns">
+      <a href="index.html" class="fbtn-out" style="text-decoration:none;display:inline-flex;align-items:center">Run your own Site Check &#8594;</a>
+      <a href="services.html" class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request cost / services quote &#8594;</a>
+      <a href="full-report.html" class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report</a>
+    </div>
+  </div>
 </div>
-<div class='sc'>
-<div class='rank-bar rb-basic'><span>#2 of 5 &mdash; Example</span><span style='font-size:.6rem;color:var(--muted2)'>Det. recently</span></div>
-<div class='sc-top'><div><div class='sc-meta'><span class='score-b amber'>★ 71/100</span><span style='font-size:.6rem;color:var(--muted2);margin-left:6px'>Example — live data loading</span></div><div class='sc-addr'>39 Wattle Road, Casula NSW 2170</div><div class='sc-sub'>Liverpool &middot; 4 lots</div></div><div class='zone-pill'>NSW</div></div>
-<div class='sc-data'><div class='scd'><div class='scd-v g'>4</div><div class='scd-l'>Lots</div></div><div class='scd'><div class='scd-v'>Approved</div><div class='scd-l'>Status</div></div><div class='scd'><div class='scd-v'>NSW</div><div class='scd-l'>State</div></div></div>
-<div style='padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6'>Four-lot Torrens title subdivision, R2 zone.</div>
-<div class='sc-foot'><div class='f-left' style='font-size:.72rem;color:var(--muted)'>Check this address or request a quote</div><div style='display:flex;gap:6px'><button class='fbtn-out' data-addr='39%20Wattle%20Road%2C%20Casula%20NSW%202170' onclick='goCheck(this)'>Run site check →</button><a href='services.html' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Request quote →</a></div></div>
+
+<!-- POTENTIAL CARD 2 — Entry / 2-lot subdivision -->
+<div class="sc">
+  <div class="rank-bar rb-basic"><span>Site potential &middot; #2 of 5</span><span style="font-size:.6rem;color:var(--muted2)">Preliminary screening signal</span></div>
+  <div class="sc-top"><div>
+    <div class="sc-meta">
+      <span class="score-b amber">&#9733; 71/100</span>
+      <span class="hl-badge hl-badge-blue">Entry opportunity &mdash; small subdivision review</span>
+    </div>
+    <div class="sc-addr">Penrith, Penrith Council <span style="font-size:.63rem;color:var(--muted2);font-weight:400">&#8212; Exact address hidden in beta</span></div>
+    <div class="sc-sub">Penrith &middot; R2 zone &middot; ~900m&#178; &middot; Est. 2 lots</div>
+  </div><div class="zone-pill">R2</div></div>
+  <div class="sc-data">
+    <div class="scd"><div class="scd-v a">2</div><div class="scd-l">Est. lots</div></div>
+    <div class="scd"><div class="scd-v a">~900m&#178;</div><div class="scd-l">Block</div></div>
+    <div class="scd"><div class="scd-v hl-none">None</div><div class="scd-l">DA status</div></div>
+  </div>
+  <div class="sc-notes"><strong>R2 block with possible 2-lot Torrens subdivision pathway. Good entry-level opportunity for small builders and local investors.</strong> Confirm LEP minimum lot size, frontage and servicing. <strong>No DA lodged or approved. Professional verification required.</strong></div>
+  <div class="sc-foot">
+    <div class="sc-confidence">Tier: <span style="color:var(--muted)">Entry opportunity &middot; Professional verification required</span></div>
+    <div class="sc-btns">
+      <a href="index.html" class="fbtn-out" style="text-decoration:none;display:inline-flex;align-items:center">Run your own Site Check &#8594;</a>
+      <a href="services.html" class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request cost / services quote &#8594;</a>
+      <a href="full-report.html" class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report</a>
+    </div>
+  </div>
 </div>
-<div class='sc'>
-<div class='rank-bar rb-basic'><span>#3 of 5 &mdash; Example</span><span style='font-size:.6rem;color:var(--muted2)'>Det. recently</span></div>
-<div class='sc-top'><div><div class='sc-meta'><span class='score-b amber'>★ 69/100</span><span style='font-size:.6rem;color:var(--muted2);margin-left:6px'>Example — live data loading</span></div><div class='sc-addr'>12 Smith Street, Penrith NSW 2750</div><div class='sc-sub'>Penrith &middot; 2 lots</div></div><div class='zone-pill'>NSW</div></div>
-<div class='sc-data'><div class='scd'><div class='scd-v g'>2</div><div class='scd-l'>Lots</div></div><div class='scd'><div class='scd-v'>Approved</div><div class='scd-l'>Status</div></div><div class='scd'><div class='scd-v'>NSW</div><div class='scd-l'>State</div></div></div>
-<div style='padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6'>Two-lot Torrens title subdivision, R2 zone, Penrith LGA.</div>
-<div class='sc-foot'><div class='f-left' style='font-size:.72rem;color:var(--muted)'>Check this address or request a quote</div><div style='display:flex;gap:6px'><button class='fbtn-out' data-addr='12%20Smith%20Street%2C%20Penrith%20NSW%202750' onclick='goCheck(this)'>Run site check →</button><a href='services.html' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Request quote →</a></div></div>
+
+<!-- POTENTIAL CARD 3 — Medium / 4-lot -->
+<div class="sc">
+  <div class="rank-bar rb-basic"><span>Site potential &middot; #3 of 5</span><span style="font-size:.6rem;color:var(--muted2)">Preliminary screening signal</span></div>
+  <div class="sc-top"><div>
+    <div class="sc-meta">
+      <span class="score-b amber">&#9733; 75/100</span>
+      <span class="hl-badge hl-badge-blue">Medium opportunity &mdash; delivery and finance review</span>
+    </div>
+    <div class="sc-addr">Campbelltown, Campbelltown Council <span style="font-size:.63rem;color:var(--muted2);font-weight:400">&#8212; Exact address hidden in beta</span></div>
+    <div class="sc-sub">Campbelltown &middot; R2 zone &middot; ~1,650m&#178; &middot; Est. 3&ndash;4 lots</div>
+  </div><div class="zone-pill">R2</div></div>
+  <div class="sc-data">
+    <div class="scd"><div class="scd-v g">3&ndash;4</div><div class="scd-l">Est. lots</div></div>
+    <div class="scd"><div class="scd-v a">~1,650m&#178;</div><div class="scd-l">Block</div></div>
+    <div class="scd"><div class="scd-v hl-none">None</div><div class="scd-l">DA status</div></div>
+  </div>
+  <div class="sc-notes"><strong>R2 block with estimated 3&ndash;4 lot subdivision potential. Active builders and developers. Civil works and finance support likely useful.</strong> Town planner and licensed surveyor required. <strong>No DA lodged or approved. Professional verification required.</strong></div>
+  <div class="sc-foot">
+    <div class="sc-confidence">Tier: <span style="color:var(--muted)">Medium opportunity &middot; Finance support likely useful</span></div>
+    <div class="sc-btns">
+      <a href="index.html" class="fbtn-out" style="text-decoration:none;display:inline-flex;align-items:center">Run your own Site Check &#8594;</a>
+      <a href="full-report.html" class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report &#8594;</a>
+      <a href="finance.html" class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Finance support</a>
+    </div>
+  </div>
 </div>
+
+<!-- POTENTIAL CARD 4 — Medium / R3 multi-dwelling -->
+<div class="sc">
+  <div class="rank-bar rb-basic"><span>Site potential &middot; #4 of 5</span><span style="font-size:.6rem;color:var(--muted2)">Preliminary screening signal</span></div>
+  <div class="sc-top"><div>
+    <div class="sc-meta">
+      <span class="score-b amber">&#9733; 73/100</span>
+      <span class="hl-badge hl-badge-blue">Medium opportunity &mdash; delivery and finance review</span>
+    </div>
+    <div class="sc-addr">Merewether, Newcastle <span style="font-size:.63rem;color:var(--muted2);font-weight:400">&#8212; Exact address hidden in beta</span></div>
+    <div class="sc-sub">Newcastle &middot; R3 zone &middot; ~1,200m&#178; &middot; Est. 4&ndash;5 dwellings</div>
+  </div><div class="zone-pill">R3</div></div>
+  <div class="sc-data">
+    <div class="scd"><div class="scd-v g">4&ndash;5</div><div class="scd-l">Est. dwellings</div></div>
+    <div class="scd"><div class="scd-v a">~1,200m&#178;</div><div class="scd-l">Block</div></div>
+    <div class="scd"><div class="scd-v hl-none">None</div><div class="scd-l">DA status</div></div>
+  </div>
+  <div class="sc-notes"><strong>R3 medium-density zone. Townhouse or multi-dwelling pathway may be viable. Developer, builder and investor audience.</strong> Town planner and DCP review required. <strong>No DA lodged or approved. Professional verification required.</strong></div>
+  <div class="sc-foot">
+    <div class="sc-confidence">Tier: <span style="color:var(--muted)">Medium opportunity &middot; Finance and professional review likely needed</span></div>
+    <div class="sc-btns">
+      <a href="index.html" class="fbtn-out" style="text-decoration:none;display:inline-flex;align-items:center">Run your own Site Check &#8594;</a>
+      <a href="full-report.html" class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report &#8594;</a>
+      <a href="finance.html" class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Finance support</a>
+    </div>
+  </div>
+</div>
+
+<!-- POTENTIAL CARD 5 — High-entry / R4 complex -->
+<div class="sc">
+  <div class="rank-bar rb-basic"><span>Site potential &middot; #5 of 5</span><span style="font-size:.6rem;color:var(--muted2)">Preliminary screening signal</span></div>
+  <div class="sc-top"><div>
+    <div class="sc-meta">
+      <span class="score-b">&#9733; 76/100</span>
+      <span class="hl-badge hl-badge-blue">High-entry / complex opportunity</span>
+    </div>
+    <div class="sc-addr">Homebush, Strathfield <span style="font-size:.63rem;color:var(--muted2);font-weight:400">&#8212; Exact address hidden in beta</span></div>
+    <div class="sc-sub">Strathfield &middot; R4 zone &middot; ~2,400m&#178; &middot; Est. 8+ dwellings</div>
+  </div><div class="zone-pill">R4</div></div>
+  <div class="sc-data">
+    <div class="scd"><div class="scd-v g">8+</div><div class="scd-l">Est. dwellings</div></div>
+    <div class="scd"><div class="scd-v a">~2,400m&#178;</div><div class="scd-l">Block</div></div>
+    <div class="scd"><div class="scd-v hl-none">None</div><div class="scd-l">DA status</div></div>
+  </div>
+  <div class="sc-notes"><strong>Large R4 high-density site. Apartment or larger multi-dwelling project may be permissible. Experienced developers and capital partners.</strong> Town planner, architect, civil engineer and lender-ready review required. <strong>No DA lodged or approved. Professional verification required.</strong></div>
+  <div class="sc-foot">
+    <div class="sc-confidence">Tier: <span style="color:var(--muted)">High-entry / complex &middot; Consultant team and lender review required</span></div>
+    <div class="sc-btns">
+      <a href="index.html" class="fbtn-out" style="text-decoration:none;display:inline-flex;align-items:center">Run your own Site Check &#8594;</a>
+      <a href="services.html" class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request professional review &#8594;</a>
+      <a href="finance.html" class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Finance support</a>
+    </div>
+  </div>
+</div>
+
+</div><!-- /potential-cards -->
+
+<!-- ═══ SECTION 2: APPROVED DA / DELIVERY & VALUE ═══════════════ -->
+<div class="hl-section-header" id="section-approved" style="margin-top:28px">
+  <div class="hl-section-title">&#10003; Approved DA / Delivery &amp; Value Opportunities</div>
+  <div class="hl-section-sub">Approved DA sites that may need delivery planning, construction-cost review, finance support, professional review, civil works, external works or subdivision works. Stage, cost and value must be verified &middot; <span class="hl-beta-tag">Updated regularly during beta</span></div>
+</div>
+
+<div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:.67rem;color:var(--muted2);line-height:1.7">
+  &#9432;&nbsp; <strong style="color:var(--muted)">Approved DA note</strong> &mdash;
+  DA approval does not confirm construction stage, profitability, finance readiness or completion status.
+  The project may be unstarted, under construction, held for sale, waiting for finance, or approaching completion.
+  Stage, cost and value must be verified before any decision.
+</div>
+
+<div id="approved-cards">
+
+<!-- APPROVED CARD 1 — Easier entry -->
+<div class="sc">
+  <div class="rank-bar rb-basic">
+    <span><span style="font-size:.58rem;font-weight:700;padding:1px 7px;border-radius:4px;margin-right:5px;background:rgba(200,168,75,.09);color:var(--gold);border:1px solid rgba(200,168,75,.25)">Entry opportunity</span>Penrith, Penrith Council <span style="font-size:.6rem;color:var(--muted2)">&#8212; Exact address in Full Report</span></span>
+    <span style="font-size:.6rem;color:var(--muted2)">Det. recently</span>
+  </div>
+  <div class="sc-top"><div>
+    <div class="sc-meta">
+      <span class="score-b">&#9733; 74/100</span>
+      <span class="hl-badge hl-badge-green">DA Approved</span>
+    </div>
+    <div class="sc-addr" style="font-size:.82rem">Penrith LGA &middot; 2-lot Torrens subdivision</div>
+    <div class="sc-sub">Penrith Council &middot; 2 lots approved &middot; DA approved &mdash; stage unverified</div>
+  </div><div class="zone-pill">NSW</div></div>
+  <div class="sc-data">
+    <div class="scd"><div class="scd-v g">2</div><div class="scd-l">Lots</div></div>
+    <div class="scd"><div class="scd-v g">Approved</div><div class="scd-l">DA status</div></div>
+    <div class="scd"><div class="scd-v" style="color:var(--muted)">Unverified</div><div class="scd-l">Stage</div></div>
+  </div>
+  <div class="sc-notes">DA approved &mdash; stage unverified. Driveway, drainage and landscaping may be required &mdash; verify scope before committing. <strong>Verify stage and scope before any commitment.</strong></div>
+  <div class="sc-foot">
+    <div class="sc-confidence">Pathway: <span style="color:var(--green)">External works &middot; Services quote &middot; Cost review</span></div>
+    <div class="sc-btns">
+      <a href="services.html" class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request cost / services quote &#8594;</a>
+      <a href="full-report.html" class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report</a>
+    </div>
+  </div>
+</div>
+
+<!-- APPROVED CARD 2 — Medium complexity -->
+<div class="sc">
+  <div class="rank-bar rb-basic">
+    <span><span style="font-size:.58rem;font-weight:700;padding:1px 7px;border-radius:4px;margin-right:5px;background:rgba(91,156,242,.09);color:#5b9cf2;border:1px solid rgba(91,156,242,.22)">Medium opportunity</span>Newcastle, Newcastle Council <span style="font-size:.6rem;color:var(--muted2)">&#8212; Exact address in Full Report</span></span>
+    <span style="font-size:.6rem;color:var(--muted2)">Det. recently</span>
+  </div>
+  <div class="sc-top"><div>
+    <div class="sc-meta">
+      <span class="score-b amber">&#9733; 68/100</span>
+      <span class="hl-badge hl-badge-green">DA Approved</span>
+    </div>
+    <div class="sc-addr" style="font-size:.82rem">Newcastle LGA &middot; 3-lot subdivision</div>
+    <div class="sc-sub">Newcastle Council &middot; 3 lots approved &middot; DA approved &mdash; stage unverified</div>
+  </div><div class="zone-pill">NSW</div></div>
+  <div class="sc-data">
+    <div class="scd"><div class="scd-v g">3</div><div class="scd-l">Lots</div></div>
+    <div class="scd"><div class="scd-v g">Approved</div><div class="scd-l">DA status</div></div>
+    <div class="scd"><div class="scd-v" style="color:var(--muted)">Unverified</div><div class="scd-l">Stage</div></div>
+  </div>
+  <div class="sc-notes">3-lot Torrens title subdivision &mdash; stage unverified. Civil / external works may be required &mdash; verify scope before committing. Finance support may be useful. <strong>Verify stage and scope before any commitment.</strong></div>
+  <div class="sc-foot">
+    <div class="sc-confidence">Pathway: <span style="color:#5b9cf2">Civil works &middot; Finance support &middot; Delivery planning</span></div>
+    <div class="sc-btns">
+      <a href="full-report.html" class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report &#8594;</a>
+      <a href="finance.html" class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Finance support</a>
+      <a href="services.html" class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Request quote</a>
+    </div>
+  </div>
+</div>
+
+<!-- APPROVED CARD 3 — Medium complexity -->
+<div class="sc">
+  <div class="rank-bar rb-basic">
+    <span><span style="font-size:.58rem;font-weight:700;padding:1px 7px;border-radius:4px;margin-right:5px;background:rgba(91,156,242,.09);color:#5b9cf2;border:1px solid rgba(91,156,242,.22)">Medium opportunity</span>Campbelltown, Campbelltown Council <span style="font-size:.6rem;color:var(--muted2)">&#8212; Exact address in Full Report</span></span>
+    <span style="font-size:.6rem;color:var(--muted2)">Det. recently</span>
+  </div>
+  <div class="sc-top"><div>
+    <div class="sc-meta">
+      <span class="score-b">&#9733; 76/100</span>
+      <span class="hl-badge hl-badge-green">DA Approved</span>
+    </div>
+    <div class="sc-addr" style="font-size:.82rem">Campbelltown LGA &middot; 4-lot subdivision</div>
+    <div class="sc-sub">Campbelltown Council &middot; 4 lots approved &middot; DA approved &mdash; stage unverified</div>
+  </div><div class="zone-pill">NSW</div></div>
+  <div class="sc-data">
+    <div class="scd"><div class="scd-v g">4</div><div class="scd-l">Lots</div></div>
+    <div class="scd"><div class="scd-v g">Approved</div><div class="scd-l">DA status</div></div>
+    <div class="scd"><div class="scd-v" style="color:var(--muted)">Unverified</div><div class="scd-l">Stage</div></div>
+  </div>
+  <div class="sc-notes">4-lot Torrens title subdivision &mdash; stage unverified. Roads, drainage, retaining and service connections may be required &mdash; verify scope before committing. Finance support and professional review recommended. <strong>Verify stage and scope before any commitment.</strong></div>
+  <div class="sc-foot">
+    <div class="sc-confidence">Pathway: <span style="color:#5b9cf2">Civil works &middot; Finance support &middot; Professional review</span></div>
+    <div class="sc-btns">
+      <a href="full-report.html" class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report &#8594;</a>
+      <a href="finance.html" class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Finance support</a>
+      <a href="services.html" class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Request professional review</a>
+    </div>
+  </div>
+</div>
+
+<!-- APPROVED CARD 4 — Easier entry -->
+<div class="sc">
+  <div class="rank-bar rb-basic">
+    <span><span style="font-size:.58rem;font-weight:700;padding:1px 7px;border-radius:4px;margin-right:5px;background:rgba(200,168,75,.09);color:var(--gold);border:1px solid rgba(200,168,75,.25)">Entry opportunity</span>Liverpool, Liverpool Council <span style="font-size:.6rem;color:var(--muted2)">&#8212; Exact address in Full Report</span></span>
+    <span style="font-size:.6rem;color:var(--muted2)">Det. recently</span>
+  </div>
+  <div class="sc-top"><div>
+    <div class="sc-meta">
+      <span class="score-b amber">&#9733; 69/100</span>
+      <span class="hl-badge hl-badge-green">DA Approved</span>
+    </div>
+    <div class="sc-addr" style="font-size:.82rem">Liverpool LGA &middot; Dual occupancy Torrens</div>
+    <div class="sc-sub">Liverpool Council &middot; 2 dwellings approved &middot; DA approved &mdash; stage unverified</div>
+  </div><div class="zone-pill">NSW</div></div>
+  <div class="sc-data">
+    <div class="scd"><div class="scd-v g">2</div><div class="scd-l">Dwellings</div></div>
+    <div class="scd"><div class="scd-v g">Approved</div><div class="scd-l">DA status</div></div>
+    <div class="scd"><div class="scd-v" style="color:var(--muted)">Unverified</div><div class="scd-l">Stage</div></div>
+  </div>
+  <div class="sc-notes">Dual occupancy Torrens title &mdash; stage unverified. Driveway, turf and fencing may be required &mdash; verify stage and scope before committing. <strong>Verify stage and scope before any commitment.</strong></div>
+  <div class="sc-foot">
+    <div class="sc-confidence">Pathway: <span style="color:var(--green)">External works &middot; Services quote</span></div>
+    <div class="sc-btns">
+      <a href="services.html" class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request cost / services quote &#8594;</a>
+      <a href="full-report.html" class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report</a>
+    </div>
+  </div>
+</div>
+
+<!-- APPROVED CARD 5 — High-entry / complex -->
+<div class="sc">
+  <div class="rank-bar rb-basic">
+    <span><span style="font-size:.58rem;font-weight:700;padding:1px 7px;border-radius:4px;margin-right:5px;background:rgba(245,158,11,.09);color:#f59e0b;border:1px solid rgba(245,158,11,.22)">High-entry / complex</span>Warriewood, Northern Beaches <span style="font-size:.6rem;color:var(--muted2)">&#8212; Exact address in Full Report</span></span>
+    <span style="font-size:.6rem;color:var(--muted2)">Det. recently</span>
+  </div>
+  <div class="sc-top"><div>
+    <div class="sc-meta">
+      <span class="score-b">&#9733; 72/100</span>
+      <span class="hl-badge hl-badge-green">DA Approved</span>
+    </div>
+    <div class="sc-addr" style="font-size:.82rem">Northern Beaches LGA &middot; 2-lot subdivision</div>
+    <div class="sc-sub">Northern Beaches Council &middot; 2 lots approved &middot; DA approved &mdash; stage unverified</div>
+  </div><div class="zone-pill">NSW</div></div>
+  <div class="sc-data">
+    <div class="scd"><div class="scd-v g">2</div><div class="scd-l">Lots</div></div>
+    <div class="scd"><div class="scd-v g">Approved</div><div class="scd-l">DA status</div></div>
+    <div class="scd"><div class="scd-v" style="color:var(--muted)">Unverified</div><div class="scd-l">Stage</div></div>
+  </div>
+  <div class="sc-notes">2-lot subdivision in high-value coastal corridor &mdash; stage unverified. High land value means lender-ready review and cost-to-complete analysis recommended before committing. <strong>Verify stage, cost and scope before any commitment.</strong></div>
+  <div class="sc-foot">
+    <div class="sc-confidence">Pathway: <span style="color:#f59e0b">Full report &middot; Lender-ready review &middot; Finance support</span></div>
+    <div class="sc-btns">
+      <a href="full-report.html" class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report &#8594;</a>
+      <a href="finance.html" class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Finance support</a>
+      <a href="services.html" class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Request quote</a>
+    </div>
+  </div>
+</div>
+
+</div><!-- /approved-cards -->
+
+<!-- Hot list disclaimer -->
+<div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-top:20px;font-size:.65rem;color:var(--muted2);line-height:1.7">
+&#9432;&nbsp; <strong style="color:var(--muted)">Hot List disclaimer</strong> &mdash; Items are preliminary screening signals only. They are not legal, planning, financial, valuation or investment advice. Exact address details may be withheld in beta to protect owners, users and SiteVerdict opportunity intelligence. Professional verification is required before any decision.
+</div>
+
 </div>
 
 <!-- Services CTA -->
@@ -144,7 +453,7 @@ footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-c
     <div style="font-size:.82rem;color:var(--text);line-height:1.6">
       <span style="font-weight:600">Need help with a site?</span> Free quotes for driveways, retaining walls, drainage and excavation in Sydney and surrounds.
     </div>
-    <a href="services.html" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#000;font-size:.78rem;font-weight:700;padding:9px 16px;border-radius:10px;text-decoration:none;white-space:nowrap;flex-shrink:0">Request free quote &#8594;</a>
+    <a href='/services' style='display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#000;font-size:.78rem;font-weight:700;padding:9px 16px;border-radius:10px;text-decoration:none;white-space:nowrap;flex-shrink:0'>Request free quote &#8594;</a>
   </div>
 </div>
 
@@ -162,7 +471,7 @@ footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-c
 
 <footer>
   <div>SiteVerdict &middot; ABN 42 663 950 070</div>
-  <div>NSW Planning Portal &middot; NSW ePlanning API &middot; <a href="https://wa.me/61402623628" style="color:inherit">Chat with us</a> &middot; <a href="terms.html" style="color:inherit">Terms</a></div>
+  <div>NSW Planning Portal &middot; NSW ePlanning API &middot; <a href="https://wa.me/61402623628" style="color:inherit">Chat with us</a> &middot; <a href='/terms' style='color:inherit'>Terms</a></div>
 </footer>
 
 <script>
@@ -180,51 +489,99 @@ function goServices(){
 }
 
 // Static fallback cards — shown when live API is unavailable
-var FALLBACK_SITES = [
+var FALLBACK_POTENTIAL = [
   {
-    address: '14 Redfern Street, Redfern NSW 2016',
-    council:  'City of Sydney',
-    score:    78,
-    status:   'Approved',
-    lots:     2,
-    description: 'Torrens title two-lot subdivision, R1 zone, 920m\u00b2 block.',
-    decision_date: '2024-09-12'
+    address: 'Blacktown, Blacktown Council',
+    council: 'Blacktown',
+    zone: 'R2', block: '~650m²', score: 74, lots: 1,
+    label: 'Entry opportunity — high-demand pathway',
+    description: 'Granny flat or secondary dwelling pathway likely. R2 zone with block supporting dual occupancy review. High-demand pathway for homeowners and small builders. No DA lodged or approved.',
+    confidence: 'Estimated · Professional verification required'
   },
   {
-    address: '6 Fenton Street, Panania NSW 2213',
-    council:  'Canterbury-Bankstown',
-    score:    71,
-    status:   'Approved',
-    lots:     2,
-    description: 'Two-lot Torrens title subdivision, R2 zone, 650m\u00b2 block.',
-    decision_date: '2024-11-04'
+    address: 'Penrith, Penrith Council',
+    council: 'Penrith',
+    zone: 'R2', block: '~900m²', score: 71, lots: 2,
+    label: 'Entry opportunity — small subdivision review',
+    description: 'R2 block with possible 2-lot Torrens subdivision pathway. Good entry-level opportunity for small builders and local investors. No DA lodged or approved.',
+    confidence: 'Estimated · Professional verification required'
   },
   {
-    address: '23 Pacific Street, Newcastle NSW 2300',
-    council:  'Newcastle',
-    score:    65,
-    status:   'Approved',
-    lots:     3,
-    description: 'Three-lot Torrens title subdivision, MU1 zone, heritage precinct.',
-    decision_date: '2024-08-22'
+    address: 'Campbelltown, Campbelltown Council',
+    council: 'Campbelltown',
+    zone: 'R2', block: '~1,650m²', score: 75, lots: 4,
+    label: 'Medium opportunity — delivery and finance review',
+    description: 'R2 block with estimated 3–4 lot subdivision potential. Civil works and finance support likely useful. Town planner and licensed surveyor required. No DA lodged or approved.',
+    confidence: 'Estimated · Professional verification required'
   },
   {
-    address: '8 Hillside Drive, Camden NSW 2570',
-    council:  'Camden',
-    score:    70,
-    status:   'Approved',
-    lots:     2,
-    description: 'Dual occupancy and Torrens title subdivision, R2 zone.',
-    decision_date: '2024-10-15'
+    address: 'Merewether, Newcastle',
+    council: 'Newcastle',
+    zone: 'R3', block: '~1,200m²', score: 73, lots: 4,
+    label: 'Medium opportunity — delivery and finance review',
+    description: 'R3 medium-density zone. Townhouse or multi-dwelling pathway may be viable. Town planner and DCP review required. No DA lodged or approved.',
+    confidence: 'Estimated · Professional verification required'
   },
   {
-    address: '39 Wattle Road, Casula NSW 2170',
-    council:  'Liverpool',
-    score:    74,
-    status:   'Approved',
-    lots:     4,
-    description: 'Four-lot Torrens title subdivision, R2 zone, flat block.',
-    decision_date: '2024-07-30'
+    address: 'Homebush, Strathfield',
+    council: 'Strathfield',
+    zone: 'R4', block: '~2,400m²', score: 76, lots: 8,
+    label: 'High-entry / complex opportunity',
+    description: 'Large R4 high-density site. Apartment or larger multi-dwelling project may be permissible. Town planner, architect, civil engineer and lender-ready review required. No DA lodged or approved.',
+    confidence: 'Estimated · Complex review required'
+  }
+];
+
+var FALLBACK_APPROVED = [
+  {
+    address: 'Penrith, Penrith Council',
+    suburb: 'Penrith',
+    council: 'Penrith',
+    score: 74, lots: 2, status: 'Approved',
+    tier: 'entry',
+    label: 'Entry opportunity — approved small project',
+    description: 'DA approved 2-lot Torrens subdivision — stage unverified. Driveway, drainage and landscaping may be required — verify scope before committing.',
+    type_label: 'Approved DA · Stage unverified'
+  },
+  {
+    address: 'Liverpool, Liverpool Council',
+    suburb: 'Liverpool',
+    council: 'Liverpool',
+    score: 69, lots: 2, status: 'Approved',
+    tier: 'entry',
+    label: 'Entry opportunity — approved dual occupancy',
+    description: 'Dual occupancy Torrens title — stage unverified. Driveway, turf and fencing may be required — verify stage and scope before committing.',
+    type_label: 'Approved DA · Stage unverified'
+  },
+  {
+    address: 'Newcastle, Newcastle Council',
+    suburb: 'Newcastle',
+    council: 'Newcastle',
+    score: 68, lots: 3, status: 'Approved',
+    tier: 'medium',
+    label: 'Medium opportunity — delivery and finance review',
+    description: '3-lot Torrens subdivision — stage unverified. Civil / external works may be required — verify scope before committing.',
+    type_label: 'Approved DA · Stage unverified'
+  },
+  {
+    address: 'Campbelltown, Campbelltown Council',
+    suburb: 'Campbelltown',
+    council: 'Campbelltown',
+    score: 76, lots: 4, status: 'Approved',
+    tier: 'medium',
+    label: 'Medium opportunity — delivery and finance review',
+    description: '4-lot Torrens subdivision — stage unverified. Roads, drainage and service connections may be required — verify scope before committing.',
+    type_label: 'Approved DA · Stage unverified'
+  },
+  {
+    address: 'Warriewood, Northern Beaches',
+    suburb: 'Warriewood',
+    council: 'Northern Beaches',
+    score: 72, lots: 2, status: 'Approved',
+    tier: 'high',
+    label: 'High-entry / complex opportunity',
+    description: '2-lot subdivision in high-value coastal corridor — stage unverified. Lender-ready review and cost-to-complete analysis recommended before committing.',
+    type_label: 'Approved DA · Stage unverified'
   }
 ];
 function ago(t){
@@ -236,58 +593,182 @@ function ago(t){
 function buildCard(site, idx, total, isFallback){
   var scoreClass = site.score>=85?'g':'a';
   var isTop = idx===0 && !isFallback;
-  var safeAddr  = escapeHTML(site.address||'');
-  var safeCounc = escapeHTML(site.council||'');
-  var safeStat  = escapeHTML(site.status||'Approved');
-  var safeDesc  = escapeHTML(site.description||'Residential subdivision DA');
+  var safeCounc  = escapeHTML(site.council||'NSW');
+  var safeSuburb = escapeHTML(site.suburb||(site.council?site.council+' LGA':'NSW approved DA'));
+  var addrDisplay = safeSuburb
+    + ' <span style="font-size:.62rem;color:var(--muted2);font-weight:400">&#8212; Exact address hidden in beta</span>';
+  var safeDesc = escapeHTML(site.description||'DA approved \u2014 stage unverified. Delivery planning, cost review, finance support or services quote may be useful. Professional verification required.');
+  var safeTierLabel = escapeHTML(site.label||'Approved DA \u2014 stage unverified');
+  var tier = (site.tier||'entry').toLowerCase();
+
+  // CTA logic by tier (Task 5)
+  var ctaHtml;
+  if(tier==='high'){
+    ctaHtml = "<a href='services.html' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Request professional review \u2192</a>"
+      +"<a href='finance.html' class='fbtn-out2' style='text-decoration:none;display:inline-flex;align-items:center'>Finance support</a>"
+      +"<a href='full-report.html' class='fbtn-out2' style='text-decoration:none;display:inline-flex;align-items:center'>Unlock full report</a>";
+  } else if(tier==='medium'){
+    ctaHtml = "<a href='full-report.html' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Unlock full report \u2192</a>"
+      +"<a href='finance.html' class='fbtn-out2' style='text-decoration:none;display:inline-flex;align-items:center'>Finance support</a>"
+      +"<a href='services.html' class='fbtn-out2' style='text-decoration:none;display:inline-flex;align-items:center'>Request quote</a>";
+  } else {
+    // entry (default)
+    ctaHtml = "<a href='services.html' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Request cost / services quote \u2192</a>"
+      +"<a href='full-report.html' class='fbtn-out2' style='text-decoration:none;display:inline-flex;align-items:center'>Unlock full report</a>";
+  }
+
+  // Tier badge colour
+  var tierStyle = tier==='high'
+    ? 'background:rgba(245,158,11,.09);color:#f59e0b;border:1px solid rgba(245,158,11,.22)'
+    : tier==='medium'
+    ? 'background:rgba(91,156,242,.09);color:#5b9cf2;border:1px solid rgba(91,156,242,.22)'
+    : 'background:rgba(200,168,75,.09);color:var(--gold);border:1px solid rgba(200,168,75,.25)';
+
   return "<div class='sc"+(isTop?' top-site':'')+"'>"
     +"<div class='rank-bar "+(isTop?'rb-top':'rb-basic')+"'>"
-      +"<span>#"+(idx+1)+" of "+total+(isTop?' \u2014 Top site today':'')+(isFallback?' (example)':'')+"</span>"
-      +"<span style='font-size:.6rem;color:var(--muted2)'>Det. "+ago(site.decision_date)+"</span>"
+      +"<span><span style='font-size:.58rem;font-weight:700;padding:1px 7px;border-radius:4px;margin-right:5px;"+tierStyle+"'>"+safeTierLabel+"</span>"
+      +safeSuburb+" \u2014 Approved DA"+(isFallback?' (example)':'')+"</span>"
+      +"<span style='font-size:.6rem;color:var(--muted2)'>Det. recently</span>"
     +"</div>"
     +"<div class='sc-top'><div>"
-      +"<div class='sc-meta'><span class='score-b "+(site.score<80?'amber':'')+"'>\u2605 "+site.score+"/100</span>"
-      +(isFallback?"<span style='font-size:.6rem;color:var(--muted2);margin-left:6px'>Example \u2014 live data loading</span>":"")
+      +"<div class='sc-meta'>"
+        +"<span class='score-b "+scoreClass+"'>\u2605 "+(site.score||'\u2014')+"/100</span>"
+        +"<span class='hl-badge hl-badge-green'>DA Approved</span>"
       +"</div>"
-      +"<div class='sc-addr'>"+safeAddr+"</div>"
-      +"<div class='sc-sub'>"+safeCounc+(site.lots?' \u00b7 '+site.lots+' lots':'')+"</div>"
+      +"<div class='sc-addr' style='font-size:.82rem'>"+addrDisplay+"</div>"
+      +"<div class='sc-sub'>"+safeCounc+" &middot; "+(site.lots?site.lots+' lots':'NSW project')+" &middot; DA approved &mdash; stage unverified</div>"
     +"</div><div class='zone-pill'>NSW</div></div>"
     +"<div class='sc-data'>"
-      +"<div class='scd'><div class='scd-v g'>"+(site.lots||'?')+"</div><div class='scd-l'>Lots</div></div>"
-      +"<div class='scd'><div class='scd-v'>"+safeStat+"</div><div class='scd-l'>Status</div></div>"
-      +"<div class='scd'><div class='scd-v'>NSW</div><div class='scd-l'>State</div></div>"
+      +"<div class='scd'><div class='scd-v g'>"+(site.lots||'\u2014')+"</div><div class='scd-l'>Lots</div></div>"
+      +"<div class='scd'><div class='scd-v g'>Approved</div><div class='scd-l'>DA status</div></div>"
+      +"<div class='scd'><div class='scd-v' style='color:var(--muted)'>Unverified</div><div class='scd-l'>Stage</div></div>"
     +"</div>"
-    +"<div style='padding:8px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.6'>"+safeDesc+"</div>"
+    +"<div class='sc-notes'>"+safeDesc+"</div>"
     +"<div class='sc-foot'>"
-      +"<div class='f-left' style='font-size:.72rem;color:var(--muted)'>Check this address or request a quote</div>"
-      +"<div style='display:flex;gap:6px'>"
-        +"<button class='fbtn-out' data-addr='"+encodeURIComponent(site.address||'')+"' onclick='goCheck(this)'>Run site check \u2192</button>"
-        +"<a href='services.html' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Request quote \u2192</a>"
-      +"</div>"
+      +"<div class='sc-confidence'>Pathway: <span style='color:var(--muted2)'>"
+      +(tier==='high'?'Professional review &middot; Finance &middot; Lender-ready report'
+       :tier==='medium'?'Full report &middot; Finance support &middot; Civil works'
+       :'Services quote &middot; Cost review &middot; Full report')+"</span></div>"
+      +"<div style='display:flex;gap:6px;flex-wrap:wrap'>"+ctaHtml+"</div>"
     +"</div>"
   +"</div>";
 }
 
+
+function makePotentialCard(site, idx, total){
+  var scoreClass = site.score >= 80 ? 'g' : 'a';
+  var safeAddr  = escapeHTML(site.address || '');
+  var safeCounc = escapeHTML(site.council || '');
+  var safeLabel = escapeHTML(site.label || 'Potential site opportunity');
+  var safeDesc  = escapeHTML(site.description || '');
+  var safeConf  = escapeHTML(site.confidence || 'Estimated');
+  var safeBlock = escapeHTML(site.block || '?');
+  var enc       = encodeURIComponent(site.address || '');
+  return "<div class='sc" + (idx===0 ? ' top-site' : '') + "'>"
+    + "<div class='rank-bar " + (idx===0 ? 'rb-top' : 'rb-basic') + "'>"
+      + "<span>Site potential &middot; #" + (idx+1) + " of " + total + "</span>"
+      + "<span style='font-size:.6rem;color:var(--muted2)'>Preliminary screening signal</span>"
+    + "</div>"
+    + "<div class='sc-top'><div>"
+      + "<div class='sc-meta'>"
+        + "<span class='score-b " + scoreClass + "'>★ " + site.score + "/100</span>"
+        + "<span class='hl-badge hl-badge-blue'>" + safeLabel + "</span>"
+      + "</div>"
+      + "<div class='sc-addr'>" + safeAddr + "</div>"
+      + "<div class='sc-sub'>" + safeCounc + " &middot; " + (site.zone||'NSW') + " zone &middot; " + safeBlock + " &middot; Est. " + site.lots + " lots</div>"
+    + "</div><div class='zone-pill'>" + (site.zone||'NSW') + "</div></div>"
+    + "<div class='sc-notes'>" + safeDesc + " <strong>No DA lodged or approved. Professional verification required.</strong></div>"
+    + "<div class='sc-foot'>"
+      + "<div class='sc-confidence'>Confidence: <span style='color:var(--muted)'>" + safeConf + "</span></div>"
+      + "<div class='sc-btns'>"
+        + "<button class='fbtn-out' data-addr='" + enc + "' onclick='goCheck(this)'>Run site check →</button>"
+        + "<a href='full-report.html' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Unlock full report →</a>"
+        + "<a href='services.html' class='fbtn-out2' style='text-decoration:none;display:inline-flex;align-items:center'>Professional review</a>"
+      + "</div>"
+    + "</div>"
+  + "</div>";
+}
+
+function makeApprovedCard(site, idx, total){
+  var scoreClass = site.score >= 80 ? 'g' : 'a';
+  var safeAddr  = escapeHTML(site.address || '');
+  var safeCounc = escapeHTML(site.council || '');
+  var safeLabel = escapeHTML(site.label || 'Approved DA');
+  var safeDesc  = escapeHTML(site.description || '');
+  var safeType  = escapeHTML(site.type_label || 'Approved DA');
+  var enc       = encodeURIComponent(site.address || '');
+  return "<div class='sc'>"
+    + "<div class='rank-bar rb-basic'>"
+      + "<span>" + safeLabel + "</span>"
+      + "<span style='font-size:.6rem;color:var(--muted2)'>Det. recently</span>"
+    + "</div>"
+    + "<div class='sc-top'><div>"
+      + "<div class='sc-meta'>"
+        + "<span class='score-b " + scoreClass + "'>★ " + site.score + "/100</span>"
+        + "<span class='hl-badge hl-badge-green'>DA Approved</span>"
+      + "</div>"
+      + "<div class='sc-addr'>" + safeAddr + "</div>"
+      + "<div class='sc-sub'>" + safeCounc + " &middot; " + site.lots + " lots &middot; External works required</div>"
+    + "</div><div class='zone-pill'>NSW</div></div>"
+    + "<div class='sc-notes'>" + safeDesc + "</div>"
+    + "<div class='sc-foot'>"
+      + "<div class='sc-confidence'>Type: <span style='color:var(--green)'>" + safeType + "</span></div>"
+      + "<div class='sc-btns'>"
+        + "<button class='fbtn-out' data-addr='" + enc + "' onclick='goCheck(this)'>Run site check →</button>"
+        + "<a href='services.html' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Request quote →</a>"
+      + "</div>"
+    + "</div>"
+  + "</div>";
+}
+
 function showFallback(reason){
   console.error('Hot list fallback triggered:', reason);
-  var c=document.getElementById('sites-container');
-  var mn=document.getElementById('market-note');
+  var c = document.getElementById('sites-container');
+  var mn = document.getElementById('market-note');
   if(!c) return;
-  // Fallback header message
-  c.innerHTML="<div style='background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.2);"
-    +"border-radius:12px;padding:14px 18px;margin-bottom:14px;font-size:.78rem;line-height:1.7'>"
-    +"<strong style='color:var(--gold)'>Hot list is being refreshed.</strong> "
-    +"In the meantime, run a free Site Check or request a quote. "
-    +"<span style='color:var(--muted2);font-size:.68rem'>Live data will return automatically.</span>"
-  +"</div>";
-  // Render fallback cards
-  FALLBACK_SITES.forEach(function(site, idx){
-    c.innerHTML += buildCard(site, idx, FALLBACK_SITES.length, true);
+
+  var html = "<div id='fallback-notice' style='background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.2);"
+    + "border-radius:12px;padding:14px 18px;margin-bottom:14px;font-size:.78rem;line-height:1.7'>"
+    + "<strong style='color:var(--gold)'>Hot list is being refreshed.</strong> "
+    + "In the meantime, run a free Site Check or request a quote. "
+    + "<span style='color:var(--muted2);font-size:.68rem'>Live data will return automatically.</span>"
+  + "</div>";
+
+  // Section 1: Site Potential
+  html += "<div class='hl-section-header'>"
+    + "<div class='hl-section-title'>&#128269; Today&rsquo;s Site Potential</div>"
+    + "<div class='hl-section-sub'>Pre-DA opportunities for further review &middot; No DA approval confirmed &middot; Professional verification required &middot; "
+    + "<span class='hl-beta-tag'>Example beta opportunities</span></div>"
+  + "</div>";
+  FALLBACK_POTENTIAL.forEach(function(site, idx){
+    html += makePotentialCard(site, idx, FALLBACK_POTENTIAL.length);
   });
+
+  // Section 2: Approved / Near-completion
+  html += "<div class='hl-section-header' style='margin-top:28px'>"
+    + "<div class='hl-section-title'>&#10003; Approved DA / Delivery &amp; Value Opportunities</div>"
+    + "<div class='hl-section-sub'>Approved DA sites that may need delivery planning, construction-cost review, finance support, professional review, civil works, external works or subdivision works. Stage, cost and value must be verified &middot; "
+    + "<span class='hl-beta-tag'>Example beta opportunities</span></div>"
+  + "</div>";
+  FALLBACK_APPROVED.forEach(function(site, idx){
+    html += makeApprovedCard(site, idx, FALLBACK_APPROVED.length);
+  });
+
+  // Disclaimer
+  html += "<div style='background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;"
+    + "padding:12px 16px;margin-top:20px;font-size:.65rem;color:var(--muted2);line-height:1.7'>"
+    + "&#9432;&nbsp; <strong style='color:var(--muted)'>Hot List disclaimer</strong> &mdash; "
+    + "Items are preliminary screening signals only. They are not legal, planning, financial, "
+    + "valuation or investment advice. Professional verification is required before any decision. "
+    + "Updated regularly during beta."
+  + "</div>";
+
+  c.innerHTML = html;
   var sc = document.getElementById('site-count');
-  if(sc){ sc.textContent='Showing example properties \u2014 live data temporarily unavailable'; sc.style.color='var(--muted)'; }
-  if(mn) mn.textContent='';
+  if(sc){ sc.textContent = 'Showing example properties — live data temporarily unavailable'; sc.style.color = 'var(--muted)'; }
+  if(mn) mn.textContent = '';
 }
+
 document.getElementById('today-date').textContent=(new Date).toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
 // Fetch with 12-second timeout
@@ -309,15 +790,20 @@ fetch('/.netlify/functions/daleads?mode=hotlist')
     var sc=document.getElementById('site-count');
     if(sc){ sc.textContent=e.length+' properties screened from '+s+' recent NSW approved DAs'; sc.style.color='var(--green)'; }
     if(!e.length){
-      c.innerHTML="<div style='text-align:center;padding:32px;color:var(--muted)'>No data today. Check back tomorrow.</div>";
+      var appEl2 = document.getElementById('approved-cards');
+      if(appEl2) appEl2.innerHTML = "<div style='text-align:center;padding:24px;color:var(--muted);font-size:.78rem'>No live approved DA data today &mdash; example cards shown. Check back soon.</div>";
       if(mn) mn.textContent='';
       return;
     }
     var d=e[0].score||0;
     if(mn){ mn.textContent=d>=85?'Strong market':d>=70?'Active market':'Steady market'; mn.style.color=d>=85?'var(--green)':d>=70?'var(--amber)':'var(--muted)'; }
-    c.innerHTML='';
+    // Task 6: only update #approved-cards — never wipe #potential-cards
+    var appEl = document.getElementById('approved-cards');
+    if(appEl){
+      appEl.innerHTML = '';
+      e.forEach(function(site, idx){ appEl.innerHTML += buildCard(site, idx, e.length, false); });
+    }
     document.getElementById('fallback-banner') && (document.getElementById('fallback-banner').style.display='none');
-    e.forEach(function(site, idx){ c.innerHTML+=buildCard(site, idx, e.length, false); });
   })
   .catch(function(err){
     clearTimeout(fetchTimer);

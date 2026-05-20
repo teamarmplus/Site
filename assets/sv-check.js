@@ -88,25 +88,173 @@ async function safeFunctionJson(url, fallback){
 function chatPro(){window.open("https://wa.me/61402623628?text=Hi+SiteVerdict+I+want+to+chat+with+a+professional","_blank")}var MF={R1:12,R2:12,R3:9,R4:9,RU1:50,RU2:50,RU4:2e3},CD={ALBURY:{days:63,range:"53-63",n:3},BATHURST:{days:43,range:"33-73",n:3},BLACKTOWN:{days:153,range:"40-399",n:12},BYRON:{days:189,range:"14-393",n:6},CAMDEN:{days:45,range:"2-375",n:12},CAMPBELLTOWN:{days:109,range:"109-329",n:3},"CANADA BAY":{days:206,range:"127-557",n:5},CANTERBURY:{days:49,range:"5-448",n:62},BANKSTOWN:{days:49,range:"5-448",n:62},"CENTRAL COAST":{days:89,range:"21-165",n:8},CESSNOCK:{days:85,range:"50-110",n:3},"COFFS HARBOUR":{days:73,range:"65-168",n:3},CUMBERLAND:{days:186,range:"48-361",n:8},FAIRFIELD:{days:177,range:"136-177",n:2},GOULBURN:{days:122,range:"15-292",n:6},"INNER WEST":{days:119,range:"54-166",n:9},"LAKE MACQUARIE":{days:131,range:"41-474",n:15},LIVERPOOL:{days:314,range:"71-425",n:14},MAITLAND:{days:23,range:"18-85",n:4},NEWCASTLE:{days:122,range:"73-360",n:11},"NORTH SYDNEY":{days:279,range:"194-279",n:2},"NORTHERN BEACHES":{days:160,range:"90-173",n:3},PARRAMATTA:{days:133,range:"2-243",n:24},PENRITH:{days:204,range:"74-386",n:9},"PORT MACQUARIE":{days:281,range:"97-281",n:2},"PORT STEPHENS":{days:85,range:"1-92",n:3},RYDE:{days:86,range:"5-86",n:4},SHELLHARBOUR:{days:71,range:"7-392",n:8},SHOALHAVEN:{days:108,range:"3-171",n:6},SUTHERLAND:{days:118,range:"35-315",n:28},"THE HILLS":{days:148,range:"70-199",n:9},WAVERLEY:{days:332,range:"132-332",n:2},WOLLONDILLY:{days:480,range:"175-480",n:2},WOLLONGONG:{days:70,range:"15-233",n:12},WOOLLAHRA:{days:232,range:"208-232",n:2}};function gc(e){if(!e)return null;var t=e.toUpperCase().replace(/\bCITY COUNCIL\b/g,"").replace(/\bSHIRE COUNCIL\b/g,"").replace(/\bMUNICIPAL COUNCIL\b/g,"").replace(/\bREGIONAL COUNCIL\b/g,"").replace(/\bCOUNCIL\b/g,"").replace(/\bCITY\b/g,"").replace(/\bSHIRE\b/g,"").replace(/\bMUNICIPAL\b/g,"").replace(/\bREGIONAL\b/g,"").replace(/\bOF\b/g,"").replace(/\s+/g," ").trim();if(CD[t])return{name:t,data:CD[t]};for(var a in CD)if(t.indexOf(a)>-1||a.indexOf(t)>-1)return{name:a,data:CD[a]};return null}function calcLots(e,t,a,r){var s=Math.floor(e/a);return!t||t<3?s:Math.max(0,Math.min(s,Math.floor(t/(MF[r]||12))))}function getSig(e,t,a){if(e<2)return"r";var r=(e>=4?3:e>=3?2:1)+(t<=90?3:t<=150?2:1)+(a>=80?3:a>=70?2:1);return r>=7?"g":r>=4?"a":"r"}function setSt(e){document.getElementById("status").textContent=e;}
 // ── SHARED GEOCODING ─────────────────────────────────────────────
 // Used by both autoLookupBlock() and runCheck() so coordinates match.
-async function geocodeAddress(addr){
-  var result=null;
-  // Attempt 1: Nominatim with "+ Australia"
-  try{
-    var r1=await fetch("https://nominatim.openstreetmap.org/search?q="+encodeURIComponent(addr+" Australia")+"&format=json&limit=1&accept-language=en");
-    var j1=await r1.json();
-    if(j1&&j1.length)result=j1[0];
-  }catch(e){console.warn("Geocode attempt 1 failed:",e);}
-  // Attempt 2: Nominatim with countrycodes=au (fallback)
-  if(!result){
-    try{
-      var r2=await fetch("https://nominatim.openstreetmap.org/search?q="+encodeURIComponent(addr)+"&format=json&limit=1&countrycodes=au");
-      var j2=await r2.json();
-      if(j2&&j2.length)result=j2[0];
-    }catch(e){console.warn("Geocode attempt 2 failed:",e);}
-  }
-  if(!result)return null;
-  return{lat:parseFloat(result.lat),lon:parseFloat(result.lon),raw:result};
+async // ── ADDRESS CLEANING UTILITIES ───────────────────────────────────
+function cleanAddressForGeocode(addr){
+  if(!addr) return addr;
+  var s = addr.trim();
+  // Remove unit/apt prefix: "U4/20", "Unit 4/20", "Apt 3/"
+  s = s.replace(/^(unit|apt|apartment|flat|shop|suite|level|loft|lot)\s*[\d\w]+[\/\-]\s*/i,'');
+  // Remove leading "U4/" or "4/"
+  s = s.replace(/^\w{0,3}\d+[\/]/i,'');
+  // Normalise range addresses like "39-45" → use first number only
+  s = s.replace(/^(\d+)-\d+\s/,'$1 ');
+  // Expand common street-type abbreviations
+  s = s.replace(/\bSt\b(?!\s*[A-Z]{3})/g,'Street')
+       .replace(/\bAve\b/g,'Avenue')
+       .replace(/\bRd\b/g,'Road')
+       .replace(/\bDr\b/g,'Drive')
+       .replace(/\bCr\b/g,'Crescent')
+       .replace(/\bCres\b/g,'Crescent')
+       .replace(/\bBvd\b/g,'Boulevard')
+       .replace(/\bPde\b/g,'Parade')
+       .replace(/\bCl\b/g,'Close')
+       .replace(/\bPl\b/g,'Place')
+       .replace(/\bCt\b/g,'Court')
+       .replace(/\bHwy\b/g,'Highway')
+       .replace(/\bLn\b/g,'Lane');
+  // Remove excess whitespace
+  s = s.replace(/\s{2,}/g,' ').trim();
+  return s;
 }
+
+// Extract parts for Nominatim structured geocoding
+function extractAddressParts(addr){
+  var s = cleanAddressForGeocode(addr.trim());
+  // Match "NUMBER STREET_NAME, SUBURB NSW POSTCODE" or without comma
+  var m = s.match(/^(\d+[-\d]*)\s+([^,]+?)(?:,\s*|\s{2,})([A-Za-z][A-Za-z\s]+?)(?:\s+NSW)?(?:\s+(\d{4}))?\s*$/i);
+  if(!m) {
+    // Try looser: number + rest, suburb after comma
+    var m2 = s.match(/^(\d+)\s+(.+?),\s*([A-Za-z][A-Za-z\s]+?)(?:\s+NSW)?(?:\s+(\d{4}))?\s*$/i);
+    if(m2) m = m2;
+  }
+  if(!m) return null;
+  return {
+    number: m[1].replace(/-\d+$/,''), // range → first num
+    streetName: m[2].trim(),
+    suburb: m[3].trim(),
+    postcode: m[4]||''
+  };
+}
+function extractSuburbPostcode(addr){
+  // Extract suburb and postcode from address for fallback geocoding
+  var parts = addr.split(',');
+  if(parts.length >= 2){
+    // Last meaningful part often has suburb, state, postcode
+    var last = parts[parts.length-1].trim();
+    var prev = parts[parts.length-2].trim();
+    // Try "Suburb NSW NNNN" or just "Suburb"
+    var m = (last+' '+prev).match(/([A-Za-z\s]+NSW\s*\d{4})/i);
+    if(m) return m[1].trim();
+    var m2 = addr.match(/([A-Za-z\s]+NSW\s*\d{4})/i);
+    if(m2) return m2[1].trim();
+    // Try suburb only
+    var m3 = addr.match(/,\s*([A-Za-z\s]+?)(?:,|\s+NSW|\s+\d{4}|$)/i);
+    if(m3) return m3[1].trim() + ' NSW';
+  }
+  return null;
+}
+
+
+function _showAddrNotFound(resultEl, n, addr){
+  var wa = "https://wa.me/61402623628?text=" + encodeURIComponent("SiteVerdict manual review request: " + addr);
+  resultEl.innerHTML = [
+    "<div style=\"max-width:620px;margin:0 auto;padding:24px;background:var(--bg2);border:1px solid var(--border);border-radius:16px\">",
+    "  <div style=\"font-size:.72rem;color:var(--amber);margin-bottom:8px\">&#9888; Address not confidently verified</div>",
+    "  <div style=\"font-size:.84rem;font-weight:500;margin-bottom:10px\">" + addr + " could not be matched to a known NSW address.</div>",
+    "  <div style=\"font-size:.74rem;color:var(--muted);line-height:1.8;margin-bottom:10px\">Try one of these:</div>",
+    "  <ul style=\"font-size:.72rem;color:var(--muted);line-height:2;margin-bottom:14px;padding-left:18px\">",
+    "    <li>Check the full address includes street, suburb, state and postcode</li>",
+    "    <li>Avoid unit numbers — enter the main street address only (e.g. 20 Smith Street)</li>",
+    "    <li>For range addresses (e.g. 39-45), try the first number only</li>",
+    "    <li>Enter block size manually below and run the check again</li>",
+    "  </ul>",
+    "  <div style=\"display:flex;gap:10px;flex-wrap:wrap\">",
+    "    <button class=\"btn btn-gold\" onclick=\"document.getElementById('addr').focus()\">Try a different address</button>",
+    "    <a href=\"" + wa + "\" class=\"btn btn-outline\" target=\"_blank\" style=\"text-decoration:none\">Request manual review via WhatsApp</a>",
+    "  </div>",
+    "</div>"
+  ].join("");
+  resultEl.classList.add("show");
+  setSt("");
+  n.disabled = false;
+  n.textContent = "Check this property \u2192";
+}
+
+async function geocodeWithConfidence(addr){
+  // Returns {lat, lon, raw, source, confidence} or null
+  var nom = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=en';
+  var cleaned = cleanAddressForGeocode(addr);
+  var suburb  = extractSuburbPostcode(addr);
+
+  var parts   = extractAddressParts(addr);
+  var strategies = [
+    // 1. Raw address + Australia (handles postcode well)
+    { q: addr + ' Australia', conf: 'Verified', label: 'Exact address' },
+    // 2. Cleaned address (abbreviations expanded) + Australia
+    cleaned !== addr
+      ? { q: cleaned + ' Australia', conf: 'Verified', label: 'Cleaned address' }
+      : null,
+    // 3. Nominatim structured params (separate street/city/postcode) — catches many q= failures
+    parts
+      ? { structured: true, street: parts.number+' '+parts.streetName,
+          city: parts.suburb, postcode: parts.postcode,
+          conf: 'Verified', label: 'Structured geocode' }
+      : null,
+    // 4. Raw with countrycodes=au
+    { q: addr, conf: 'Verified', label: 'Exact address (au)', extra: '&countrycodes=au' },
+    // 5. Cleaned with countrycodes=au
+    cleaned !== addr
+      ? { q: cleaned, conf: 'Verified', label: 'Cleaned address (au)', extra: '&countrycodes=au' }
+      : null,
+    // 6. Street name + suburb (no house number) — catches non-mapped house numbers
+    parts
+      ? { q: parts.streetName + ', ' + parts.suburb + ' NSW ' + parts.postcode + ' Australia',
+          conf: 'Estimated', label: 'Street name fallback' }
+      : null,
+    // 7. Suburb/postcode fallback — lower confidence
+    suburb
+      ? { q: suburb + ' Australia', conf: 'Estimated', label: 'Suburb/postcode fallback' }
+      : null,
+  ].filter(Boolean);
+
+  for(var i=0; i<strategies.length; i++){
+    var s = strategies[i];
+    try{
+      var url;
+      if(s.structured){
+        // Nominatim structured parameters: &street=&city=&postalcode=&country=
+        url = nom + '&street=' + encodeURIComponent(s.street)
+          + '&city=' + encodeURIComponent(s.city)
+          + (s.postcode ? '&postalcode=' + encodeURIComponent(s.postcode) : '')
+          + '&country=AU';
+      } else {
+        url = nom + '&q=' + encodeURIComponent(s.q) + (s.extra||'');
+      }
+      var r = await fetch(url);
+      var j = await r.json();
+      if(j && j.length){
+        var hit = j[0];
+        // Reject results clearly outside NSW bounding box
+        var lat = parseFloat(hit.lat), lon = parseFloat(hit.lon);
+        if(lat < -37.6 || lat > -28.1 || lon < 140.9 || lon > 153.7){
+          console.warn('Geocode: result outside NSW bbox, skipping', lat, lon, s.label);
+          continue;
+        }
+        console.log('Geocode success:', s.label, lat, lon, hit.display_name);
+        return { lat, lon, raw: hit, source: s.label, confidence: s.conf };
+      }
+    } catch(e){ console.warn('Geocode strategy '+i+' ('+s.label+') failed:', e); }
+  }
+  return null;
+}
+
+// Keep original geocodeAddress as thin wrapper for autoLookupBlock compatibility
+async function geocodeAddress(addr){
+  var r = await geocodeWithConfidence(addr);
+  if(!r) return null;
+  return { lat: r.lat, lon: r.lon, raw: r.raw };
+}
+
 async function autoLookupBlock(){
   var addr=document.getElementById("addr").value.trim();
   var statusEl=document.getElementById("block-lookup-status");
@@ -222,7 +370,8 @@ async function autoLookupBlock(){
     statusEl.innerHTML='<span style="color:var(--muted)">Could not auto-detect block size. Please enter it manually.</span>';
     btn.style.display="";
   }
-}async function runCheck(){var e=document.getElementById("addr").value.trim(),t=parseFloat(document.getElementById("block").value),a=document.getElementById("front"),r=a&&a.value?parseFloat(a.value):15;if(e){var s=!t||t<100,n=document.getElementById("run-btn");n.disabled=!0,n.textContent="Checking...";var i=document.getElementById("result");i.innerHTML="",i.classList.remove("show");var o=document.getElementById("block-lookup-status");o&&(o.textContent=""),setSt("Finding your address...");try{var _geo=await geocodeAddress(e);if(!_geo)return setSt("Address not found. Please check and try again. Include suburb and postcode."),n.disabled=!1,void(n.textContent="Check this property →");var v=_geo.lat,u=_geo.lon,m=20037508.34*u/180,p=Math.log(Math.tan((90+v)*Math.PI/360))/(Math.PI/180)*20037508.34/180,g=encodeURIComponent(JSON.stringify({x:m,y:p,spatialReference:{wkid:102100}})),y="https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer";setSt("Checking zone, heritage, flood and overlays...");var[f,h,b,L,S,R,A,E,w,P,C,I]=await Promise.all([fetch(y+"/11/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,SYM_CODE,LGA_NAME&returnGeometry=false&f=json"),fetch(y+"/14/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LOT_SIZE&returnGeometry=false&f=json"),fetch(y+"/8/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=H_NAME,H_ID,LEGIS_REF_CLAUSE&returnGeometry=false&f=json"),fetch(y+"/4/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=FSR_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/7/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=HEIGHT_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Flood_Planning_Area/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json"),fetch(y+"/16/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=RESERVE_TYPE,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/18/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/15/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,ACID_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/17/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/13/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Bush_Fire_Prone_Land/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})}))]),[N,k,x,M,U,T,B,D,H,F,_,O]=await Promise.all([f.json(),h.json(),b.json(),L.json(),S.json(),R.json(),A.json(),E.json(),w.json(),P.json(),C.json(),I.json()]),j=B.features&&B.features.length?B.features[0].attributes.RESERVE_TYPE||B.features[0].attributes.LAY_CLASS||"Yes":null,z=D.features&&D.features.length>0,G=H.features&&H.features.length?H.features[0].attributes.ACID_CLASS||H.features[0].attributes.LAY_CLASS||"Yes":null,W=F.features&&F.features.length>0,q=_.features&&_.features.length>0,Y=O.features&&O.features.length>0,Z="",K="",V="";if(N.features&&N.features.length){var $=N.features[0].attributes;Z=$.SYM_CODE||"",K=$.LAY_CLASS||"",V=$.LGA_NAME||""}var X={R1:450,R2:450,R3:400,R4:350,R5:2e3,R6:450,RU1:4e3,RU2:4e3,RU3:4e3,RU4:2e3,RU5:2e3,RU6:4e3,E3:2e3,E4:500,C4:400,UR:500,MU1:400,MU2:400,SP1:2e3,SP2:4e3},Q=!1,J=X[Z]||450;if(k.features&&k.features.length&&k.features[0].attributes.LOT_SIZE){var ee=k.features[0].attributes.LOT_SIZE;ee>=({R1:50,R2:50,R3:50,R4:50,R5:100,R6:100,RU1:500,RU2:500,RU3:500,RU4:500,RU5:500,RU6:500,E4:100}[Z]||50)?(J=ee,Q=!0):(Q=!1,J=X[Z]||450,console.warn("Min lot size sanity fail: "+ee+"m² for zone "+Z+" — using zone default"))}var te=["R1","R2","R3","R4","R5","R6","RU1","RU2","RU3","RU4","RU5","RU6","E4","E3","C4","UR","MU1","MU2","B4","SP1","SP2"].indexOf(Z)>-1,ae=null;if(x.features&&x.features.length){var re=x.features[0].attributes;ae={name:re.H_NAME,clause:re.LEGIS_REF_CLAUSE}}var se=M.features&&M.features.length?M.features[0].attributes.FSR_MAX||M.features[0].attributes.LAY_CLASS:null,ne=U.features&&U.features.length?U.features[0].attributes.HEIGHT_MAX||U.features[0].attributes.LAY_CLASS:null,ie=T.features&&T.features.length>0;setSt("Loading infrastructure and comparable projects...");var oe=gc(V),le=(oe&&oe.name,fetch("/.netlify/functions/daleads?mode=comps&council="+encodeURIComponent(V||"")+"&lat="+v+"&lng="+u).catch(()=>null)),de=fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent('[out:json];(node["railway"~"station|halt"](around:5000,'+v+","+u+');node["amenity"~"hospital"](around:5000,'+v+","+u+');node["shop"~"supermarket"](around:2000,'+v+","+u+"););out;")}).catch(()=>null),[ce,ve]=await Promise.all([le,de]),ue=[];if(ce)try{var me=await ce.json();for(var pe of me.comps||[])if(ue.push({addr:pe.address||"",lots:pe.lots||2,cost:pe.cost||0,days:pe.days||0}),ue.length>=3)break}catch(e){console.warn("DA Leads comps parse failed",e);ue=[];}var ge={transport:[],health:[],shopping:[]};if(ve)try{var ye=await ve.json();for(var fe of ye.elements||[]){var he=fe.tags||{},be=he.name;if(be){var Le=Math.round(1110*Math.sqrt(Math.pow((fe.lat||0)-v,2)+Math.pow((fe.lon||0)-u,2)))/10,Se=he.railway?"transport":"hospital"==he.amenity?"health":"shopping";ge[Se].length<3&&ge[Se].push({name:be,dist:Le})}}}catch(e){}var seppStation400=null,seppStation800=null,seppLightRail800=null;(ge.transport||[]).forEach(function(_st){if(_st.dist<=0.4&&!seppStation400)seppStation400=_st;if(_st.dist<=0.8&&!seppStation800)seppStation800=_st;});setSt("");var Re=calcLots(t,r,J,Z);s&&(Re=0),renderResult(e,Z,K,V,J,t,r,Re,oe,ae,ie,se,ne,ge,ue,j,z,te,Q,G,W,q,Y,seppStation400,seppStation800,seppLightRail800,s,s?'auto-detected':'manual')}catch(e){console.error("SiteVerdict runCheck failed:",e);setSt("Something went wrong: "+(e&&e.message?e.message:"Unknown error. Check browser console."));}n.disabled=!1,n.textContent="Check this property →"}else setSt("Please enter a property address.")}
+}
+async function runCheck(){var e=document.getElementById("addr").value.trim(),t=parseFloat(document.getElementById("block").value),a=document.getElementById("front"),r=a&&a.value?parseFloat(a.value):15;if(e){var s=!t||t<100,n=document.getElementById("run-btn");n.disabled=!0,n.textContent="Checking...";var i=document.getElementById("result");i.innerHTML="",i.classList.remove("show");var o=document.getElementById("block-lookup-status");o&&(o.textContent=""),setSt("Finding your address...");try{var _geoResult=await geocodeWithConfidence(e);var _geo=_geoResult;if(!_geo){_showAddrNotFound(i,n,e);return;}var v=_geo.lat,u=_geo.lon,m=20037508.34*u/180,p=Math.log(Math.tan((90+v)*Math.PI/360))/(Math.PI/180)*20037508.34/180,g=encodeURIComponent(JSON.stringify({x:m,y:p,spatialReference:{wkid:102100}})),y="https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer";setSt("Checking zone, heritage, flood and overlays...");var[f,h,b,L,S,R,A,E,w,P,C,I]=await Promise.all([fetch(y+"/11/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,SYM_CODE,LGA_NAME&returnGeometry=false&f=json"),fetch(y+"/14/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LOT_SIZE&returnGeometry=false&f=json"),fetch(y+"/8/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=H_NAME,H_ID,LEGIS_REF_CLAUSE&returnGeometry=false&f=json"),fetch(y+"/4/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=FSR_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/7/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=HEIGHT_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Flood_Planning_Area/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json"),fetch(y+"/16/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=RESERVE_TYPE,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/18/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/15/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,ACID_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/17/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/13/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Bush_Fire_Prone_Land/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})}))]),[N,k,x,M,U,T,B,D,H,F,_,O]=await Promise.all([f.json(),h.json(),b.json(),L.json(),S.json(),R.json(),A.json(),E.json(),w.json(),P.json(),C.json(),I.json()]),j=B.features&&B.features.length?B.features[0].attributes.RESERVE_TYPE||B.features[0].attributes.LAY_CLASS||"Yes":null,z=D.features&&D.features.length>0,G=H.features&&H.features.length?H.features[0].attributes.ACID_CLASS||H.features[0].attributes.LAY_CLASS||"Yes":null,W=F.features&&F.features.length>0,q=_.features&&_.features.length>0,Y=O.features&&O.features.length>0,Z="",K="",V="";if(N.features&&N.features.length){var $=N.features[0].attributes;Z=$.SYM_CODE||"",K=$.LAY_CLASS||"",V=$.LGA_NAME||""}var X={R1:450,R2:450,R3:400,R4:350,R5:2e3,R6:450,RU1:4e3,RU2:4e3,RU3:4e3,RU4:2e3,RU5:2e3,RU6:4e3,E3:2e3,E4:500,C4:400,UR:500,MU1:400,MU2:400,SP1:2e3,SP2:4e3},Q=!1,J=X[Z]||450;if(k.features&&k.features.length&&k.features[0].attributes.LOT_SIZE){var ee=k.features[0].attributes.LOT_SIZE;ee>=({R1:50,R2:50,R3:50,R4:50,R5:100,R6:100,RU1:500,RU2:500,RU3:500,RU4:500,RU5:500,RU6:500,E4:100}[Z]||50)?(J=ee,Q=!0):(Q=!1,J=X[Z]||450,console.warn("Min lot size sanity fail: "+ee+"m² for zone "+Z+" — using zone default"))}var te=["R1","R2","R3","R4","R5","R6","RU1","RU2","RU3","RU4","RU5","RU6","E4","E3","C4","UR","MU1","MU2","B4","SP1","SP2"].indexOf(Z)>-1,ae=null;if(x.features&&x.features.length){var re=x.features[0].attributes;ae={name:re.H_NAME,clause:re.LEGIS_REF_CLAUSE}}var se=M.features&&M.features.length?M.features[0].attributes.FSR_MAX||M.features[0].attributes.LAY_CLASS:null,ne=U.features&&U.features.length?U.features[0].attributes.HEIGHT_MAX||U.features[0].attributes.LAY_CLASS:null,ie=T.features&&T.features.length>0;setSt("Loading infrastructure and comparable projects...");var oe=gc(V),le=(oe&&oe.name,fetch("/.netlify/functions/daleads?mode=comps&council="+encodeURIComponent(V||"")+"&lat="+v+"&lng="+u).catch(()=>null)),de=fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent('[out:json];(node["railway"~"station|halt"](around:5000,'+v+","+u+');node["amenity"~"hospital"](around:5000,'+v+","+u+');node["shop"~"supermarket"](around:2000,'+v+","+u+"););out;")}).catch(()=>null),[ce,ve]=await Promise.all([le,de]),ue=[];if(ce)try{var me=await ce.json();for(var pe of me.comps||[])if(ue.push({addr:pe.address||"",lots:pe.lots||2,cost:pe.cost||0,days:pe.days||0}),ue.length>=3)break}catch(e){console.warn("DA Leads comps parse failed",e);ue=[];}var ge={transport:[],health:[],shopping:[]};if(ve)try{var ye=await ve.json();for(var fe of ye.elements||[]){var he=fe.tags||{},be=he.name;if(be){var Le=Math.round(1110*Math.sqrt(Math.pow((fe.lat||0)-v,2)+Math.pow((fe.lon||0)-u,2)))/10,Se=he.railway?"transport":"hospital"==he.amenity?"health":"shopping";ge[Se].length<3&&ge[Se].push({name:be,dist:Le})}}}catch(e){}var seppStation400=null,seppStation800=null,seppLightRail800=null;(ge.transport||[]).forEach(function(_st){if(_st.dist<=0.4&&!seppStation400)seppStation400=_st;if(_st.dist<=0.8&&!seppStation800)seppStation800=_st;});setSt("");var Re=calcLots(t,r,J,Z);s&&(Re=0),renderResult(e,Z,K,V,J,t,r,Re,oe,ae,ie,se,ne,ge,ue,j,z,te,Q,G,W,q,Y,seppStation400,seppStation800,seppLightRail800,s,s?'auto-detected':'manual')}catch(e){console.error("SiteVerdict runCheck failed:",e);setSt("Something went wrong: "+(e&&e.message?e.message:"Unknown error. Check browser console."));}n.disabled=!1,n.textContent="Check this property →"}else setSt("Please enter a property address.")}
 
 
 
