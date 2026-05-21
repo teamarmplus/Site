@@ -282,7 +282,20 @@ var SC = {
   'BLACKTOWN':         {name:'Blacktown City Council',              postcode:'2148'},
   'SEVEN HILLS':       {name:'Blacktown City Council',              postcode:'2147'},
   'WINDSOR':           {name:'Hawkesbury City Council',             postcode:'2756'},
-  'RICHMOND':          {name:'Hawkesbury City Council',             postcode:'2753'}
+  'RICHMOND':          {name:'Hawkesbury City Council',             postcode:'2753'},
+  // Fairfield LGA
+  'CANLEY HEIGHTS':    {name:'Fairfield City Council',              postcode:'2166'},
+  'CANLEY VALE':       {name:'Fairfield City Council',              postcode:'2166'},
+  'CABRAMATTA':        {name:'Fairfield City Council',              postcode:'2166'},
+  'CABRAMATTA WEST':   {name:'Fairfield City Council',              postcode:'2166'},
+  'FAIRFIELD':         {name:'Fairfield City Council',              postcode:'2165'},
+  'FAIRFIELD EAST':    {name:'Fairfield City Council',              postcode:'2165'},
+  'FAIRFIELD WEST':    {name:'Fairfield City Council',              postcode:'2165'},
+  'FAIRFIELD HEIGHTS': {name:'Fairfield City Council',              postcode:'2165'},
+  'BONNYRIGG':         {name:'Fairfield City Council',              postcode:'2177'},
+  'EDENSOR PARK':      {name:'Fairfield City Council',              postcode:'2176'},
+  'SMITHFIELD':        {name:'Fairfield City Council',              postcode:'2164'},
+  'WETHERILL PARK':    {name:'Fairfield City Council',              postcode:'2164'}
 };
 
 // Lookup suburb in SC, optionally filter by postcode
