@@ -85,7 +85,63 @@ async function safeFunctionJson(url, fallback){
 }
 
 // ── API ENGINE (preserved) ──────────────────────────
-function chatPro(){window.open("https://wa.me/61402623628?text=Hi+SiteVerdict+I+want+to+chat+with+a+professional","_blank")}var MF={R1:12,R2:12,R3:9,R4:9,RU1:50,RU2:50,RU4:2e3},CD={ALBURY:{days:63,range:"53-63",n:3},BATHURST:{days:43,range:"33-73",n:3},BLACKTOWN:{days:153,range:"40-399",n:12},BYRON:{days:189,range:"14-393",n:6},CAMDEN:{days:45,range:"2-375",n:12},CAMPBELLTOWN:{days:109,range:"109-329",n:3},"CANADA BAY":{days:206,range:"127-557",n:5},CANTERBURY:{days:49,range:"5-448",n:62},BANKSTOWN:{days:49,range:"5-448",n:62},"CENTRAL COAST":{days:89,range:"21-165",n:8},CESSNOCK:{days:85,range:"50-110",n:3},"COFFS HARBOUR":{days:73,range:"65-168",n:3},CUMBERLAND:{days:186,range:"48-361",n:8},FAIRFIELD:{days:177,range:"136-177",n:2},GOULBURN:{days:122,range:"15-292",n:6},"INNER WEST":{days:119,range:"54-166",n:9},"LAKE MACQUARIE":{days:131,range:"41-474",n:15},LIVERPOOL:{days:314,range:"71-425",n:14},MAITLAND:{days:23,range:"18-85",n:4},NEWCASTLE:{days:122,range:"73-360",n:11},"NORTH SYDNEY":{days:279,range:"194-279",n:2},"NORTHERN BEACHES":{days:160,range:"90-173",n:3},PARRAMATTA:{days:133,range:"2-243",n:24},PENRITH:{days:204,range:"74-386",n:9},"PORT MACQUARIE":{days:281,range:"97-281",n:2},"PORT STEPHENS":{days:85,range:"1-92",n:3},RYDE:{days:86,range:"5-86",n:4},SHELLHARBOUR:{days:71,range:"7-392",n:8},SHOALHAVEN:{days:108,range:"3-171",n:6},SUTHERLAND:{days:118,range:"35-315",n:28},"THE HILLS":{days:148,range:"70-199",n:9},WAVERLEY:{days:332,range:"132-332",n:2},WOLLONDILLY:{days:480,range:"175-480",n:2},WOLLONGONG:{days:70,range:"15-233",n:12},WOOLLAHRA:{days:232,range:"208-232",n:2}};function gc(e){if(!e)return null;var t=e.toUpperCase().replace(/\bCITY COUNCIL\b/g,"").replace(/\bSHIRE COUNCIL\b/g,"").replace(/\bMUNICIPAL COUNCIL\b/g,"").replace(/\bREGIONAL COUNCIL\b/g,"").replace(/\bCOUNCIL\b/g,"").replace(/\bCITY\b/g,"").replace(/\bSHIRE\b/g,"").replace(/\bMUNICIPAL\b/g,"").replace(/\bREGIONAL\b/g,"").replace(/\bOF\b/g,"").replace(/\s+/g," ").trim();if(CD[t])return{name:t,data:CD[t]};for(var a in CD)if(t.indexOf(a)>-1||a.indexOf(t)>-1)return{name:a,data:CD[a]};return null}function calcLots(e,t,a,r){var s=Math.floor(e/a);return!t||t<3?s:Math.max(0,Math.min(s,Math.floor(t/(MF[r]||12))))}function getSig(e,t,a){if(e<2)return"r";var r=(e>=4?3:e>=3?2:1)+(t<=90?3:t<=150?2:1)+(a>=80?3:a>=70?2:1);return r>=7?"g":r>=4?"a":"r"}function setSt(e){document.getElementById("status").textContent=e;}
+function chatPro(){window.open("https://wa.me/61402623628?text=Hi+SiteVerdict+I+want+to+chat+with+a+professional","_blank")}var MF={R1:12,R2:12,R3:9,R4:9,RU1:50,RU2:50,RU4:2e3},CD={ALBURY:{days:63,range:"53-63",n:3},BATHURST:{days:43,range:"33-73",n:3},BLACKTOWN:{days:153,range:"40-399",n:12},BYRON:{days:189,range:"14-393",n:6},CAMDEN:{days:45,range:"2-375",n:12},CAMPBELLTOWN:{days:109,range:"109-329",n:3},"CANADA BAY":{days:206,range:"127-557",n:5},CANTERBURY:{days:49,range:"5-448",n:62},BANKSTOWN:{days:49,range:"5-448",n:62},"CENTRAL COAST":{days:89,range:"21-165",n:8},CESSNOCK:{days:85,range:"50-110",n:3},"COFFS HARBOUR":{days:73,range:"65-168",n:3},CUMBERLAND:{days:186,range:"48-361",n:8},FAIRFIELD:{days:177,range:"136-177",n:2},GOULBURN:{days:122,range:"15-292",n:6},"INNER WEST":{days:119,range:"54-166",n:9},"LAKE MACQUARIE":{days:131,range:"41-474",n:15},LIVERPOOL:{days:314,range:"71-425",n:14},MAITLAND:{days:23,range:"18-85",n:4},NEWCASTLE:{days:122,range:"73-360",n:11},"NORTH SYDNEY":{days:279,range:"194-279",n:2},"NORTHERN BEACHES":{days:160,range:"90-173",n:3},PARRAMATTA:{days:133,range:"2-243",n:24},PENRITH:{days:204,range:"74-386",n:9},"PORT MACQUARIE":{days:281,range:"97-281",n:2},"PORT STEPHENS":{days:85,range:"1-92",n:3},RYDE:{days:86,range:"5-86",n:4},SHELLHARBOUR:{days:71,range:"7-392",n:8},SHOALHAVEN:{days:108,range:"3-171",n:6},SUTHERLAND:{days:118,range:"35-315",n:28},"THE HILLS":{days:148,range:"70-199",n:9},WAVERLEY:{days:332,range:"132-332",n:2},WOLLONDILLY:{days:480,range:"175-480",n:2},WOLLONGONG:{days:70,range:"15-233",n:12},WOOLLAHRA:{days:232,range:"208-232",n:2}};
+// ── KNOWN COUNCILS REGISTRY ─────────────────────────────────────
+// Separates council identification from DA timeline data coverage.
+// councilKnown:true means the council can be named from NSW Planning Portal data.
+// daTimelineCoverage:false means DA timeline data is not yet in SiteVerdict.
+// A council can be known but have no DA timeline coverage — these are different states.
+var KC={
+  FEDERATION:       {displayName:'Federation Council',        daTimelineCoverage:false},
+  COROWA:           {displayName:'Federation Council',        daTimelineCoverage:false},
+  ALBURY:           {displayName:'Albury City Council',       daTimelineCoverage:true},
+  ARMIDALE:         {displayName:'Armidale Regional',         daTimelineCoverage:false},
+  BALLINA:          {displayName:'Ballina Shire',             daTimelineCoverage:false},
+  BATHURST:         {displayName:'Bathurst Regional',         daTimelineCoverage:true},
+  BLACKTOWN:        {displayName:'Blacktown City',            daTimelineCoverage:true},
+  BLUE_MOUNTAINS:   {displayName:'Blue Mountains City',       daTimelineCoverage:false},
+  BYRON:            {displayName:'Byron Shire',               daTimelineCoverage:true},
+  CAMDEN:           {displayName:'Camden Council',            daTimelineCoverage:true},
+  CAMPBELLTOWN:     {displayName:'Campbelltown City',         daTimelineCoverage:true},
+  'CANADA BAY':     {displayName:'Canada Bay Council',        daTimelineCoverage:true},
+  CANTERBURY:       {displayName:'Canterbury-Bankstown',      daTimelineCoverage:true},
+  BANKSTOWN:        {displayName:'Canterbury-Bankstown',      daTimelineCoverage:true},
+  'CENTRAL COAST':  {displayName:'Central Coast Council',     daTimelineCoverage:true},
+  CESSNOCK:         {displayName:'Cessnock City',             daTimelineCoverage:true},
+  'COFFS HARBOUR':  {displayName:'Coffs Harbour City',        daTimelineCoverage:true},
+  CUMBERLAND:       {displayName:'Cumberland Council',        daTimelineCoverage:true},
+  DUBBO:            {displayName:'Dubbo Regional',            daTimelineCoverage:false},
+  FAIRFIELD:        {displayName:'Fairfield City',            daTimelineCoverage:true},
+  GOULBURN:         {displayName:'Goulburn Mulwaree',         daTimelineCoverage:true},
+  'INNER WEST':     {displayName:'Inner West Council',        daTimelineCoverage:true},
+  'LAKE MACQUARIE': {displayName:'Lake Macquarie City',       daTimelineCoverage:true},
+  LIVERPOOL:        {displayName:'Liverpool City',            daTimelineCoverage:true},
+  MAITLAND:         {displayName:'Maitland City',             daTimelineCoverage:true},
+  MOREE:            {displayName:'Moree Plains Shire',        daTimelineCoverage:false},
+  MURRAY:           {displayName:'Murray River Council',      daTimelineCoverage:false},
+  MURRUMBIDGEE:     {displayName:'Murrumbidgee Council',      daTimelineCoverage:false},
+  NEWCASTLE:        {displayName:'Newcastle City',            daTimelineCoverage:true},
+  'NORTH SYDNEY':   {displayName:'North Sydney Council',      daTimelineCoverage:true},
+  'NORTHERN BEACHES':{displayName:'Northern Beaches Council', daTimelineCoverage:true},
+  ORANGE:           {displayName:'Orange City',               daTimelineCoverage:false},
+  PARRAMATTA:       {displayName:'City of Parramatta',        daTimelineCoverage:true},
+  PENRITH:          {displayName:'Penrith City',              daTimelineCoverage:true},
+  'PORT MACQUARIE': {displayName:'Port Macquarie-Hastings',   daTimelineCoverage:true},
+  'PORT STEPHENS':  {displayName:'Port Stephens Council',     daTimelineCoverage:true},
+  QUEANBEYAN:       {displayName:'Queanbeyan-Palerang',       daTimelineCoverage:false},
+  RYDE:             {displayName:'City of Ryde',              daTimelineCoverage:true},
+  SHELLHARBOUR:     {displayName:'Shellharbour City',         daTimelineCoverage:true},
+  SHOALHAVEN:       {displayName:'Shoalhaven City',           daTimelineCoverage:true},
+  SUTHERLAND:       {displayName:'Sutherland Shire',          daTimelineCoverage:true},
+  TAMWORTH:         {displayName:'Tamworth Regional',         daTimelineCoverage:false},
+  'THE HILLS':      {displayName:'The Hills Shire',           daTimelineCoverage:true},
+  WAGGA:            {displayName:'Wagga Wagga City',          daTimelineCoverage:false},
+  WAVERLEY:         {displayName:'Waverley Council',          daTimelineCoverage:true},
+  WOLLONDILLY:      {displayName:'Wollondilly Shire',         daTimelineCoverage:true},
+  WOLLONGONG:       {displayName:'Wollongong City',           daTimelineCoverage:true},
+  WOOLLAHRA:        {displayName:'Woollahra Municipal',       daTimelineCoverage:true}
+};
+function gc(e){if(!e)return null;var t=e.toUpperCase().replace(/\bCITY COUNCIL\b/g,"").replace(/\bSHIRE COUNCIL\b/g,"").replace(/\bMUNICIPAL COUNCIL\b/g,"").replace(/\bREGIONAL COUNCIL\b/g,"").replace(/\bCOUNCIL\b/g,"").replace(/\bCITY\b/g,"").replace(/\bSHIRE\b/g,"").replace(/\bMUNICIPAL\b/g,"").replace(/\bREGIONAL\b/g,"").replace(/\bOF\b/g,"").replace(/\s+/g," ").trim();if(CD[t])return{name:t,data:CD[t],councilKnown:true,daTimelineCoverage:true};for(var a in CD)if(t.indexOf(a)>-1||a.indexOf(t)>-1)return{name:a,data:CD[a],councilKnown:true,daTimelineCoverage:true};if(KC[t])return{name:KC[t].displayName||t,data:null,councilKnown:true,daTimelineCoverage:KC[t].daTimelineCoverage};for(var b in KC){if(t.indexOf(b)>-1||b.indexOf(t)>-1)return{name:KC[b].displayName||b,data:null,councilKnown:true,daTimelineCoverage:KC[b].daTimelineCoverage};}return{name:e,data:null,councilKnown:false,daTimelineCoverage:false}}function calcLots(e,t,a,r){var s=Math.floor(e/a);return!t||t<3?s:Math.max(0,Math.min(s,Math.floor(t/(MF[r]||12))))}function getSig(e,t,a){if(e<2)return"r";var r=(e>=4?3:e>=3?2:1)+(t<=90?3:t<=150?2:1)+(a>=80?3:a>=70?2:1);return r>=7?"g":r>=4?"a":"r"}function setSt(e){document.getElementById("status").textContent=e;}
 // ── SHARED GEOCODING ─────────────────────────────────────────────
 // Used by both autoLookupBlock() and runCheck() so coordinates match.
 async // ── ADDRESS CLEANING UTILITIES ───────────────────────────────────
@@ -574,7 +630,12 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
   var primaryRisk = '';
   if(heritage) primaryRisk = 'Heritage overlay requires Impact Statement. Adds cost and DA complexity.';
   else if(flood) primaryRisk = 'Flood planning area. Hydraulic assessment required for DA.';
-  else if(!days) primaryRisk = 'Council not in database \u2014 DA timeline unknown. Contact council directly.';
+  else if(!days && cm && cm.councilKnown && !cm.daTimelineCoverage)
+    primaryRisk = 'Council identified, but DA timeline coverage is not yet available for this council.';
+  else if(!days && cm && cm.councilKnown)
+    primaryRisk = 'Council identified \u2014 DA timeline coverage not yet available.';
+  else if(!days)
+    primaryRisk = 'Council not identified from address \u2014 DA timeline unavailable. Enter full address with suburb and postcode.';
   else if(days>250) primaryRisk = 'Council DA median '+days+'d \u2014 high holding cost risk. Allow 15\u201322 months.';
   else primaryRisk = 'Sewer capacity at street level unverified. Confirm with Sydney Water before offer.';
 
@@ -1020,7 +1081,7 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
         +'<div class="ctrl"><div class="ctrl-lbl">FSR</div><div class="ctrl-val">'+esc(fsrText,20)+'</div><div class="ctrl-src">Layer 4</div></div>'
         +'<div class="ctrl"><div class="ctrl-lbl">Height limit</div><div class="ctrl-val">'+esc(htText,20)+'</div><div class="ctrl-src">Layer 7</div></div>'
         +'<div class="ctrl"><div class="ctrl-lbl">DA pathway</div><div class="ctrl-val">'+(heritage?'Heritage DA':'Standard DA')+'</div><div class="ctrl-src">Layer 8 heritage check</div></div>'
-        +'<div class="ctrl"><div class="ctrl-lbl">Council DA median</div><div class="ctrl-val '+( cm&&cm.data&&cm.data.days<=90?'g':cm&&cm.data&&cm.data.days>200?'r':'a')+'">'+esc(daMedian,20)+'</div><div class="ctrl-src">'+(cm&&cm.data?cm.data.n+' real DAs \u00b7 range: '+esc(cm.data.range||'',20):'Council not in database')+'</div></div>'
+        +'<div class="ctrl"><div class="ctrl-lbl">Council DA median</div><div class="ctrl-val '+( cm&&cm.data&&cm.data.days<=90?'g':cm&&cm.data&&cm.data.days>200?'r':'a')+'">'+esc(daMedian,20)+'</div><div class="ctrl-src">'+(cm&&cm.data?cm.data.n+' real DAs \u00b7 range: '+esc(cm.data.range||'',20):(cm&&cm.councilKnown?'Coverage not yet available':'Council not identified'))+'</div></div>'
       +'</div>'
     +'</div>'
 
@@ -1198,7 +1259,32 @@ function buildRiskRegister(heritage,flood,bushfire,acid,contaminated,riparian,la
 
 // Council Behaviour Analysis
 function buildCouncilBehaviour(lga,cm){
-  if(!cm||!cm.data)return '<div class="rsec"><div class="rsec-title">Council behaviour analysis</div><div style="font-size:.76rem;color:var(--muted);padding:8px 0">'+(lga||'This council')+' is not yet in our database of '+34+' councils. Contact council directly for DA timeline estimates.</div></div>';
+  if(!cm||!cm.data){
+    var _cmName = (cm&&cm.name) ? cm.name : (lga||'This council');
+    var _known  = cm&&cm.councilKnown;
+    var _body   = _known
+      ? '<strong>'+_cmName+'</strong> has been identified from NSW Planning Portal data.'
+        +' DA timeline and processing history coverage is not yet available for this council in SiteVerdict.'
+        +' <span style="display:block;margin-top:6px">SiteVerdict can still provide preliminary site-risk context,'
+        +' but local DA timing, council processing patterns and recent approval history should be'
+        +' verified directly with council or through a professional review.</span>'
+      : _cmName+' could not be identified from available NSW Planning Portal data for this address.'
+        +' DA timeline estimates are not available.'
+        +' Enter the full address including suburb, state and postcode and try again,'
+        +' or request a manual SiteVerdict review.';
+    return '<div class="rsec">'
+      +'<div class="rsec-title">Council behaviour analysis</div>'
+      +'<div style="font-size:.76rem;color:var(--muted);padding:8px 0;line-height:1.7">'+_body+'</div>'
+      +(_known
+        ? '<div style="font-size:.67rem;color:var(--amber);padding:4px 8px;background:rgba(245,158,11,.07);'
+          +'border:1px solid rgba(245,158,11,.2);border-radius:6px;margin-top:4px">'
+          +'&#9888;&nbsp;DA timeline coverage: Not yet available'
+          +' &middot; Confidence: Needs review'
+          +' &middot; Professional verification required'
+          +'</div>'
+        : '')
+      +'</div>';
+  }
   var d=cm.data,name=cm.name;
   var speed=d.days<=45?'Very fast':d.days<=90?'Fast':d.days<=150?'Average':d.days<=250?'Slow':'Very slow';
   var sc=d.days<=90?'var(--green)':d.days<=150?'var(--amber)':'var(--red)';
