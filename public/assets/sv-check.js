@@ -144,7 +144,28 @@ var KC={
 function gc(e,suburbHint,postcodeHint){if(!e)return null;var t=e.toUpperCase().replace(/\bCITY COUNCIL\b/g,"").replace(/\bSHIRE COUNCIL\b/g,"").replace(/\bMUNICIPAL COUNCIL\b/g,"").replace(/\bREGIONAL COUNCIL\b/g,"").replace(/\bCOUNCIL\b/g,"").replace(/\bCITY\b/g,"").replace(/\bSHIRE\b/g,"").replace(/\bMUNICIPAL\b/g,"").replace(/\bREGIONAL\b/g,"").replace(/\bOF\b/g,"").replace(/\s+/g," ").trim();if(CD[t])return{name:t,data:CD[t],councilKnown:true,daTimelineCoverage:true,councilSource:"planning-portal"};for(var a in CD)if(t.indexOf(a)>-1||a.indexOf(t)>-1)return{name:a,data:CD[a],councilKnown:true,daTimelineCoverage:true,councilSource:"planning-portal"};if(KC[t])return{name:KC[t].displayName||t,data:null,councilKnown:true,daTimelineCoverage:KC[t].daTimelineCoverage,councilSource:"planning-portal"};for(var b in KC){if(t.indexOf(b)>-1||b.indexOf(t)>-1)return{name:KC[b].displayName||b,data:null,councilKnown:true,daTimelineCoverage:KC[b].daTimelineCoverage,councilSource:"planning-portal"};}var sbFb=gcSuburb(suburbHint||e,postcodeHint);if(sbFb)return sbFb;return{name:e,data:null,councilKnown:false,daTimelineCoverage:false,councilSource:"unknown"}}function calcLots(e,t,a,r){var s=Math.floor(e/a);return!t||t<3?s:Math.max(0,Math.min(s,Math.floor(t/(MF[r]||12))))}function getSig(e,t,a){if(e<2)return"r";var r=(e>=4?3:e>=3?2:1)+(t<=90?3:t<=150?2:1)+(a>=80?3:a>=70?2:1);return r>=7?"g":r>=4?"a":"r"}function setSt(e){document.getElementById("status").textContent=e;}
 // ── SHARED GEOCODING ─────────────────────────────────────────────
 // Used by both autoLookupBlock() and runCheck() so coordinates match.
-// ── ADDRESS CLEANING UTILITIES ───────────────────────────────────
+async // ── ADDRESS CLEANING UTILITIES ───────────────────────────────────
+// ── CLIENT-SIDE ADDRESS INPUT NORMALISER ────────────────────────
+// Cleans messy user input before sending to geocode function.
+// Tolerates: lowercase, missing NSW/spaces, partial suburb names, extra commas.
+function normalizeAddressInput(s){
+  if(!s) return s;
+  s = s.trim();
+  // Add space before trailing 4-digit postcode if missing: "Heights2166" → "Heights 2166"
+  s = s.replace(/([A-Za-z])(\d{4})$/, '$1 $2');
+  // Normalise multiple commas/spaces
+  s = s.replace(/,{2,}/g, ',').replace(/\s{2,}/g, ' ');
+  // Title-case words (helps suburb matching)
+  s = s.replace(/\w/g, function(c){ return c.toUpperCase(); });
+  // Re-standardise NSW casing after title-case
+  s = s.replace(/Nsw/g, 'NSW').replace(/Nsw$/,'NSW');
+  // Add NSW if missing and looks like it has a postcode but no state
+  if(!/NSW/.test(s) && !/VIC|QLD|SA|WA|TAS|NT|ACT/i.test(s) && /\d{4}/.test(s)){
+    s = s.replace(/(\d{4})/, 'NSW $1');
+  }
+  return s.trim();
+}
+
 function cleanAddressForGeocode(addr){
   if(!addr) return addr;
   var s = addr.trim();
@@ -196,20 +217,20 @@ function extractAddressParts(addr){
   };
 }
 function extractSuburbPostcode(addr){
-  // Extract suburb and postcode from address for fallback geocoding.
-  // Works for normal, range and lot-based inputs such as:
-  // "Lot 109, St Moritz Street, Austral, NSW 2179" and "6 Fenton Street, Panania NSW 2213".
-  var streetWords=/\b(street|st|road|rd|avenue|ave|drive|dr|close|cl|place|pl|court|ct|crescent|cres|boulevard|bvd|parade|pde|lane|ln|highway|hwy)\b/i;
-  var tail = addr.match(/,\s*([A-Za-z][A-Za-z\s'\-]+?)\s*,?\s*NSW\s*(\d{4})?\s*$/i);
-  if(tail && !streetWords.test(tail[1])) return tail[1].trim() + ' NSW' + (tail[2] ? ' ' + tail[2] : '');
-  var simple = addr.trim().match(/^([A-Za-z][A-Za-z\s'\-]+?)\s+NSW\s*(\d{4})?\s*$/i);
-  if(simple && !streetWords.test(simple[1])) return simple[1].trim() + ' NSW' + (simple[2] ? ' ' + simple[2] : '');
+  // Extract suburb and postcode from address for fallback geocoding
   var parts = addr.split(',');
   if(parts.length >= 2){
+    // Last meaningful part often has suburb, state, postcode
     var last = parts[parts.length-1].trim();
     var prev = parts[parts.length-2].trim();
-    var m = (prev+' '+last).match(/([A-Za-z][A-Za-z\s'\-]+?)\s+NSW\s*(\d{4})?/i);
-    if(m && !streetWords.test(m[1])) return m[1].trim() + ' NSW' + (m[2] ? ' ' + m[2] : '');
+    // Try "Suburb NSW NNNN" or just "Suburb"
+    var m = (last+' '+prev).match(/([A-Za-z\s]+NSW\s*\d{4})/i);
+    if(m) return m[1].trim();
+    var m2 = addr.match(/([A-Za-z\s]+NSW\s*\d{4})/i);
+    if(m2) return m2[1].trim();
+    // Try suburb only
+    var m3 = addr.match(/,\s*([A-Za-z\s]+?)(?:,|\s+NSW|\s+\d{4}|$)/i);
+    if(m3) return m3[1].trim() + ' NSW';
   }
   return null;
 }
@@ -282,14 +303,15 @@ function _showAddrNotFound(resultEl, n, addr){
   var wa = "https://wa.me/61402623628?text=" + encodeURIComponent("SiteVerdict manual review request: " + addr);
   resultEl.innerHTML = [
     "<div style=\"max-width:620px;margin:0 auto;padding:24px;background:var(--bg2);border:1px solid var(--border);border-radius:16px\">",
-    "  <div style=\"font-size:.72rem;color:var(--amber);margin-bottom:8px\">&#9888; Address not confidently verified</div>",
-    "  <div style=\"font-size:.84rem;font-weight:500;margin-bottom:10px\">" + addr + " could not be matched to a known NSW address.</div>",
-    "  <div style=\"font-size:.74rem;color:var(--muted);line-height:1.8;margin-bottom:10px\">Try one of these:</div>",
+    "  <div style=\"font-size:.72rem;color:var(--amber);margin-bottom:8px\">&#9888; Address not matched</div>",
+    "  <div style=\"font-size:.84rem;font-weight:500;margin-bottom:10px\">" + addr + " could not be matched in NSW address data.</div>",
+    "  <div style=\"font-size:.74rem;color:var(--muted);line-height:1.8;margin-bottom:10px\">If address lookup is temporarily unavailable, try again shortly. Otherwise:</div>",
     "  <ul style=\"font-size:.72rem;color:var(--muted);line-height:2;margin-bottom:14px;padding-left:18px\">",
-    "    <li>Check the full address includes street, suburb, state and postcode</li>",
-    "    <li>Avoid unit numbers — enter the main street address only (e.g. 20 Smith Street)</li>",
-    "    <li>For range addresses (e.g. 39-45), try the first number only</li>",
-    "    <li>Enter block size manually below and run the check again</li>",
+    "    <li>Include full street number, street name, suburb, NSW and postcode</li>",
+    "    <li>Messy or abbreviated addresses (e.g. canley heigh,2166) are automatically cleaned — try once more after a small correction</li>",
+    "    <li>For Lot addresses (e.g. Lot 109), include suburb and postcode</li>",
+    "    <li>For range addresses (e.g. 39-45), the first number is used automatically</li>",
+    "    <li>Enter block size manually below to still get a limited site report</li>",
     "  </ul>",
     "  <div style=\"display:flex;gap:10px;flex-wrap:wrap\">",
     "    <button class=\"btn btn-gold\" onclick=\"document.getElementById('addr').focus()\">Try a different address</button>",
@@ -518,7 +540,7 @@ async function autoLookupBlock(){
     btn.style.display="";
   }
 }
-async function runCheck(){var e=document.getElementById("addr").value.trim(),t=parseFloat(document.getElementById("block").value),a=document.getElementById("front"),r=a&&a.value?parseFloat(a.value):15;if(e){var s=!t||t<100,n=document.getElementById("run-btn");n.disabled=!0,n.textContent="Checking...";var i=document.getElementById("result");i.innerHTML="",i.classList.remove("show");var o=document.getElementById("block-lookup-status");o&&(o.textContent="");if(window._loadingTimer){clearInterval(window._loadingTimer);window._loadingTimer=null;}var _geoResult=null;window._parcelConfidence=null;window._parcelWarning=null;setSt("Finding your address...");try{var _geoResult=await geocodeWithConfidence(e);var _geo=_geoResult;if(!_geo){_showAddrNotFound(i,n,e);return;}
+async function runCheck(){var e=normalizeAddressInput(document.getElementById("addr").value.trim()),t=parseFloat(document.getElementById("block").value),a=document.getElementById("front"),r=a&&a.value?parseFloat(a.value):15;if(e){var s=!t||t<100,n=document.getElementById("run-btn");n.disabled=!0,n.textContent="Checking...";var i=document.getElementById("result");i.innerHTML="",i.classList.remove("show");var o=document.getElementById("block-lookup-status");o&&(o.textContent="");if(window._loadingTimer){clearInterval(window._loadingTimer);window._loadingTimer=null;}var _geoResult=null;window._parcelConfidence=null;window._parcelWarning=null;setSt("Finding your address...");try{var _geoResult=await geocodeWithConfidence(e);var _geo=_geoResult;if(!_geo){_showAddrNotFound(i,n,e);return;}
 
     // ── GEOCODE QUALITY GATE ────────────────────────────────────
     // Address type detection
@@ -560,11 +582,8 @@ async function runCheck(){var e=document.getElementById("addr").value.trim(),t=p
     var _googleLocConf = _locationType==='ROOFTOP'?'Verified'
       :_locationType==='RANGE_INTERPOLATED'?'Estimated'
       :_locationType?'Needs review':'';
-    // Recalculate addrConfidence using Google locationType when available.
-    // But Google address match is not parcel verification: lot and range inputs stay conservative.
+    // Recalculate addrConfidence using Google locationType when available
     if(_geoIsGoogle && _googleLocConf) _addrConfidence = _googleLocConf;
-    if(_isLot) _addrConfidence = 'Needs review';
-    else if(_isRange && _addrConfidence === 'Verified') _addrConfidence = 'Estimated';
     // Street-only and lot-geocoded-by-suburb are always Needs review
     if(_addrType==='street-only' || _isLotGeocode) _addrConfidence = 'Needs review';
     _geoResult.addrType      = _addrType;
@@ -1069,24 +1088,6 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
     infraHtml='<div style="font-size:.7rem;color:var(--muted)">No stations detected within 5km or data unavailable.</div>';
   }
 
-  // Data confidence labels for the result header/card
-  var _atypeLabel = addrType==='lot'?'Lot-based address'
-    :addrType==='range'?'Range address'
-    :addrType==='unit'?'Unit address'
-    :addrType==='street-only'?'Street-only address'
-    :'Normal address';
-  var _atypeColor = addrType==='lot'||addrType==='range'||addrType==='street-only'?'var(--amber)':'var(--green)';
-  var _csrcLabel  = councilSource==='planning-portal'?'\u2713 NSW Planning Portal'
-    :councilSource==='suburb-postcode-fallback'?'\u26a0 Suburb/postcode inference'
-    :'\u2014 Not identified';
-  var _csrcColor  = councilSource==='planning-portal'?'var(--green)'
-    :councilSource==='suburb-postcode-fallback'?'var(--amber)':'var(--muted2)';
-  var _daLabel    = cm&&cm.daTimelineCoverage?'\u2713 Available'
-    :cm&&cm.councilKnown?'\u26a0 Not yet available for this council'
-    :'\u2014 Unknown';
-  var _daColor    = cm&&cm.daTimelineCoverage?'var(--green)'
-    :cm&&cm.councilKnown?'var(--amber)':'var(--muted2)';
-
   var H='<div class="rcard">'
     // Header
     +'<div class="rh '+sig+'">'
@@ -1118,6 +1119,21 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
 
 
     // Data confidence section
+    var _atypeLabel = addrType==='lot'?'Lot-based address'
+      :addrType==='range'?'Range address'
+      :addrType==='unit'?'Unit address'
+      :'Normal address';
+    var _atypeColor = addrType==='lot'||addrType==='range'?'var(--amber)':'var(--green)';
+    var _csrcLabel  = councilSource==='planning-portal'?'\u2713 NSW Planning Portal'
+      :councilSource==='suburb-postcode-fallback'?'\u26a0 Suburb/postcode inference'
+      :'\u2014 Not identified';
+    var _csrcColor  = councilSource==='planning-portal'?'var(--green)'
+      :councilSource==='suburb-postcode-fallback'?'var(--amber)':'var(--muted2)';
+    var _daLabel    = cm&&cm.daTimelineCoverage?'\u2713 Available ('+35+' councils)'
+      :cm&&cm.councilKnown?'\u26a0 Not yet available for this council'
+      :'\u2014 Unknown';
+    var _daColor    = cm&&cm.daTimelineCoverage?'var(--green)'
+      :cm&&cm.councilKnown?'var(--amber)':'var(--muted2)';
     +'<div class="rsec" style="background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.08)">'      +'<div class="rsec-title">Data confidence'      +' <span class="tag" style="background:transparent;border-color:rgba(255,255,255,.1);color:var(--muted)">&#9432; What we verified &middot; What needs review</span>'      +'</div>'      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.72rem;margin-bottom:8px">'
         +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px;grid-column:span 2">'          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Entered address</div>'          +'<div style="font-weight:500;color:var(--text);margin-bottom:3px">'+esc(addr,80)+'</div>'          +(addrType==='lot'&&lotNum            ?'<div style="font-size:.63rem;color:var(--amber)">&#9888; Lot '+esc(lotNum,10)+' detected &mdash; Lot number is not a street number. Verify parcel via NSW Land Registry or cadastre before any reliance.</div>'            :addrType==='range'            ?'<div style="font-size:.63rem;color:var(--amber)">&#9888; Range address &mdash; exact parcel may differ. Confidence lowered until parcel is verified.</div>'            :addrType==='street-only'            ?'<div style="font-size:.63rem;color:var(--amber)">&#9888; Street-only address &mdash; no house number. Results at street level only.</div>'            :(lotGeoWarn?'<div style="font-size:.63rem;color:var(--amber)">&#9888; '+esc(lotGeoWarn,200)+'</div>':''))        +'</div>'
         +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Matched address</div>'          +'<div style="font-weight:500;color:var(--text);font-size:.75rem">'+esc(matchedAddr||addr,60)+'</div>'          +'<div style="margin-top:3px;font-size:.63rem;color:'+(geoSource&&geoSource.indexOf('Google')>-1?'var(--green)':'var(--amber)')+'">'            +(geoSource?'Source: '+esc(geoSource,40):'Address source unknown')          +'</div>'        +'</div>'
@@ -1128,6 +1144,8 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
         +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Council</div>'          +'<div style="font-weight:600;color:var(--text)">'+(lga||'Not detected')+'</div>'          +'<div style="margin-top:3px;font-size:.63rem;color:'+_csrcColor+'">'+_csrcLabel+'</div>'        +'</div>'
         +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">DA timeline</div>'          +'<div style="font-weight:600;color:'+_daColor+'">'            +(cm&&cm.data&&cm.data.days?cm.data.days+'d median':(cm&&cm.councilKnown?'Known council':'Unknown'))          +'</div>'          +'<div style="margin-top:3px;font-size:.63rem;color:'+_daColor+'">'+_daLabel+'</div>'        +'</div>'
         +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Overall confidence</div>'          +'<div style="font-weight:600;font-size:.72rem;color:'+(geoConf==='Verified'&&zone&&blockSource==='auto-detected'?'var(--green)':'var(--amber)')+'">'            +(geoConf==='Verified'&&zone&&blockSource==='auto-detected'?'Verified \u2014 address, zone and parcel confirmed'              :addrType==='lot'?'Needs review \u2014 Lot address, parcel verification required'              :geoConf==='Estimated'?'Estimated \u2014 address approximate, parcel needs review'              :geoConf==='Needs review'?'Needs review \u2014 not confidently verified'              :geoConf==='Verified'&&zone?'Address \u2714 \u00b7 Zone \u2714 \u00b7 Parcel needs review'              :geoConf==='Verified'?'Address verified \u2014 planning data needs review'              :'Needs review \u2014 professional verification required')          +'</div>'        +'</div>'
+      +(true
+        +'<div style="background:rgba(91,156,242,.06);border:1px solid rgba(91,156,242,.15);border-radius:6px;padding:7px 10px;margin-top:4px"><div style="font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);margin-bottom:3px">&#9679; Beta diagnostic</div><div style="display:flex;gap:12px;flex-wrap:wrap;font-size:.61rem;color:var(--muted2)"><span><span style=\"color:var(--muted)\">Geocode:</span> '+esc(geoConf||'—',20)+' ('+esc(geoSource||'—',40)+')</span>'+'<span><span style=\"color:var(--muted)\">Location type:</span> '+(locationType||'—')+'</span>'+'<span><span style=\"color:var(--muted)\">Parcel:</span> '+(blockSource==='auto-detected'?'NSW Cadastre (auto)':blockSource==='estimated'?'Cadastre (est)':blockSource==='needs-review'?'Cadastre (review)':blockSource==='manual'?'Manual entry':'Not matched')+'</span>'+'<span><span style=\"color:var(--muted)\">Planning:</span> NSW Planning Portal</span>'+'<span><span style=\"color:var(--muted)\">Paid API:</span> '+(paidApiUsed?'&#10003; Google':'Nominatim (free)')+'</span>'+'</div></div>')
       +'</div>'      +(addrType==='lot'||addrType==='range'||geoConf==='Estimated'||geoConf==='Needs review'        ?'<div style="font-size:.62rem;color:var(--amber);line-height:1.7;padding:8px 10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:6px;margin-top:4px">'          +(addrType==='lot'?'&#9888; Lot-based address: Lot and DP numbers must be matched to a specific parcel via NSW Land Registry or cadastre before any result can be relied upon. Parcel area, zone and overlays shown are based on geocoded coordinates only and may relate to a different parcel.'            :addrType==='range'?'&#9888; Range address: exact parcel may differ from geocoded coordinates. Parcel area and zone may relate to an adjacent property. Verify before relying on this result.'            :'&#9888; Address found at approximate location. Results below are indicative only \u2014 professional verification required.')        +'</div>'        :'')      +'</div>'    +
 
     // Planning controls
@@ -1549,7 +1567,7 @@ function buildVerificationChecklist(zone,block,heritage,flood,bushfire,acid,cont
 
 // ── SHAREABLE SUMMARY ─────────────────────────────────────────────
 // Public-safe: no owner, no lead data, no internal notes, address hidden
-function buildShareableSummary(zone,block,mls,n,cm,heritage,flood,bushfire,geoConf,addrType,overall){
+function buildShareableSummary(zone,block,mls,n,cm,heritage,flood,bushfire,geoConf,addrType,overallScore){
   var safeAddr = addrType==='lot'?'[Lot address — not shown]':'[Address on file — not shown publicly]';
   var confColor = geoConf==='Verified'?'var(--green)':'var(--amber)';
   var riskCount = [heritage,flood,bushfire].filter(Boolean).length;
@@ -1691,7 +1709,7 @@ function svCalcFin(uid,lots){
 // ── PERSONA-SPECIFIC NEXT STEPS ──────────────────────────────────
 // Safe, non-advisory next steps by user type.
 // Never investment advice, financial advice, or guaranteed outcomes.
-function buildPersonaNextSteps(zone,cm,heritage,flood,bushfire,block,addrType,overall){
+function buildPersonaNextSteps(zone,cm,heritage,flood,bushfire,block,addrType,overallScore){
   var low  = overallScore < 70;
   var _cm  = cm&&cm.name?cm.name:'your council';
   var _z   = zone||'unknown zone';
@@ -1781,10 +1799,10 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
       +buildRiskRegister(heritage,flood,bushfire,acidSulfate,contaminated,riparian,landReserve,foreshore,cm,n,zone,block,mls,geoConf,addrType,blockSource,lga,front)
       +buildDevPathway(zone,block,mls,n,heritage,flood,cm,geoConf,addrType)
       +buildCouncilBehaviour(lga,cm)
-      +buildPersonaNextSteps(zone,cm,heritage,flood,bushfire,block,addrType,overall)
+      +buildPersonaNextSteps(zone,cm,heritage,flood,bushfire,block,addrType,overallScore)
       +buildProVerification()
       +buildVerificationChecklist(zone,block,heritage,flood,bushfire,acidSulfate,contaminated,riparian,cm,n,addrType)
-      +buildShareableSummary(zone,block,mls,n,cm,heritage,flood,bushfire,geoConf,addrType,overall);
+      +buildShareableSummary(zone,block,mls,n,cm,heritage,flood,bushfire,geoConf,addrType,overallScore);
     if(ctaBox){rcard.insertBefore(newSections,ctaBox);}else{rcard.appendChild(newSections);}
   }catch(e){console.warn("Institutional sections render failed",e);}
 

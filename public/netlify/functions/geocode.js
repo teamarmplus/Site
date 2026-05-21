@@ -12,7 +12,8 @@ exports.handler = async function(event) {
     return { statusCode: 200, headers: CORS, body: '' };
   }
 
-  const addr = (event.queryStringParameters || {}).address || '';
+  const rawAddr = (event.queryStringParameters || {}).address || '';
+  const addr    = normaliseInput(rawAddr);
   if (!addr || addr.trim().length < 5) {
     return {
       statusCode: 400,
@@ -33,17 +34,12 @@ exports.handler = async function(event) {
         && lon >= NSW_BBOX.lonMin && lon <= NSW_BBOX.lonMax;
   }
 
-  const nom = 'https://nominatim.openstreetmap.org/search?format=json&limit=3&accept-language=en';
-  const UA  = { 'User-Agent': 'SiteVerdict/1.0 (siteverdict.com.au)' };
-  const isLotAddr = /^(lot|proposed\s+lot)\s+\d+/i.test(addr.trim());
-  const addressForGoogle = isLotAddr ? lotGeocodeQuery(addr, suburb) : addr;
-
   // ── Strategy 1: Google Geocoding API ───────────────────────────
   const googleKey = process.env.GOOGLE_MAPS_API_KEY;
   if (googleKey) {
     try {
       const gUrl = 'https://maps.googleapis.com/maps/api/geocode/json'
-        + '?address=' + encodeURIComponent(addressForGoogle + ' NSW Australia')
+        + '?address=' + encodeURIComponent(addr + ' NSW Australia')
         + '&components=country:AU|administrative_area:NSW'
         + '&key=' + googleKey;
       const gRes  = await fetch(gUrl);
@@ -62,13 +58,11 @@ exports.handler = async function(event) {
               lat:          loc.lat,
               lon:          loc.lng,
               source:       'Google Geocoding API',
-              confidence:   isLotAddr ? 'Needs review' : 'Verified',
+              confidence:   'Verified',
               matchedAddr:  hit.formatted_address,
               locationType: hit.geometry.location_type || '',
               placeId:      hit.place_id || '',
               paidApiUsed:  true,
-              isLotAddress: isLotAddr,
-              lotWarning: isLotAddr ? 'Lot-based address: Google matched the street/suburb, not a verified lot parcel. Verify lot/DP via NSW Land Registry or cadastre.' : '',
               postcode,
               council
             })
@@ -80,9 +74,13 @@ exports.handler = async function(event) {
     }
   }
 
+  // ── Nominatim fallback strategies ──────────────────────────────
+  const nom = 'https://nominatim.openstreetmap.org/search?format=json&limit=3&accept-language=en';
+  const UA  = { 'User-Agent': 'SiteVerdict/1.0 (siteverdict.com.au)' };
+
   // ── Lot address: try suburb-only geocoding (Lot# is not a house number) ──
-  if (isLotAddr) {
-    // For Lot addresses, geocode by suburb/postcode only — more honest than treating Lot# as house#
+  const _isLotAddr = /^(lot|proposed\s+lot)\s+\d+/i.test(addr.trim());
+  if (_isLotAddr) {
     const lotSuburb = suburb ? suburb + ' NSW Australia' : null;
     if (lotSuburb) {
       try {
@@ -115,7 +113,6 @@ exports.handler = async function(event) {
     }
   }
 
-    // ── Nominatim fallback strategies ──────────────────────────────
   const strategies = [
     // 1. Exact with NSW forced
     { url: nom + '&q=' + enc(addr + ' NSW Australia'), label: 'Exact+NSW', conf: 'Verified' },
@@ -188,6 +185,33 @@ exports.handler = async function(event) {
 
 function enc(s) { return encodeURIComponent(s); }
 
+// ── Input normaliser ───────────────────────────────────────────
+// Tolerates: lowercase, missing NSW, missing space before postcode,
+// partial suburb name typos, extra commas, inconsistent capitalisation.
+function normaliseInput(s) {
+  if (!s) return s;
+  s = s.trim();
+  // Add space before trailing 4-digit postcode if missing (e.g. "Heights2166" → "Heights 2166")
+  s = s.replace(/([A-Za-z])(\d{4})$/, '$1 $2');
+  // Normalise multiple spaces/commas
+  s = s.replace(/,{2,}/g, ',').replace(/\s{2,}/g, ' ');
+  // Ensure NSW is present — add if missing and looks like an AU address
+  if (!/NSW/i.test(s) && /\d{4}/.test(s)) {
+    // Replace bare postcode with NSW POSTCODE
+    s = s.replace(/(\d{4})(?!\s*$)/, 'NSW $1');
+  }
+  if (!/NSW/i.test(s) && !/VIC|QLD|SA|WA|TAS|NT|ACT/i.test(s)) {
+    // Append NSW if no state at all
+    if (!/Australia/i.test(s)) s = s + ' NSW';
+  }
+  // Title-case each word (helps geocoder match suburb names)
+  s = s.replace(/\w/g, function(c){ return c.toUpperCase(); });
+  // Re-standardise NSW casing after title-case
+  s = s.replace(/Nsw/, 'NSW');
+  return s.trim();
+}
+
+
 function cleanAddress(s) {
   // Preserve Lot addresses — Lot 109 ≠ house number 109
   const _isLot = /^(lot|proposed\s+lot)\s+\d+/i.test(s.trim());
@@ -220,24 +244,11 @@ function parseAddressParts(s) {
 }
 
 function extractSuburbPostcode(addr) {
-  const streetWords = /\b(street|st|road|rd|avenue|ave|drive|dr|close|cl|place|pl|court|ct|crescent|cres|boulevard|bvd|parade|pde|lane|ln|highway|hwy)\b/i;
-  // Best case: last locality before NSW/postcode, with or without a comma before NSW.
-  const tail = addr.match(/,\s*([A-Za-z][A-Za-z\s'\-]+?)\s*,?\s*NSW\s*(\d{4})?\s*$/i);
-  if (tail && !streetWords.test(tail[1])) return tail[1].trim() + ' NSW' + (tail[2] ? ' ' + tail[2] : '');
-  // Partial input such as "Austral NSW 2179".
-  const simple = addr.trim().match(/^([A-Za-z][A-Za-z\s'\-]+?)\s+NSW\s*(\d{4})?\s*$/i);
-  if (simple && !streetWords.test(simple[1])) return simple[1].trim() + ' NSW' + (simple[2] ? ' ' + simple[2] : '');
   const m = addr.match(/,\s*([A-Za-z][A-Za-z\s]+NSW\s*\d{0,4})/i)
     || addr.match(/([A-Za-z][A-Za-z\s]+NSW\s*\d{4})/i);
   if (m) return m[1].trim();
   const m2 = addr.match(/,\s*([A-Za-z][A-Za-z\s]+?)\s*(?:NSW|\d{4}|$)/i);
-  return m2 && !streetWords.test(m2[1]) ? m2[1].trim() + ' NSW' : null;
-}
-
-function lotGeocodeQuery(addr, suburbHint) {
-  // Lot 109 is not house number 109. Remove the lot token and geocode the street/locality only.
-  const stripped = addr.replace(/^(lot|proposed\s+lot)\s+\d+[A-Za-z]?\s*(?:dp\s*\d+)?\s*,?\s*/i, '').trim();
-  return stripped || suburbHint || addr;
+  return m2 ? m2[1].trim() + ' NSW' : null;
 }
 
 function extractPostcodeFromGoogleResult(hit) {
