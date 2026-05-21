@@ -387,7 +387,7 @@ async function autoLookupBlock(){
     btn.style.display="";
   }
 }
-async function runCheck(){var e=document.getElementById("addr").value.trim(),t=parseFloat(document.getElementById("block").value),a=document.getElementById("front"),r=a&&a.value?parseFloat(a.value):15;if(e){var s=!t||t<100,n=document.getElementById("run-btn");n.disabled=!0,n.textContent="Checking...";var i=document.getElementById("result");i.innerHTML="",i.classList.remove("show");var o=document.getElementById("block-lookup-status");o&&(o.textContent=""),setSt("Finding your address...");try{var _geoResult=await geocodeWithConfidence(e);var _geo=_geoResult;if(!_geo){_showAddrNotFound(resultEl,n,e);return;}var v=_geo.lat,u=_geo.lon,m=20037508.34*u/180,p=Math.log(Math.tan((90+v)*Math.PI/360))/(Math.PI/180)*20037508.34/180,g=encodeURIComponent(JSON.stringify({x:m,y:p,spatialReference:{wkid:102100}})),y="https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer";setSt("Checking zone, heritage, flood and overlays...");var[f,h,b,L,S,R,A,E,w,P,C,I]=await Promise.all([fetch(y+"/11/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,SYM_CODE,LGA_NAME&returnGeometry=false&f=json"),fetch(y+"/14/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LOT_SIZE&returnGeometry=false&f=json"),fetch(y+"/8/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=H_NAME,H_ID,LEGIS_REF_CLAUSE&returnGeometry=false&f=json"),fetch(y+"/4/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=FSR_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/7/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=HEIGHT_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Flood_Planning_Area/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json"),fetch(y+"/16/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=RESERVE_TYPE,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/18/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/15/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,ACID_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/17/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/13/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Bush_Fire_Prone_Land/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})}))]),[N,k,x,M,U,T,B,D,H,F,_,O]=await Promise.all([f.json(),h.json(),b.json(),L.json(),S.json(),R.json(),A.json(),E.json(),w.json(),P.json(),C.json(),I.json()]),j=B.features&&B.features.length?B.features[0].attributes.RESERVE_TYPE||B.features[0].attributes.LAY_CLASS||"Yes":null,z=D.features&&D.features.length>0,G=H.features&&H.features.length?H.features[0].attributes.ACID_CLASS||H.features[0].attributes.LAY_CLASS||"Yes":null,W=F.features&&F.features.length>0,q=_.features&&_.features.length>0,Y=O.features&&O.features.length>0,Z="",K="",V="";if(N.features&&N.features.length){var $=N.features[0].attributes;Z=$.SYM_CODE||"",K=$.LAY_CLASS||"",V=$.LGA_NAME||""}var X={R1:450,R2:450,R3:400,R4:350,R5:2e3,R6:450,RU1:4e3,RU2:4e3,RU3:4e3,RU4:2e3,RU5:2e3,RU6:4e3,E3:2e3,E4:500,C4:400,UR:500,MU1:400,MU2:400,SP1:2e3,SP2:4e3},Q=!1,J=X[Z]||450;if(k.features&&k.features.length&&k.features[0].attributes.LOT_SIZE){var ee=k.features[0].attributes.LOT_SIZE;ee>=({R1:50,R2:50,R3:50,R4:50,R5:100,R6:100,RU1:500,RU2:500,RU3:500,RU4:500,RU5:500,RU6:500,E4:100}[Z]||50)?(J=ee,Q=!0):(Q=!1,J=X[Z]||450,console.warn("Min lot size sanity fail: "+ee+"m² for zone "+Z+" — using zone default"))}var te=["R1","R2","R3","R4","R5","R6","RU1","RU2","RU3","RU4","RU5","RU6","E4","E3","C4","UR","MU1","MU2","B4","SP1","SP2"].indexOf(Z)>-1,ae=null;if(x.features&&x.features.length){var re=x.features[0].attributes;ae={name:re.H_NAME,clause:re.LEGIS_REF_CLAUSE}}var se=M.features&&M.features.length?M.features[0].attributes.FSR_MAX||M.features[0].attributes.LAY_CLASS:null,ne=U.features&&U.features.length?U.features[0].attributes.HEIGHT_MAX||U.features[0].attributes.LAY_CLASS:null,ie=T.features&&T.features.length>0;setSt("Loading infrastructure and comparable projects...");var oe=gc(V),le=(oe&&oe.name,fetch("/.netlify/functions/daleads?mode=comps&council="+encodeURIComponent(V||"")+"&lat="+v+"&lng="+u).catch(()=>null)),de=fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent('[out:json];(node["railway"~"station|halt"](around:5000,'+v+","+u+');node["amenity"~"hospital"](around:5000,'+v+","+u+');node["shop"~"supermarket"](around:2000,'+v+","+u+"););out;")}).catch(()=>null),[ce,ve]=await Promise.all([le,de]),ue=[];if(ce)try{var me=await ce.json();for(var pe of me.comps||[])if(ue.push({addr:pe.address||"",lots:pe.lots||2,cost:pe.cost||0,days:pe.days||0}),ue.length>=3)break}catch(e){console.warn("DA Leads comps parse failed",e);ue=[];}var ge={transport:[],health:[],shopping:[]};if(ve)try{var ye=await ve.json();for(var fe of ye.elements||[]){var he=fe.tags||{},be=he.name;if(be){var Le=Math.round(1110*Math.sqrt(Math.pow((fe.lat||0)-v,2)+Math.pow((fe.lon||0)-u,2)))/10,Se=he.railway?"transport":"hospital"==he.amenity?"health":"shopping";ge[Se].length<3&&ge[Se].push({name:be,dist:Le})}}}catch(e){}var seppStation400=null,seppStation800=null,seppLightRail800=null;(ge.transport||[]).forEach(function(_st){if(_st.dist<=0.4&&!seppStation400)seppStation400=_st;if(_st.dist<=0.8&&!seppStation800)seppStation800=_st;});setSt("");var Re=calcLots(t,r,J,Z);s&&(Re=0),renderResult(e,Z,K,V,J,t,r,Re,oe,ae,ie,se,ne,ge,ue,j,z,te,Q,G,W,q,Y,seppStation400,seppStation800,seppLightRail800,s,s?'auto-detected':'manual')}catch(e){console.error("SiteVerdict runCheck failed:",e);setSt("Something went wrong: "+(e&&e.message?e.message:"Unknown error. Check browser console."));}n.disabled=!1,n.textContent="Check this property →"}else setSt("Please enter a property address.")}
+async function runCheck(){var e=document.getElementById("addr").value.trim(),t=parseFloat(document.getElementById("block").value),a=document.getElementById("front"),r=a&&a.value?parseFloat(a.value):15;if(e){var s=!t||t<100,n=document.getElementById("run-btn");n.disabled=!0,n.textContent="Checking...";var i=document.getElementById("result");i.innerHTML="",i.classList.remove("show");var o=document.getElementById("block-lookup-status");o&&(o.textContent="");if(window._loadingTimer){clearInterval(window._loadingTimer);window._loadingTimer=null;}setSt("Finding your address...");try{var _geoResult=await geocodeWithConfidence(e);var _geo=_geoResult;if(!_geo){_showAddrNotFound(i,n,e);return;}var v=_geo.lat,u=_geo.lon,m=20037508.34*u/180,p=Math.log(Math.tan((90+v)*Math.PI/360))/(Math.PI/180)*20037508.34/180,g=encodeURIComponent(JSON.stringify({x:m,y:p,spatialReference:{wkid:102100}})),y="https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer";setSt("Checking zone, heritage, flood and overlays...");var[f,h,b,L,S,R,A,E,w,P,C,I]=await Promise.all([fetch(y+"/11/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,SYM_CODE,LGA_NAME&returnGeometry=false&f=json"),fetch(y+"/14/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LOT_SIZE&returnGeometry=false&f=json"),fetch(y+"/8/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=H_NAME,H_ID,LEGIS_REF_CLAUSE&returnGeometry=false&f=json"),fetch(y+"/4/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=FSR_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/7/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=HEIGHT_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Flood_Planning_Area/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json"),fetch(y+"/16/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=RESERVE_TYPE,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/18/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/15/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,ACID_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/17/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/13/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Bush_Fire_Prone_Land/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})}))]),[N,k,x,M,U,T,B,D,H,F,_,O]=await Promise.all([f.json(),h.json(),b.json(),L.json(),S.json(),R.json(),A.json(),E.json(),w.json(),P.json(),C.json(),I.json()]),j=B.features&&B.features.length?B.features[0].attributes.RESERVE_TYPE||B.features[0].attributes.LAY_CLASS||"Yes":null,z=D.features&&D.features.length>0,G=H.features&&H.features.length?H.features[0].attributes.ACID_CLASS||H.features[0].attributes.LAY_CLASS||"Yes":null,W=F.features&&F.features.length>0,q=_.features&&_.features.length>0,Y=O.features&&O.features.length>0,Z="",K="",V="";if(N.features&&N.features.length){var $=N.features[0].attributes;Z=$.SYM_CODE||"",K=$.LAY_CLASS||"",V=$.LGA_NAME||""}var X={R1:450,R2:450,R3:400,R4:350,R5:2e3,R6:450,RU1:4e3,RU2:4e3,RU3:4e3,RU4:2e3,RU5:2e3,RU6:4e3,E3:2e3,E4:500,C4:400,UR:500,MU1:400,MU2:400,SP1:2e3,SP2:4e3},Q=!1,J=X[Z]||450;if(k.features&&k.features.length&&k.features[0].attributes.LOT_SIZE){var ee=k.features[0].attributes.LOT_SIZE;ee>=({R1:50,R2:50,R3:50,R4:50,R5:100,R6:100,RU1:500,RU2:500,RU3:500,RU4:500,RU5:500,RU6:500,E4:100}[Z]||50)?(J=ee,Q=!0):(Q=!1,J=X[Z]||450,console.warn("Min lot size sanity fail: "+ee+"m² for zone "+Z+" — using zone default"))}var te=["R1","R2","R3","R4","R5","R6","RU1","RU2","RU3","RU4","RU5","RU6","E4","E3","C4","UR","MU1","MU2","B4","SP1","SP2"].indexOf(Z)>-1,ae=null;if(x.features&&x.features.length){var re=x.features[0].attributes;ae={name:re.H_NAME,clause:re.LEGIS_REF_CLAUSE}}var se=M.features&&M.features.length?M.features[0].attributes.FSR_MAX||M.features[0].attributes.LAY_CLASS:null,ne=U.features&&U.features.length?U.features[0].attributes.HEIGHT_MAX||U.features[0].attributes.LAY_CLASS:null,ie=T.features&&T.features.length>0;setSt("Loading infrastructure and comparable projects...");var oe=gc(V),le=(oe&&oe.name,fetch("/.netlify/functions/daleads?mode=comps&council="+encodeURIComponent(V||"")+"&lat="+v+"&lng="+u).catch(()=>null)),de=fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent('[out:json];(node["railway"~"station|halt"](around:5000,'+v+","+u+');node["amenity"~"hospital"](around:5000,'+v+","+u+');node["shop"~"supermarket"](around:2000,'+v+","+u+"););out;")}).catch(()=>null),[ce,ve]=await Promise.all([le,de]),ue=[];if(ce)try{var me=await ce.json();for(var pe of me.comps||[])if(ue.push({addr:pe.address||"",lots:pe.lots||2,cost:pe.cost||0,days:pe.days||0}),ue.length>=3)break}catch(e){console.warn("DA Leads comps parse failed",e);ue=[];}var ge={transport:[],health:[],shopping:[]};if(ve)try{var ye=await ve.json();for(var fe of ye.elements||[]){var he=fe.tags||{},be=he.name;if(be){var Le=Math.round(1110*Math.sqrt(Math.pow((fe.lat||0)-v,2)+Math.pow((fe.lon||0)-u,2)))/10,Se=he.railway?"transport":"hospital"==he.amenity?"health":"shopping";ge[Se].length<3&&ge[Se].push({name:be,dist:Le})}}}catch(e){}var seppStation400=null,seppStation800=null,seppLightRail800=null;(ge.transport||[]).forEach(function(_st){if(_st.dist<=0.4&&!seppStation400)seppStation400=_st;if(_st.dist<=0.8&&!seppStation800)seppStation800=_st;});setSt("");var Re=calcLots(t,r,J,Z);s&&(Re=0),renderResult(e,Z,K,V,J,t,r,Re,oe,ae,ie,se,ne,ge,ue,j,z,te,Q,G,W,q,Y,seppStation400,seppStation800,seppLightRail800,s,s?'auto-detected':'manual',_geoResult&&_geoResult.source?_geoResult.source:'',_geoResult&&_geoResult.confidence?_geoResult.confidence:'',_geoResult&&_geoResult.matchedAddr?_geoResult.matchedAddr:'')}catch(e){console.error("SiteVerdict runCheck failed:",e);setSt("Something went wrong: "+(e&&e.message?e.message:"Unknown error. Check browser console."));}n.disabled=!1,n.textContent="Check this property →"}else setSt("Please enter a property address.")}
 
 
 
@@ -754,7 +754,7 @@ function calcCouncilComplexity(cm){
 // Sets innerHTML on #result with the full report card structure.
 // All enhancement sections (verdict, scorecard etc) are added by
 // the renderResult wrapper AFTER this function runs.
-function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,overallScore,blockSource){
+function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,overallScore,blockSource,geoSource,geoConf,matchedAddr){
   var resultEl=document.getElementById('result');
   if(!resultEl) return;
 
@@ -882,39 +882,94 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
 
 
     // Data confidence section
-    +'<div class="rsec" style="background:rgba(255,255,255,.02)">'
-      +'<div class="rsec-title">Data confidence <span class="tag tag-live" style="background:transparent;border-color:rgba(255,255,255,.1);color:var(--muted)">&#9432; What we checked &middot; What needs professional review</span></div>'
-      +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:.72rem">'
-        // Block size
+    +'<div class="rsec" style="background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.08)">'
+      +'<div class="rsec-title">Data confidence'
+      +' <span class="tag" style="background:transparent;border-color:rgba(255,255,255,.1);color:var(--muted)">&#9432; What we checked &middot; What needs professional review</span>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.72rem;margin-bottom:8px">'
+
+        // Row 1: Address match
+        +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px;grid-column:span 2">'
+          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Address matched</div>'
+          +'<div style="font-weight:500;color:var(--text)">'
+            +(matchedAddr ? matchedAddr : esc(addr,60))
+          +'</div>'
+          +'<div style="margin-top:3px;font-size:.63rem;color:'
+            +(geoSource&&geoSource.indexOf('Google')>-1?'var(--green)':'var(--amber)')
+          +'">'
+            +(geoSource ? '✓ Source: '+geoSource : '⚠ Address source unknown')
+            +' · '
+            +(geoConf==='Verified'?'✓ Verified':'&#8212; '+(!geoConf?'Needs review':geoConf))
+          +'</div>'
+        +'</div>'
+
+        // Row 2: Block size
         +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'
-          +'<div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2);margin-bottom:4px">Block size</div>'
-          +'<div style="font-weight:600;color:var(--text)">'+(block?block+'m\u00b2':'Not provided')+'</div>'
-          +'<div style="margin-top:3px;font-size:.65rem;color:'+(blockSource==='auto-detected'?'var(--green)':'var(--amber)')+'">'
+          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Block size</div>'
+          +'<div style="font-weight:600;color:var(--text)">'+(block?block+'m²':'Not provided')+'</div>'
+          +'<div style="margin-top:3px;font-size:.63rem;color:'+(blockSource==='auto-detected'?'var(--green)':'var(--amber)')+'">'
             +(blockSource==='auto-detected'
-              ?'\u2713 Auto-detected (NSW Cadastre)'
-              :(block?'\u26a0 Manually entered \u2014 verify against title':'Enter block size for better results'))+'</div>'
+              ?'✓ Auto-detected (NSW Cadastre)'
+              :(block?'⚠ Manually entered — verify against title':'— Enter block size for better results'))
+          +'</div>'
         +'</div>'
-        // Zone
+
+        // Row 3: Zone
         +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'
-          +'<div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2);margin-bottom:4px">Zone</div>'
-          +'<div style="font-weight:600;color:var(--text)">'+(zone||'Unknown')+'</div>'
-          +'<div style="margin-top:3px;font-size:.65rem;color:'+(zone&&zone!=='E2'&&zone!=='RE1'?'var(--green)':'var(--amber)')+'">'
-            +(zone?'\u2713 Live from NSW Planning Portal':'\u2717 Zone not detected \u2014 enter address in full')+'</div>'
+          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Zone</div>'
+          +'<div style="font-weight:600;color:var(--text)">'+(zone||'Not detected')+'</div>'
+          +'<div style="margin-top:3px;font-size:.63rem;color:'+(zone?'var(--green)':'var(--amber)')+'">'
+            +(zone?'✓ Live NSW Planning Portal':'⚠ Zone not detected — enter full address with suburb')
+          +'</div>'
         +'</div>'
-        // Lot count
+
+        // Row 4: Parcel match
         +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'
-          +'<div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2);margin-bottom:4px">Est. lot count</div>'
-          +'<div style="font-weight:600;color:var(--text)">'+(n>=2?n+' lots (est.)':'Below threshold')+'</div>'
-          +'<div style="margin-top:3px;font-size:.65rem;color:var(--muted2)">Estimated \u2014 licensed surveyor must confirm</div>'
+          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Parcel match</div>'
+          +'<div style="font-weight:600;color:var(--text)">'
+            +(blockSource==='auto-detected'?'Parcel found':'Not matched')
+          +'</div>'
+          +'<div style="margin-top:3px;font-size:.63rem;color:'+(blockSource==='auto-detected'?'var(--green)':'var(--muted2)')+'">'
+            +(blockSource==='auto-detected'?'✓ NSW Cadastre parcel matched':'— NSW Cadastre parcel not matched')
+          +'</div>'
         +'</div>'
+
+        // Row 5: Council
+        +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'
+          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Council</div>'
+          +'<div style="font-weight:600;color:var(--text)">'+(lga||'Not detected')+'</div>'
+          +'<div style="margin-top:3px;font-size:.63rem;color:'+(lga?'var(--green)':'var(--amber)')+'">'
+            +(lga?'✓ NSW Planning Portal':'— Not detected')
+          +'</div>'
+        +'</div>'
+
+        // Row 6: Overall confidence summary
+        +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'
+          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Overall confidence</div>'
+          +'<div style="font-weight:600;font-size:.72rem;color:'
+            +(geoConf==='Verified'&&zone&&blockSource==='auto-detected'?'var(--green)'
+              :geoConf==='Verified'&&zone?'var(--amber)'
+              :'var(--amber)')
+          +'">'
+            +(geoConf==='Verified'&&zone&&blockSource==='auto-detected'?'Verified — address, zone and parcel confirmed'
+              :geoConf==='Verified'&&zone?'Address ✔ · Zone ✔ · Parcel needs review'
+              :geoConf==='Verified'?'Address verified — planning data needs review'
+              :'Needs review — professional verification required')
+          +'</div>'
+        +'</div>'
+
       +'</div>'
-      +'<div style="margin-top:8px;font-size:.64rem;color:var(--muted2);line-height:1.7">'
-        +'<strong style="color:var(--muted)">Not yet fully modelled:</strong> '
-        +'Slope &amp; earthworks &middot; Riparian / watercourse corridors &middot; Detailed flood depth &middot; Easements &middot; Title boundaries &middot; Sewer capacity &middot; Tree preservation orders. '
-        +'These require a licensed professional.'
+      // Disclaimer for partial results
+      +((!geoConf||geoConf!=='Verified'||!zone||!blockSource||blockSource!=='auto-detected')
+        ?'<div style="font-size:.62rem;color:var(--muted2);line-height:1.7;padding:6px 8px;background:rgba(255,255,255,.01);border-radius:6px">'
+          +(geoConf==='Verified'&&!zone?'&#9888; Address verified but zone and parcel data could not be found. Enter your full address with suburb, state and postcode.':''  )
+          +(geoConf==='Verified'&&zone&&blockSource!=='auto-detected'?'&#9888; Address and zone verified. Block size is estimated — professional verification required.':'')
+          +(!geoConf?'&#9888; Address not confidently verified. Results below are approximate only.':'')
+        +'</div>'
+        :'')
       +'</div>'
-    +'</div>'
     +
+
     // Planning controls
     +'<div class="rsec">'
       +'<div class="rsec-title">Planning controls <span class="tag tag-live">&#9679; NSW Planning Portal \u00b7 live</span></div>'
@@ -1206,7 +1261,7 @@ function buildProVerification(){
 }
 
 // ── UPDATED renderResult WRAPPER ────────────────────
-function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,blockSource){
+function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,blockSource,geoSource,geoConf,matchedAddr){
   // Calculate scores
   var ps =calcPlanningStrength(zone,mls,mlsReal,heritage,fsr,height,zoneAllows);
   var ov =calcOverlayRisk(heritage,flood,bushfire,acidSulfate,contaminated,riparian,landReserve,foreshore);
@@ -1220,7 +1275,7 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
 
   // Run inner renderer (sets innerHTML on #result)
   try{
-    _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,overall,blockSource);
+    _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,overall,blockSource,geoSource,geoConf,matchedAddr);
   }catch(e){console.error("_renderResultInner failed:",e); return;}
 
   var resultEl=document.getElementById('result');
