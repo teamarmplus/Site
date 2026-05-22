@@ -96,12 +96,11 @@
   <div class="two" style="margin-bottom:8px">
     <div>
       <label class="lbl">
-        Block size (m&#178;)
-        <span id="block-lookup-status" style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--green);font-size:.58rem;margin-left:6px"></span>
+        Land size / block size (m&#178;)
       </label>
-      <input class="fi" id="block" type="number" placeholder="Optional — or auto-detect" min="100">
-      <div class="hint"><button id="auto-lookup-btn" onclick="autoLookupBlock()">&#128269; Auto-detect from address</button></div>
+      <input class="fi" id="block" type="number" placeholder="Optional — enter advertised, title or contract size" min="100">
     </div>
+    <div class="hint" style="margin-top:3px;font-size:.63rem">Optional — enter advertised, contract, title or known land size. If blank, SiteVerdict returns a limited location/planning facts check.</div>
     <div>
       <label class="lbl">Street frontage (m)</label>
       <input class="fi" id="front" type="number" placeholder="15" min="1">
