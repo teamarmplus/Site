@@ -1,16 +1,22 @@
-/version.json
+# SiteVerdict — no-cache headers (launch testing)
+# Prevents CDN/browser caching of HTML and version files
+
+/
   Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
 
-# SiteVerdict — Launch cache headers
-# HTML must never be stale during testing
+/index.html
+  Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
+
 /*.html
   Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
 
-/
+/version.json
   Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
