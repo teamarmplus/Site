@@ -1,0 +1,12 @@
+{
+  "site": "siteverdict2",
+  "build": "sitecheck-expanded-report-2026-05-22",
+  "status": "latest",
+  "features": {
+    "autoDetectRemoved": true,
+    "manualLandSize": true,
+    "fakeAddressRejected": true,
+    "expandedBaseReport": true,
+    "overlayWordingSafe": true
+  }
+}
