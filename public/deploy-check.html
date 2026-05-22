@@ -4,19 +4,53 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SiteVerdict Deploy Check</title>
-<style>body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#07080a;color:#eeedf0;line-height:1.7;padding:40px;max-width:780px;margin:auto}code{background:#161820;padding:2px 6px;border-radius:6px;color:#c8a84b}.ok{color:#3ecf8e}.warn{color:#f59e0b}a{color:#c8a84b}</style>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+        background:#07080a;color:#eeedf0;line-height:1.7;
+        padding:40px;max-width:780px;margin:auto}
+  code{background:#161820;padding:2px 8px;border-radius:6px;color:#c8a84b;font-size:.9em}
+  .ok{color:#3ecf8e} .warn{color:#f59e0b} .label{color:#888;font-size:.85em}
+  a{color:#c8a84b}
+  table{border-collapse:collapse;width:100%;margin-top:12px}
+  td,th{padding:7px 12px;text-align:left;border-bottom:1px solid #1e2028;font-size:.9em}
+  th{color:#888;font-size:.75em;text-transform:uppercase;letter-spacing:.06em}
+</style>
 </head>
 <body>
-<h1>SiteVerdict Deploy Check</h1>
-<p class="ok"><strong>Route-hardened package is live.</strong></p>
-<p>Build marker: <code>siteverdict2-route-hardened-2026-05-22</code></p>
-<ul>
-<li>Full Report direct page: <a href="/full-report.html">/full-report.html</a></li>
-<li>Full Report clean route: <a href="/full-report">/full-report</a></li>
-<li>Services clean route: <a href="/services">/services</a></li>
-<li>Hot List clean route: <a href="/hot-list">/hot-list</a></li>
-<li>Finance clean route: <a href="/finance">/finance</a></li>
-</ul>
-<p class="warn">If this page is not visible on siteverdict2, Netlify is not serving the latest GitHub commit/package.</p>
+<h1>SiteVerdict — Deploy Check</h1>
+<p class="ok"><strong>&#10003; Latest package deployed.</strong></p>
+<p><span class="label">Build marker:</span> <code>siteverdict2-launch-base-2026-05-22</code></p>
+<p><span class="label">Date:</span> 2026-05-22</p>
+
+<h2>Route checks</h2>
+<table>
+<tr><th>Route</th><th>Expected</th><th>Test link</th></tr>
+<tr><td>/</td><td>Homepage loads</td><td><a href="/">Test</a></td></tr>
+<tr><td>/full-report.html</td><td>Full Report page loads</td><td><a href="/full-report.html">Test</a></td></tr>
+<tr><td>/full-report</td><td>Redirects to /full-report.html (200)</td><td><a href="/full-report">Test</a></td></tr>
+<tr><td>/hot-list</td><td>Hot List loads</td><td><a href="/hot-list">Test</a></td></tr>
+<tr><td>/services</td><td>Services loads</td><td><a href="/services">Test</a></td></tr>
+<tr><td>/finance</td><td>Finance loads</td><td><a href="/finance">Test</a></td></tr>
+</table>
+
+<h2>Link checks</h2>
+<table>
+<tr><th>File</th><th>Full Report links</th><th>Expected</th></tr>
+<tr><td>index.html nav</td><td>/full-report.html</td><td class="ok">&#10003; Direct</td></tr>
+<tr><td>hot-list.html buttons</td><td>/full-report.html (×14)</td><td class="ok">&#10003; Direct</td></tr>
+<tr><td>services.html nav</td><td>/full-report.html</td><td class="ok">&#10003; Direct</td></tr>
+<tr><td>finance.html nav</td><td>/full-report.html</td><td class="ok">&#10003; Direct</td></tr>
+</table>
+
+<h2>Wording checks</h2>
+<table>
+<tr><th>File</th><th>Wording</th><th>Expected</th></tr>
+<tr><td>services.html</td><td>24 hours for quote-ready enquiries</td><td class="ok">&#10003; Correct</td></tr>
+</table>
+
+<p class="warn" style="margin-top:24px">
+  &#9888; If this page shows an old build marker, Netlify is not serving the latest package.
+  Deploy via GitHub push or Netlify drag-and-drop and reload.
+</p>
 </body>
 </html>

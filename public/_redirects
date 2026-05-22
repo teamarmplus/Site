@@ -1,27 +1,19 @@
-# SiteVerdict redirects - route hardened
-# Clean URLs
-/full-report        /full-report/index.html    200
-/full-report/       /full-report/index.html    200
-/services           /services/index.html       200
-/services/          /services/index.html       200
-/hot-list           /hot-list/index.html       200
-/hot-list/          /hot-list/index.html       200
-/finance            /finance/index.html        200
-/finance/           /finance/index.html        200
-/terms              /terms/index.html          200
-/terms/             /terms/index.html          200
+# ── Block internal paths — forced 404 (! overrides static files) ──
+/tools              /404.html  404!
+/tools/*            /404.html  404!
+/data               /404.html  404!
+/data/*             /404.html  404!
+/docs               /404.html  404!
+/docs/*             /404.html  404!
+/.env               /404.html  404!
+/.env.*             /404.html  404!
+/*.key              /404.html  404!
+/*.pem              /404.html  404!
+/register-trader.html  /404.html  404!
 
-# Protected internal directories
-/tools              /404.html  404
-/tools/*            /404.html  404
-/data               /404.html  404
-/data/*             /404.html  404
-/docs               /404.html  404
-/docs/*             /404.html  404
-
-# HTML fallbacks
-/full-report.html   /full-report.html          200
-/services.html      /services.html             200
-/hot-list.html      /hot-list.html             200
-/finance.html       /finance.html              200
-/terms.html         /terms.html                200
+# ── Clean URLs ─────────────────────────────────────────────────────
+/hot-list           /hot-list.html      200
+/services           /services.html      200
+/finance            /finance.html       200
+/terms              /terms.html         200
+/full-report        /full-report.html   200
