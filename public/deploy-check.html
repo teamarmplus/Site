@@ -3,24 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="siteverdict-build" content="sitecheck-manual-landsize-2026-05-22">
 <title>SiteVerdict Deploy Check</title>
 <style>
   body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;
         background:#07080a;color:#eeedf0;line-height:1.7;
         padding:40px;max-width:780px;margin:auto}
   code{background:#161820;padding:2px 8px;border-radius:6px;color:#c8a84b;font-size:.9em}
-  .ok{color:#3ecf8e} .warn{color:#f59e0b} .label{color:#888;font-size:.85em}
+  .ok{color:#3ecf8e} .warn{color:#f59e0b} .fail{color:#ef4444}
+  .label{color:#888;font-size:.85em}
   a{color:#c8a84b}
   table{border-collapse:collapse;width:100%;margin-top:12px}
   td,th{padding:7px 12px;text-align:left;border-bottom:1px solid #1e2028;font-size:.9em}
   th{color:#888;font-size:.75em;text-transform:uppercase;letter-spacing:.06em}
+  .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.75em;font-weight:700}
+  .g{background:rgba(62,207,142,.12);color:#3ecf8e}
+  .a{background:rgba(245,158,11,.12);color:#f59e0b}
 </style>
 </head>
 <body>
-<h1>SiteVerdict — Deploy Check</h1>
-<p class="ok"><strong>&#10003; Latest package deployed.</strong></p>
-<p><span class="label">Build marker:</span> <code>siteverdict2-launch-base-2026-05-22</code></p>
-<p><span class="label">Date:</span> 2026-05-22</p>
+<h1>SiteVerdict &mdash; Deploy Check</h1>
+<p class="ok"><strong>&#10003; Deploy check page loaded.</strong></p>
+<p><span class="label">Build marker:</span> <code id="bm">sitecheck-manual-landsize-2026-05-22</code></p>
+<p class="warn">&#9888; If the build marker above does not match your latest deploy, Netlify is serving a cached or older version. Hard-refresh or redeploy.</p>
+
+<h2>Cache headers</h2>
+<p>HTML pages on this site now serve <code>Cache-Control: no-store, no-cache</code>. If you still see stale content after a deploy, do a hard-refresh (<code>Cmd+Shift+R</code> / <code>Ctrl+Shift+R</code>).</p>
 
 <h2>Route checks</h2>
 <table>
@@ -33,24 +41,25 @@
 <tr><td>/finance</td><td>Finance loads</td><td><a href="/finance">Test</a></td></tr>
 </table>
 
-<h2>Link checks</h2>
+<h2>Homepage expected state (this build)</h2>
 <table>
-<tr><th>File</th><th>Full Report links</th><th>Expected</th></tr>
-<tr><td>index.html nav</td><td>/full-report.html</td><td class="ok">&#10003; Direct</td></tr>
-<tr><td>hot-list.html buttons</td><td>/full-report.html (×14)</td><td class="ok">&#10003; Direct</td></tr>
-<tr><td>services.html nav</td><td>/full-report.html</td><td class="ok">&#10003; Direct</td></tr>
-<tr><td>finance.html nav</td><td>/full-report.html</td><td class="ok">&#10003; Direct</td></tr>
+<tr><th>Item</th><th>Expected</th><th>Status</th></tr>
+<tr><td>Auto-detect button</td><td>Not present</td><td><span class="badge g">&#10003; Removed</span></td></tr>
+<tr><td>Land size label</td><td>&ldquo;Land size / block size&rdquo;</td><td><span class="badge g">&#10003; Present</span></td></tr>
+<tr><td>Fake address (999 Fake Street)</td><td>Rejected &mdash; no report generated</td><td><span class="badge g">&#10003; Gate active</span></td></tr>
+<tr><td>Site facts section</td><td>Entered addr, matched addr, zone, confidence&hellip;</td><td><span class="badge g">&#10003; Expanded</span></td></tr>
+<tr><td>Overlay wording</td><td>&ldquo;Not detected in available layer&rdquo; (not &ldquo;Clear&rdquo;)</td><td><span class="badge g">&#10003; Updated</span></td></tr>
+<tr><td>Disclaimer in result</td><td>&ldquo;Not legal, planning, financial&hellip;&rdquo;</td><td><span class="badge g">&#10003; Present</span></td></tr>
+<tr><td>Full Report preview section</td><td>Visible in result, CTA to /full-report.html</td><td><span class="badge g">&#10003; Present</span></td></tr>
+<tr><td>Possible next pathways</td><td>6 buttons including Full Report</td><td><span class="badge g">&#10003; Present</span></td></tr>
+<tr><td>Intelligence score</td><td>Not shown publicly</td><td><span class="badge g">&#10003; Hidden</span></td></tr>
 </table>
 
-<h2>Wording checks</h2>
-<table>
-<tr><th>File</th><th>Wording</th><th>Expected</th></tr>
-<tr><td>services.html</td><td>24 hours for quote-ready enquiries</td><td class="ok">&#10003; Correct</td></tr>
-</table>
+<h2>Asset versioning</h2>
+<p>All homepage CSS/JS assets include <code>?v=sitecheck-manual-landsize-2026-05-22</code> to bust browser cache on this deploy.</p>
 
 <p class="warn" style="margin-top:24px">
-  &#9888; If this page shows an old build marker, Netlify is not serving the latest package.
-  Deploy via GitHub push or Netlify drag-and-drop and reload.
+  &#9888; This page is for launch testing only. Build marker: <code>sitecheck-manual-landsize-2026-05-22</code>
 </p>
 </body>
 </html>
