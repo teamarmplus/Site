@@ -313,7 +313,7 @@ function gcSuburb(suburb, postcode){
 
 
 
-function _showAddrNotFound(resultEl, n, addr){
+function _showAddrNotFound(resultEl, n, addr, reason){
   var wa = "https://wa.me/61402623628?text=" + encodeURIComponent("SiteVerdict manual review request: " + addr);
   resultEl.innerHTML = [
     "<div style=\"max-width:620px;margin:0 auto;padding:24px;background:var(--bg2);border:1px solid var(--border);border-radius:16px\">",
@@ -360,8 +360,16 @@ async function geocodeWithConfidence(addr){
           placeId: data.placeId || '',
           paidApiUsed: data.paidApiUsed || false,
           isLotAddress: data.isLotAddress || false,
-          lotWarning: data.lotWarning || null
+          lotWarning: data.lotWarning || null,
+          addressQuality: data.addressQuality || '',
+          found: data.found !== false,
+          reason: data.reason || null
         };
+      }
+    } else {
+      // Server returned found:false — pass reason and quality back to caller
+      if(data && data.found === false){
+        return { found: false, reason: data.reason||null, addressQuality: data.addressQuality||'failed', attempted: data.attempted||addr };
       }
     }
   } catch(e) {
@@ -369,63 +377,83 @@ async function geocodeWithConfidence(addr){
   }
 
   // Browser-side fallback (if server function unavailable)
+  // Uses same strict validation as server: streetMatch + pcOk required.
+  // Suburb fallback removed — fake addresses must not produce usable results.
   var nom     = 'https://nominatim.openstreetmap.org/search?format=json&limit=3&accept-language=en';
   var cleaned = cleanAddressForGeocode(addr);
   var parts   = extractAddressParts(addr);
   var suburb  = extractSuburbPostcode(addr);
+  var _bInputPc = (addr.match(/\b(\d{4})\b/) || [])[1] || null;
+  var _isLotBr  = /^(lot|proposed\s+lot)\s+\d+/i.test(addr.trim());
 
-  // Tightened NSW bbox: upper bound -28.5 excludes QLD border ambiguity
   function inNSW(lat, lon) {
     return lat >= -37.6 && lat <= -28.5 && lon >= 140.9 && lon <= 153.7;
   }
 
-  var strategies = [
-    { q: addr + ' NSW Australia', conf: 'Verified', label: 'Exact+NSW' },
-    cleaned !== addr
-      ? { q: cleaned + ' NSW Australia', conf: 'Verified', label: 'Cleaned+NSW' }
-      : null,
-    parts
-      ? { structured: true, street: parts.number+' '+parts.streetName,
-          city: parts.suburb, postcode: parts.postcode, conf: 'Verified', label: 'Structured' }
-      : null,
-    { q: addr, conf: 'Verified', label: 'Exact (au)', extra: '&countrycodes=au' },
-    parts
-      ? { q: parts.streetName+', '+parts.suburb+' NSW '+parts.postcode+' Australia',
-          conf: 'Estimated', label: 'Street name' }
-      : null,
-    suburb
-      ? { q: suburb + ' NSW Australia', conf: 'Estimated', label: 'Suburb fallback' }
-      : null,
-  ].filter(Boolean);
-
-  for (var i = 0; i < strategies.length; i++) {
-    var s = strategies[i];
+  // Lot addresses: suburb fallback allowed, clearly marked Needs review
+  if (_isLotBr && suburb) {
     try {
-      var url;
-      if (s.structured) {
-        url = nom + '&street=' + encodeURIComponent(s.street)
-          + '&city=' + encodeURIComponent(s.city)
-          + (s.postcode ? '&postalcode=' + encodeURIComponent(s.postcode) : '')
-          + '&country=AU';
-      } else {
-        url = nom + '&q=' + encodeURIComponent(s.q) + (s.extra||'');
-      }
-      var r = await fetch(url);
-      var j = await r.json();
-      if (j && j.length) {
-        for (var k = 0; k < j.length; k++) {
-          var hit = j[k];
-          var lat = parseFloat(hit.lat), lon = parseFloat(hit.lon);
-          if (inNSW(lat, lon)) {
-            console.log('Geocode (browser):', s.label, lat, lon, hit.display_name);
-            return { lat, lon, raw: hit, source: 'Nominatim ('+s.label+')', confidence: s.conf };
-          }
+      var lotR = await fetch(nom + '&q=' + encodeURIComponent(suburb + ' NSW Australia'));
+      var lotJ = await lotR.json();
+      if (lotJ && lotJ.length) {
+        var lh = lotJ[0];
+        var llat = parseFloat(lh.lat), llon = parseFloat(lh.lon);
+        if (inNSW(llat, llon)) {
+          return { lat: llat, lon: llon, raw: lh, source: 'Nominatim (Lot suburb fallback)',
+                   confidence: 'Needs review', addressQuality: 'suburb_only',
+                   isLotAddress: true, found: true,
+                   lotWarning: 'Lot-based address: placed at suburb centre. Verify via NSW Land Registry.' };
         }
       }
-    } catch(e) { console.warn('Geocode strategy ('+s.label+') failed:', e); }
+    } catch(e) { console.warn('Lot browser fallback failed:', e); }
   }
-  return null;
+
+  if (!parts) return { found: false, reason: 'Address not matched.', addressQuality: 'failed' };
+
+  var nomStrategies = [
+    { structured: true, street: parts.number + ' ' + parts.streetName,
+      city: parts.suburb, postcode: parts.postcode, conf: 'Estimated', label: 'Structured' },
+    { q: cleaned + ' NSW Australia', conf: 'Estimated', label: 'Cleaned+NSW' },
+  ].filter(Boolean);
+
+  for (var bi = 0; bi < nomStrategies.length; bi++) {
+    var bs = nomStrategies[bi];
+    try {
+      var burl;
+      if (bs.structured) {
+        burl = nom + '&street=' + encodeURIComponent(bs.street)
+          + '&city=' + encodeURIComponent(bs.city)
+          + (bs.postcode ? '&postalcode=' + encodeURIComponent(bs.postcode) : '')
+          + '&country=AU';
+      } else {
+        burl = nom + '&q=' + encodeURIComponent(bs.q);
+      }
+      var br = await fetch(burl);
+      var bj = await br.json();
+      if (bj && bj.length) {
+        for (var bk = 0; bk < bj.length; bk++) {
+          var bhit = bj[bk];
+          var blat = parseFloat(bhit.lat), blon = parseFloat(bhit.lon);
+          if (!inNSW(blat, blon)) continue;
+          // Street name must appear in result
+          var bDisp = (bhit.display_name || '').toLowerCase();
+          var bStreet = parts.streetName.toLowerCase();
+          var bWords = bStreet.split(/\s+/).filter(function(w){ return w.length > 3; });
+          var bMatch = bWords.length === 0 || bWords.some(function(w){ return bDisp.indexOf(w) !== -1; });
+          // Postcode must match if input had one
+          var bResPc = bhit.address ? bhit.address.postcode : null;
+          var bPcOk  = !_bInputPc || !bResPc || _bInputPc === bResPc;
+          if (!bMatch || !bPcOk) continue;
+          console.log('Geocode (browser):', bs.label, blat, blon, bhit.display_name);
+          return { lat: blat, lon: blon, raw: bhit, source: 'Nominatim (' + bs.label + ')',
+                   confidence: bs.conf, addressQuality: 'interpolated', found: true };
+        }
+      }
+    } catch(e) { console.warn('Geocode strategy (' + bs.label + ') failed:', e); }
+  }
+  return { found: false, reason: 'Address could not be confidently matched.', addressQuality: 'failed' };
 }
+
 
 
 // Keep original geocodeAddress as thin wrapper for autoLookupBlock compatibility
@@ -565,7 +593,22 @@ async function autoLookupBlock(){
     btn.style.display="";
   }
 }
-async function runCheck(){var e=normalizeAddressInput(document.getElementById("addr").value.trim()),t=parseFloat(document.getElementById("block").value),a=document.getElementById("front"),r=a&&a.value?parseFloat(a.value):15;if(e){var s=!t||t<100,n=document.getElementById("run-btn");n.disabled=!0,n.textContent="Checking...";var i=document.getElementById("result");i.innerHTML="",i.classList.remove("show");var o=document.getElementById("block-lookup-status");o&&(o.textContent="");if(window._loadingTimer){clearInterval(window._loadingTimer);window._loadingTimer=null;}var _geoResult=null;window._parcelConfidence=null;window._parcelWarning=null;window._cadastreArea=null;window._cadastreLot=null;setSt("Finding your address...");try{var _geoResult=await geocodeWithConfidence(e);var _geo=_geoResult;if(!_geo){_showAddrNotFound(i,n,e);return;}
+async function runCheck(){var e=normalizeAddressInput(document.getElementById("addr").value.trim()),t=parseFloat(document.getElementById("block").value),a=document.getElementById("front"),r=a&&a.value?parseFloat(a.value):15;if(e){var s=!t||t<100,n=document.getElementById("run-btn");n.disabled=!0,n.textContent="Checking...";var i=document.getElementById("result");i.innerHTML="",i.classList.remove("show");var o=document.getElementById("block-lookup-status");o&&(o.textContent="");if(window._loadingTimer){clearInterval(window._loadingTimer);window._loadingTimer=null;}var _geoResult=null;window._parcelConfidence=null;window._parcelWarning=null;window._cadastreArea=null;window._cadastreLot=null;setSt("Finding your address...");try{var _geoResult=await geocodeWithConfidence(e);var _geo=_geoResult;
+    if(!_geo){_showAddrNotFound(i,n,e);return;}
+    // ── HARD GATE: invalid / fake address ─────────────────────────
+    // If geocode returned found:false (even with a reason), stop here.
+    // addressQuality:failed|suburb_only|route_only for normal street addr = no report.
+    var _addrQuality = _geo.addressQuality || ((_geo.found===false) ? 'failed' : '');
+    var _addrTypeEarly = detectAddressType(e);
+    if(_geo.found===false){
+      _showAddrNotFound(i,n,e,_geo.reason);
+      return; // do not consume gate, do not query planning portal
+    }
+    // For normal addresses: reject suburb_only and route_only results
+    if(_addrTypeEarly==='normal' && (_addrQuality==='suburb_only'||_addrQuality==='route_only'||_addrQuality==='approximate')){
+      _showAddrNotFound(i,n,e,'Address matched suburb or route only — not specific enough for a planning check. Please enter a full street address.');
+      return;
+    }
 
     // ── GEOCODE QUALITY GATE ────────────────────────────────────
     // Address type detection
