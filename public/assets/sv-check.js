@@ -2141,6 +2141,40 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
   }catch(e){}
 
   // Phase 2: AI interpretation layer — async, does not block render
+  // ── QA copy button (launch testing helper — no user data exposed) ──────
+  try{
+    var qaBtn = document.createElement('button');
+    qaBtn.textContent = 'Copy QA result';
+    qaBtn.style.cssText = 'font-size:.62rem;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted2);cursor:pointer;margin:8px 0 0 4px';
+    qaBtn.title = 'Copy QA summary to clipboard for launch testing';
+    qaBtn.onclick = function(){
+      var _qs = {
+        enteredAddress:     addr||'',
+        matchedAddress:     matchedAddr||'',
+        addressConfidence:  geoConf||'',
+        council:            (cm&&cm.name)||lga||'',
+        zone:               zone||'',
+        minLot:             mls||'',
+        enteredLandSize:    block||'',
+        landSizeSource:     blockSource||'',
+        overallResult:      (geoConf==='Verified'&&zone&&block>0?'Facts available':skipLotCount?'Limited facts — add land size':'Limited facts'),
+        fakeAddressRejected: false,
+        sectionsShown:      ['SiteContext','ConstraintChecklist','MissingInfo','RiskNotes','EvidenceLedger','RiskRegister','DevPathway','CouncilBehaviour','PersonaSteps','ProVerification','Checklist','Shareable','FullReportPreview','NextPathways'],
+        pathwaysShown:      true
+      };
+      try{
+        navigator.clipboard.writeText(JSON.stringify(_qs, null, 2));
+        qaBtn.textContent = 'Copied!';
+        setTimeout(function(){ qaBtn.textContent = 'Copy QA result'; }, 2000);
+      }catch(e){
+        qaBtn.textContent = 'Copy failed';
+      }
+    };
+    var _qaTarget = rcard.querySelector('.rsec') || rcard;
+    _qaTarget.appendChild(qaBtn);
+  }catch(e){ console.warn('QA button failed:', e); }
+
+  // ── AI interpretation layer — async, does not block render ────────────────
   // Runs after rule-based sections are visible; augments them if Claude is available
   runAIInterpretation(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount).catch(function(){
     // Completely silent — rule-based report is already displayed
