@@ -1584,7 +1584,7 @@ function buildVerificationChecklist(zone,block,heritage,flood,bushfire,acid,cont
 
 // ── SHAREABLE SUMMARY ─────────────────────────────────────────────
 // Public-safe: no owner, no lead data, no internal notes, address hidden
-function buildShareableSummary(zone,block,mls,n,cm,heritage,flood,bushfire,geoConf,addrType,overall){
+function buildShareableSummary(zone,block,mls,n,cm,heritage,flood,bushfire,geoConf,addrType,overallScore){
   var safeAddr = addrType==='lot'?'[Lot address — not shown]':'[Address on file — not shown publicly]';
   var confColor = geoConf==='Verified'?'var(--green)':'var(--amber)';
   var riskCount = [heritage,flood,bushfire].filter(Boolean).length;
@@ -1750,7 +1750,7 @@ function svCalcFin(uid,lots){
 // ── PERSONA-SPECIFIC NEXT STEPS ──────────────────────────────────
 // Safe, non-advisory next steps by user type.
 // Never investment advice, financial advice, or guaranteed outcomes.
-function buildPersonaNextSteps(zone,cm,heritage,flood,bushfire,block,addrType,overall){
+function buildPersonaNextSteps(zone,cm,heritage,flood,bushfire,block,addrType,overallScore){
   var low  = overallScore < 70;
   var _cm  = cm&&cm.name?cm.name:'your council';
   var _z   = zone||'unknown zone';
@@ -1832,10 +1832,10 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
       +buildRiskRegister(heritage,flood,bushfire,acidSulfate,contaminated,riparian,landReserve,foreshore,cm,n,zone,block,mls,geoConf,addrType,blockSource,lga,front)
       +buildDevPathway(zone,block,mls,n,heritage,flood,cm,geoConf,addrType)
       +buildCouncilBehaviour(lga,cm)
-      +buildPersonaNextSteps(zone,cm,heritage,flood,bushfire,block,addrType,overall)
+      +buildPersonaNextSteps(zone,cm,heritage,flood,bushfire,block,addrType,overallScore)
       +buildProVerification()
       +buildVerificationChecklist(zone,block,heritage,flood,bushfire,acidSulfate,contaminated,riparian,cm,n,addrType)
-      +buildShareableSummary(zone,block,mls,n,cm,heritage,flood,bushfire,geoConf,addrType,overall)
+      +buildShareableSummary(zone,block,mls,n,cm,heritage,flood,bushfire,geoConf,addrType,overallScore)
       +buildNextPathways();
     if(ctaBox){rcard.insertBefore(newSections,ctaBox);}else{rcard.appendChild(newSections);}
   }catch(e){console.warn("Institutional sections render failed",e);}
