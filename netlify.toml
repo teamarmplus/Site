@@ -1,7 +1,7 @@
-# SiteVerdict — Netlify Configuration
+# SiteVerdict - Netlify Configuration
 # Environment variables are set in Netlify UI, not here.
-# Required: ANTHROPIC_API_KEY, DALEADS_API_KEY
-# Optional: ANTHROPIC_MODEL (default: claude-sonnet-4-5)
+# Required: GOOGLE_MAPS_API_KEY, ANTHROPIC_API_KEY, DALEADS_API_KEY
+# Optional: ANTHROPIC_MODEL
 
 [build]
   publish   = "public"
@@ -16,3 +16,28 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/full-report"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/services"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/hot-list"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/finance"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
