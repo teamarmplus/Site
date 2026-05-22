@@ -144,28 +144,29 @@ var KC={
 function gc(e,suburbHint,postcodeHint){if(!e)return null;var t=e.toUpperCase().replace(/\bCITY COUNCIL\b/g,"").replace(/\bSHIRE COUNCIL\b/g,"").replace(/\bMUNICIPAL COUNCIL\b/g,"").replace(/\bREGIONAL COUNCIL\b/g,"").replace(/\bCOUNCIL\b/g,"").replace(/\bCITY\b/g,"").replace(/\bSHIRE\b/g,"").replace(/\bMUNICIPAL\b/g,"").replace(/\bREGIONAL\b/g,"").replace(/\bOF\b/g,"").replace(/\s+/g," ").trim();if(CD[t])return{name:t,data:CD[t],councilKnown:true,daTimelineCoverage:true,councilSource:"planning-portal"};for(var a in CD)if(t.indexOf(a)>-1||a.indexOf(t)>-1)return{name:a,data:CD[a],councilKnown:true,daTimelineCoverage:true,councilSource:"planning-portal"};if(KC[t])return{name:KC[t].displayName||t,data:null,councilKnown:true,daTimelineCoverage:KC[t].daTimelineCoverage,councilSource:"planning-portal"};for(var b in KC){if(t.indexOf(b)>-1||b.indexOf(t)>-1)return{name:KC[b].displayName||b,data:null,councilKnown:true,daTimelineCoverage:KC[b].daTimelineCoverage,councilSource:"planning-portal"};}var sbFb=gcSuburb(suburbHint||e,postcodeHint);if(sbFb)return sbFb;return{name:e,data:null,councilKnown:false,daTimelineCoverage:false,councilSource:"unknown"}}function calcLots(e,t,a,r){var s=Math.floor(e/a);return!t||t<3?s:Math.max(0,Math.min(s,Math.floor(t/(MF[r]||12))))}function getSig(e,t,a){if(e<2)return"r";var r=(e>=4?3:e>=3?2:1)+(t<=90?3:t<=150?2:1)+(a>=80?3:a>=70?2:1);return r>=7?"g":r>=4?"a":"r"}function setSt(e){document.getElementById("status").textContent=e;}
 // ── SHARED GEOCODING ─────────────────────────────────────────────
 // Used by both autoLookupBlock() and runCheck() so coordinates match.
-async // ── ADDRESS CLEANING UTILITIES ───────────────────────────────────
+// ── ADDRESS CLEANING UTILITIES ───────────────────────────────────
 // ── CLIENT-SIDE ADDRESS INPUT NORMALISER ────────────────────────
 // Cleans messy user input before sending to geocode function.
 // Tolerates: lowercase, missing NSW/spaces, partial suburb names, extra commas.
 function normalizeAddressInput(s){
   if(!s) return s;
   s = s.trim();
-  // Add space before trailing 4-digit postcode if missing: "Heights2166" → "Heights 2166"
+  // Add space before trailing 4-digit postcode if missing: "Heights2166" -> "Heights 2166"
   s = s.replace(/([A-Za-z])(\d{4})$/, '$1 $2');
   // Normalise multiple commas/spaces
-  s = s.replace(/,{2,}/g, ',').replace(/\s{2,}/g, ' ');
-  // Title-case words (helps suburb matching)
-  s = s.replace(/\w/g, function(c){ return c.toUpperCase(); });
-  // Re-standardise NSW casing after title-case
-  s = s.replace(/Nsw/g, 'NSW').replace(/Nsw$/,'NSW');
-  // Add NSW if missing and looks like it has a postcode but no state
-  if(!/NSW/.test(s) && !/VIC|QLD|SA|WA|TAS|NT|ACT/i.test(s) && /\d{4}/.test(s)){
-    s = s.replace(/(\d{4})/, 'NSW $1');
+  s = s.replace(/,{2,}/g, ',').replace(/[ \t]{2,}/g, ' ');
+  // Title-case each word (split/map avoids control-char regex issues)
+  s = s.split(' ').map(function(w){
+    return w.length ? w[0].toUpperCase() + w.slice(1) : w;
+  }).join(' ');
+  // Re-standardise NSW casing
+  s = s.replace(/Nsw(?=\s|$)/g, 'NSW');
+  // Add NSW if no state present but a 4-digit postcode exists
+  if(s.indexOf('NSW') === -1 && !/VIC|QLD|SA|WA|TAS|NT|ACT/i.test(s) && /\d{4}/.test(s)){
+    s = s.replace(/(\d{4})(\s*)$/, 'NSW $1');
   }
   return s.trim();
 }
-
 function cleanAddressForGeocode(addr){
   if(!addr) return addr;
   var s = addr.trim();
@@ -549,7 +550,7 @@ async function autoLookupBlock(){
     console.log("Auto-detect success:",best.area,"m²");
   }catch(e){
     console.error("Auto-detect failed:",e);
-    statusEl.innerHTML='<span style="color:var(--muted)">Could not auto-detect block size. Please enter it manually.</span>';
+    statusEl.innerHTML='<span style="color:var(--muted)">Block size was not auto-detected. This check is limited. Enter block size manually or request a Full Report / professional review.</span>';
     btn.style.display="";
   }
 }
@@ -707,11 +708,11 @@ function verdictLabelFromScore(score){
   return 'Low development potential';
 }
 function scoreRangeBand(score){
-  if(score>=80) return 'STRONG DEVELOPMENT OPPORTUNITY';
+  if(score>=80) return 'Facts available — professional verification required';
   if(score>=65) return 'REVIEW OPPORTUNITY';
   if(score>=50) return 'MODERATE POTENTIAL';
   if(score>=35) return 'LIMITED POTENTIAL';
-  return 'LOW DEVELOPMENT POTENTIAL';
+  return 'Limited facts — professional review required';
 }
 // ── IMPROVED buildVerdictSection ──────────────────────
 function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,sepp800,mls,mlsReal,block,overallScore){
@@ -1012,22 +1013,22 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
     sigLabel='Overlays present — professional review required';
   }else if(_score>=80){
     sig='g';
-    sigLabel='STRONG DEVELOPMENT OPPORTUNITY';
+    sigLabel='Facts available — professional verification required';
   }else if(_score>=65){
     sig='a';
-    sigLabel='REVIEW OPPORTUNITY — PROFESSIONAL VERIFICATION REQUIRED';
+    sigLabel='Facts available — needs professional review';
   }else if(_score>=50){
     sig='a';
-    sigLabel='MODERATE POTENTIAL — KEY CONSTRAINTS TO VERIFY';
+    sigLabel='Limited facts — professional review required';
   }else if(_score>=35){
     sig='r';
-    sigLabel='LIMITED POTENTIAL — PROCEED CAREFULLY';
+    sigLabel='Limited facts — professional verification required';
   }else if(skipLotCount){
     sig='a';
     sigLabel='Enter block size for full analysis';
   }else{
     sig='r';
-    sigLabel='LOW DEVELOPMENT POTENTIAL';
+    sigLabel='Limited facts — professional review required';
   }
   var sigColor={'g':'var(--green)','a':'var(--amber)','r':'var(--red)'}[sig];
 
@@ -1117,8 +1118,11 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
         +'<div class="rh-meta">'+esc(zLabel,60)+' \u00b7 '+esc(cmName,50)+'</div>'
       +'</div>'
       +'<div class="rh-right">'
-        +'<div class="lots-big '+sig+'">'+lotsDisplay+'</div>'
-        +'<div class="lots-lbl">'+((!skipLotCount&&n>=2)?'potential lots':'subdivision')+'</div>'
+        +'<div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Overall</div>'
+        +'<div style="font-size:.8rem;font-weight:700;color:'+(geoConf==="Verified"&&zone&&blockSource==="auto-detected"?'var(--green)':'var(--amber)')+'">'
+          +(geoConf==="Verified"&&zone&&blockSource==="auto-detected"?'Facts verified':skipLotCount?'Limited facts':'Facts available')
+        +'</div>'
+        +'<div style="font-size:.62rem;color:var(--muted2);margin-top:2px">Professional review required</div>'
       +'</div>'
     +'</div>'
 
@@ -1580,7 +1584,7 @@ function buildVerificationChecklist(zone,block,heritage,flood,bushfire,acid,cont
 
 // ── SHAREABLE SUMMARY ─────────────────────────────────────────────
 // Public-safe: no owner, no lead data, no internal notes, address hidden
-function buildShareableSummary(zone,block,mls,n,cm,heritage,flood,bushfire,geoConf,addrType,overallScore){
+function buildShareableSummary(zone,block,mls,n,cm,heritage,flood,bushfire,geoConf,addrType,overall){
   var safeAddr = addrType==='lot'?'[Lot address — not shown]':'[Address on file — not shown publicly]';
   var confColor = geoConf==='Verified'?'var(--green)':'var(--amber)';
   var riskCount = [heritage,flood,bushfire].filter(Boolean).length;
@@ -1599,6 +1603,30 @@ function buildShareableSummary(zone,block,mls,n,cm,heritage,flood,bushfire,geoCo
       +'<div><span style="color:var(--muted2)">Preliminary signal:</span> '+(n>=2?n+'-lot pathway identified':'Single dwelling')+'</div>'
     +'</div>'
     +'<div style="margin-top:8px;font-size:.6rem;color:var(--muted2);line-height:1.7">This summary contains no owner, applicant or internal lead information. It is derived from publicly available government data sources. Confidence and risk shown are indicative only. Not planning advice. Not financial advice. Professional verification required before any reliance.</div>'
+  +'</div>';
+}
+
+
+// ── POSSIBLE NEXT PATHWAYS ───────────────────────────────────────────────
+function buildNextPathways(){
+  return '<div class="rsec" style="background:rgba(91,156,242,.04);border-color:rgba(91,156,242,.2)">'
+    +'<div class="rsec-title" style="color:var(--text)">Possible next pathways</div>'
+    +'<div style="font-size:.7rem;color:var(--muted);line-height:1.7;margin-bottom:12px">'
+      +'SiteVerdict does not tell you what to do. Based on the facts and confidence level, these are practical next pathways you may consider. '
+      +'Professional advice may be required before any decision.'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">'
+      +'<a href="/full-report.html" class="btn btn-gold" style="text-align:center;text-decoration:none">Get Full Report</a>'
+      +'<a href="https://wa.me/61402623628?text=I%20want%20to%20understand%20selling%20or%20leasing%20my%20site" target="_blank" class="btn btn-outline" style="text-align:center;text-decoration:none">Sell or lease the site</a>'
+      +'<a href="/services" class="btn btn-outline" style="text-align:center;text-decoration:none">Development services</a>'
+      +'<a href="/finance" class="btn btn-outline" style="text-align:center;text-decoration:none">Finance / lender support</a>'
+      +'<a href="/hot-list" class="btn btn-outline" style="text-align:center;text-decoration:none">Hot List updates</a>'
+      +'<a href="/terms.html" class="btn btn-outline" style="text-align:center;text-decoration:none;font-size:.7rem">Terms &amp; limits</a>'
+    +'</div>'
+    +'<div style="font-size:.62rem;color:var(--muted2);margin-top:10px;line-height:1.6">'
+      +'Not legal, planning, financial, credit, valuation or investment advice. '
+      +'Subject to verification. Professional verification required.'
+    +'</div>'
   +'</div>';
 }
 
@@ -1722,7 +1750,7 @@ function svCalcFin(uid,lots){
 // ── PERSONA-SPECIFIC NEXT STEPS ──────────────────────────────────
 // Safe, non-advisory next steps by user type.
 // Never investment advice, financial advice, or guaranteed outcomes.
-function buildPersonaNextSteps(zone,cm,heritage,flood,bushfire,block,addrType,overallScore){
+function buildPersonaNextSteps(zone,cm,heritage,flood,bushfire,block,addrType,overall){
   var low  = overallScore < 70;
   var _cm  = cm&&cm.name?cm.name:'your council';
   var _z   = zone||'unknown zone';
@@ -1793,16 +1821,8 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
   var rcard=resultEl?resultEl.querySelector('.rcard'):null;
   if(!rcard){console.warn("rcard not found after render"); return;}
 
-  // 1. Executive Verdict + Scorecard
-  try{
-    var rh=rcard.querySelector('.rh');
-    if(rh){
-      var topEl=document.createElement('div');
-      topEl.innerHTML=buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,seppStation400,seppStation800,mls,mlsReal,block,overall)
-        +buildScorecard(ps,ov,yp,ac,ir,hc,cc,ep);
-      rh.insertAdjacentElement('afterend',topEl);
-    }
-  }catch(e){console.warn("Verdict/Scorecard render failed",e);}
+  // Score-led verdict and scorecard removed from public result (fact-first approach)
+  // buildVerdictSection and buildScorecard kept as internal functions, not shown publicly.
 
   // 2. New institutional sections
   try{
@@ -1812,10 +1832,11 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
       +buildRiskRegister(heritage,flood,bushfire,acidSulfate,contaminated,riparian,landReserve,foreshore,cm,n,zone,block,mls,geoConf,addrType,blockSource,lga,front)
       +buildDevPathway(zone,block,mls,n,heritage,flood,cm,geoConf,addrType)
       +buildCouncilBehaviour(lga,cm)
-      +buildPersonaNextSteps(zone,cm,heritage,flood,bushfire,block,addrType,overallScore)
+      +buildPersonaNextSteps(zone,cm,heritage,flood,bushfire,block,addrType,overall)
       +buildProVerification()
       +buildVerificationChecklist(zone,block,heritage,flood,bushfire,acidSulfate,contaminated,riparian,cm,n,addrType)
-      +buildShareableSummary(zone,block,mls,n,cm,heritage,flood,bushfire,geoConf,addrType,overallScore);
+      +buildShareableSummary(zone,block,mls,n,cm,heritage,flood,bushfire,geoConf,addrType,overall)
+      +buildNextPathways();
     if(ctaBox){rcard.insertBefore(newSections,ctaBox);}else{rcard.appendChild(newSections);}
   }catch(e){console.warn("Institutional sections render failed",e);}
 
