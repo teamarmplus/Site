@@ -1223,7 +1223,7 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
         +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Parcel match</div>'          +'<div style="font-weight:600;color:var(--text)">'            +(blockSource==='auto-detected'?'Parcel found'              :blockSource==='estimated'?'Parcel found (approx)'              :blockSource==='needs-review'?'Parcel found (needs review)'              :'Not matched')          +'</div>'          +'<div style="margin-top:3px;font-size:.63rem;color:'+(blockSource==='auto-detected'?'var(--green)':blockSource==='estimated'||blockSource==='needs-review'?'var(--amber)':'var(--muted2)')+'">'            +(blockSource==='auto-detected'?'\u2713 NSW Cadastre parcel matched'              :blockSource==='estimated'?'\u26a0 Parcel found \u2014 street-level approx'              :blockSource==='needs-review'?'\u26a0 Parcel area may not match address'              :'\u2014 NSW Cadastre parcel not matched')          +'</div>'        +'</div>'
         +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Council</div>'          +'<div style="font-weight:600;color:var(--text)">'+(lga||'Not detected')+'</div>'          +'<div style="margin-top:3px;font-size:.63rem;color:'+_csrcColor+'">'+_csrcLabel+'</div>'        +'</div>'
         +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">DA timeline</div>'          +'<div style="font-weight:600;color:'+_daColor+'">'            +(cm&&cm.data&&cm.data.days?cm.data.days+'d median':(cm&&cm.councilKnown?'Known council':'Unknown'))          +'</div>'          +'<div style="margin-top:3px;font-size:.63rem;color:'+_daColor+'">'+_daLabel+'</div>'        +'</div>'
-        +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Overall confidence</div>'          +'<div style="font-weight:600;font-size:.72rem;color:'+(geoConf==='Verified'&&zone&&blockSource==='auto-detected'?'var(--green)':'var(--amber)')+'">'            +(geoConf==='Verified'&&zone&&blockSource==='auto-detected'?'Verified \u2014 address, zone and parcel confirmed'              :addrType==='lot'?'Needs review \u2014 Lot address, parcel verification required'              :geoConf==='Estimated'?'Estimated \u2014 address approximate, parcel needs review'              :geoConf==='Needs review'?'Needs review \u2014 not confidently verified'              :geoConf==='Verified'&&zone?'Address \u2714 \u00b7 Zone \u2714 \u00b7 Parcel needs review'              :geoConf==='Verified'?'Address verified \u2014 planning data needs review'              :'Needs review \u2014 professional verification required')          +'</div>'        +'</div>'
+        +'<div style="background:var(--bg3);border-radius:8px;padding:10px 12px">'          +'<div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Overall confidence</div>'          +'<div style="font-weight:600;font-size:.72rem;color:'+(geoConf==='Verified'&&zone&&block>0?'var(--green)':'var(--amber)')+'">'            +(geoConf==='Verified'&&zone&&block>0?'Facts available \u2014 address, zone and land size confirmed'              :addrType==='lot'?'Needs review \u2014 Lot address, parcel verification required'              :geoConf==='Estimated'?'Estimated \u2014 address approximate, parcel needs review'              :geoConf==='Needs review'?'Needs review \u2014 not confidently verified'              :geoConf==='Verified'&&zone?'Address \u2714 \u00b7 Zone \u2714 \u00b7 Parcel needs review'              :geoConf==='Verified'?'Address verified \u2014 planning data needs review'              :'Needs review \u2014 professional verification required')          +'</div>'        +'</div>'
       +(true
         +'<div style="background:rgba(91,156,242,.06);border:1px solid rgba(91,156,242,.15);border-radius:6px;padding:7px 10px;margin-top:4px"><div style="font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);margin-bottom:3px">&#9679; Beta diagnostic</div><div style="display:flex;gap:12px;flex-wrap:wrap;font-size:.61rem;color:var(--muted2)"><span><span style=\"color:var(--muted)\">Geocode:</span> '+esc(geoConf||'—',20)+' ('+esc(geoSource||'—',40)+')</span>'+'<span><span style=\"color:var(--muted)\">Location type:</span> '+(locationType||'—')+'</span>'+'<span><span style=\"color:var(--muted)\">Parcel:</span> '+(blockSource==='auto-detected'?'NSW Cadastre (auto)':blockSource==='estimated'?'Cadastre (est)':blockSource==='needs-review'?'Cadastre (review)':blockSource==='manual'?'Manual entry':'Not matched')+'</span>'+'<span><span style=\"color:var(--muted)\">Planning:</span> NSW Planning Portal</span>'+'<span><span style=\"color:var(--muted)\">Paid API:</span> '+(paidApiUsed?'&#10003; Google':'Nominatim (free)')+'</span>'+'</div></div>')
       +'</div>'      +(addrType==='lot'||addrType==='range'||geoConf==='Estimated'||geoConf==='Needs review'        ?'<div style="font-size:.62rem;color:var(--amber);line-height:1.7;padding:8px 10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:6px;margin-top:4px">'          +(addrType==='lot'?'&#9888; Lot-based address: Lot and DP numbers must be matched to a specific parcel via NSW Land Registry or cadastre before any result can be relied upon. Parcel area, zone and overlays shown are based on geocoded coordinates only and may relate to a different parcel.'            :addrType==='range'?'&#9888; Range address: exact parcel may differ from geocoded coordinates. Parcel area and zone may relate to an adjacent property. Verify before relying on this result.'            :'&#9888; Address found at approximate location. Results below are indicative only \u2014 professional verification required.')        +'</div>'        :'')      +'</div>'    +
@@ -1470,6 +1470,172 @@ color:'+(level==='Verified'?'var(--green)':level==='Estimated'?'var(--amber)':'v
     +'</table></div>'
   +'</div>';
 }
+
+// ── SITE CONTEXT SECTION ─────────────────────────────────────────
+function buildSiteContextSection(zone,zoneName,block,mls,front,cm,lga,geoConf,addrType,blockSource,skip){
+  var zLabels={
+    'R1':'Low density residential','R2':'Low density residential',
+    'R3':'Medium density residential','R4':'High density residential',
+    'R5':'Large lot residential','RU1':'Primary production','RU2':'Rural landscape',
+    'RU3':'Forestry','RU4':'Primary production small lots','RU5':'Village',
+    'RU6':'Transition','E1':'Local centre','E2':'Commercial centre',
+    'E3':'Productivity support','E4':'General industrial','E5':'Metropolitan industrial',
+    'IN1':'General industrial','IN2':'Light industrial',
+    'SP1':'Special activities','SP2':'Infrastructure',
+    'W1':'Natural waterways','W2':'Recreational waterways'
+  };
+  var zFull = zoneName || zLabels[zone] || (zone ? zone+' zone' : '');
+  var zDesc  = {
+    'R1':'Single dwellings, dual occupancy and secondary dwellings where LEP permits. Low-rise only.',
+    'R2':'As R1. Dual occupancy, secondary dwelling and subdivision subject to lot size and DCP.',
+    'R3':'Medium density — townhouses, multi-dwelling, manor homes subject to LEP controls.',
+    'R4':'High density — apartments and flat buildings subject to LEP height, FSR and setbacks.',
+    'R5':'Large lot residential — hobby farms, rural living. Typically larger minimum lot sizes.',
+    'RU1':'Primary production. Residential use restricted. Agricultural and related uses.',
+    'RU2':'Rural landscape. Limited residential. Environmental and agricultural uses.',
+    'E4':'Environmental living. Low density only. Significant environmental constraints likely.',
+  }[zone] || (zone ? 'Check LEP zone objectives and Schedule 1 for permitted uses.' : 'Zone not detected for this address.');
+
+  var rows = [];
+  if(zone){
+    rows.push('<div style="margin-bottom:6px">'
+      +'<span style="font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted2)">Zone </span>'
+      +'<span style="font-weight:600;color:var(--text)">'+zone+(zFull?' \u2014 '+zFull:'')+'</span>'
+    +'</div>');
+    rows.push('<div style="font-size:.7rem;color:var(--muted);line-height:1.6;margin-bottom:8px">'+zDesc+'</div>');
+  }
+  if(mls) rows.push('<div style="font-size:.7rem;color:var(--muted);margin-bottom:4px">'
+    +'<span style="color:var(--muted2)">Min lot size:</span> <strong>'+mls+'m\u00b2</strong>'
+    +' \u00b7 <span style="font-size:.62rem">From NSW Planning Portal LEP. Subject to DCP frontage and width controls.</span>'
+  +'</div>');
+  if(block) rows.push('<div style="font-size:.7rem;color:var(--muted);margin-bottom:4px">'
+    +'<span style="color:var(--muted2)">Land size entered:</span> <strong>'+block+'m\u00b2</strong>'
+    +' \u00b7 <span style="font-size:.62rem">\u270e Entered by user \u2014 verify against title or survey.</span>'
+  +'</div>');
+  else rows.push('<div style="font-size:.7rem;color:var(--amber);margin-bottom:4px">'
+    +'\u26a0 Land size not provided. Development and yield calculations are limited until land size is entered or verified.'
+  +'</div>');
+  if(front) rows.push('<div style="font-size:.7rem;color:var(--muted);margin-bottom:4px">'
+    +'<span style="color:var(--muted2)">Street frontage entered:</span> <strong>'+front+'m</strong>'
+    +' \u00b7 <span style="font-size:.62rem">Check DCP minimum frontage requirements for proposed use.</span>'
+  +'</div>');
+  if(cm&&cm.data&&cm.data.days) rows.push('<div style="font-size:.7rem;color:var(--muted);margin-bottom:4px">'
+    +'<span style="color:var(--muted2)">DA timeline ('+( cm.name||lga||'this council')+'): </span>'
+    +'<strong>'+cm.data.days+'d median</strong>'
+    +' \u00b7 <span style="font-size:.62rem">Based on '+cm.data.n+' comparable DAs. Indicative only.</span>'
+  +'</div>');
+  else rows.push('<div style="font-size:.7rem;color:var(--muted);margin-bottom:4px">'
+    +'<span style="color:var(--muted2)">DA timeline:</span> <span style="color:var(--amber)">Not available for '+(cm&&cm.name?cm.name:lga||'this council')+'</span>'
+    +' \u00b7 <span style="font-size:.62rem">Check council website directly.</span>'
+  +'</div>');
+  if(!rows.length) return '';
+  return '<div class="rsec">'
+    +'<div class="rsec-title">Site context'
+      +' <span class="tag" style="background:transparent;border-color:rgba(255,255,255,.1);color:var(--muted)">Zone &middot; land size &middot; timeline</span>'
+    +'</div>'
+    +rows.join('')
+  +'</div>';
+}
+
+// ── CONSTRAINT CHECKLIST ─────────────────────────────────────────
+function buildConstraintChecklist(heritage,flood,bushfire,acid,contaminated,riparian,landReserve,foreshore,fsr,height){
+  function cRow(label, status, note){
+    var color = status==='Detected'?'var(--red)':status==='Not detected'?'var(--green)':'var(--amber)';
+    return '<div style="display:flex;align-items:baseline;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)">'
+      +'<div style="flex:2;font-size:.7rem;color:var(--text)">'+label+'</div>'
+      +'<div style="flex:1;font-size:.62rem;font-weight:700;color:'+color+'">'+status+'</div>'
+      +'<div style="flex:3;font-size:.61rem;color:var(--muted2);line-height:1.5">'+note+'</div>'
+    +'</div>';
+  }
+  var rows = [
+    cRow('Heritage overlay',      heritage?'Detected':'Not detected',  heritage?'Heritage Impact Statement likely required for DA.':'NSW Planning Portal (indicator only).'),
+    cRow('Flood planning area',   flood?'Detected':'Not detected',      flood?'Hydraulic assessment and FPL compliance required.':'NSW Planning Portal (indicator only).'),
+    cRow('Bushfire prone land',   bushfire?'Detected':'Not detected',   bushfire?'BAL rating required. Construction standard impact.':'NSW RFS mapping (indicator only).'),
+    cRow('Acid sulfate soils',    acid?'Detected':'Not detected',       acid?'ASSMP may be required. Engage geotechnical engineer.':'NSW Planning Portal (indicator only).'),
+    cRow('Contaminated land',     contaminated?'Detected':'Not detected',contaminated?'Phase 1/Phase 2 environmental assessment required.':'Indicator only \u2014 confirm via Section 10.7.'),
+    cRow('Riparian / watercourse',riparian?'Detected':'Not detected',   riparian?'Watercourse buffer setbacks may apply.':'Indicator only \u2014 not fully modelled.'),
+    cRow('Reserved land',         landReserve?'Detected':'Not detected',landReserve?'Check development rights and acquisition status.':'Indicator only.'),
+    cRow('Height control (LEP)',  height?'Detected':'Not checked',      height?height+'m max (LEP). DCP may set lower controls.':'Not modelled for this address in this check.'),
+    cRow('FSR control (LEP)',     fsr?'Detected':'Not checked',         fsr?fsr+':1 FSR (LEP). Subject to clause 4.4 exceptions.':'Not modelled for this address in this check.'),
+  ];
+  return '<div class="rsec">'
+    +'<div class="rsec-title">Constraint indicators'
+    +' <span class="tag" style="background:transparent;border-color:rgba(255,255,255,.1);color:var(--muted)">Indicator only \u00b7 not a planning certificate</span>'
+    +'</div>'
+    +'<div style="font-size:.62rem;color:var(--muted2);margin-bottom:8px;line-height:1.6">Each indicator is sourced from NSW Planning Portal or government data. \u201cDetected\u201d means an overlay or control was found \u2014 it is not a confirmed planning opinion. A Section 10.7 Planning Certificate from council is the authoritative source.</div>'
+    +'<div style="display:grid;grid-template-columns:2fr 1fr 3fr;gap:0;font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted2);border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:2px">'
+      +'<div>Constraint</div><div>Status</div><div>Note</div>'
+    +'</div>'
+    +rows.join('')
+  +'</div>';
+}
+
+// ── MISSING INFORMATION ──────────────────────────────────────────
+function buildMissingInfoSection(zone,block,addrType,cm){
+  var items = [
+    {label:'Title / DP number',          why:'Required to confirm lot boundaries, easements and ownership.'},
+    {label:'Surveyed land size',          why:'Entered size must be verified against a registered survey or deposited plan.'},
+    {label:'Easements and restrictions',  why:'Drainage, access, electricity and other easements affect building envelope and subdivision.'},
+    {label:'Sewer and stormwater capacity', why:'Sydney Water or council approval required. Capacity not confirmed.'},
+    {label:'Detailed DCP controls',       why:'Setbacks, car parking, landscaping, building materials and street presentation are DCP-specific.'},
+    {label:'Slope and earthworks',        why:'Cut/fill, retaining wall design and drainage paths require site survey.'},
+    {label:'Full flood / riparian review',why:'Indicative overlays only. Hydraulic engineering assessment required for DA.'},
+    {label:'Market value',                why:'SiteVerdict does not provide valuations. Engage a licensed valuer.'},
+    {label:'Finance readiness',           why:'Lender requirements vary. This check does not assess credit or finance suitability.'},
+    {label:'Professional planning opinion',why:'Section 10.7 certificate + town planner review required before relying on any planning pathway.'},
+  ];
+  if(!block) items.splice(1,0,{label:'Land size',why:'Not provided. Development and yield calculations cannot proceed without verified land size.'});
+  if(!cm||!cm.data) items.push({label:'Council DA timeline',why:(cm&&cm.name?cm.name:'This council')+" DA timeline data is not yet available in SiteVerdict. Check council website directly."});
+
+  var rows = items.map(function(it){
+    return '<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)">'
+      +'<div style="color:var(--red);flex-shrink:0;font-size:.8rem;margin-top:1px">\u2717</div>'
+      +'<div>'
+        +'<div style="font-size:.69rem;color:var(--text);font-weight:500">'+it.label+'</div>'
+        +'<div style="font-size:.62rem;color:var(--muted2);line-height:1.5;margin-top:1px">'+it.why+'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+
+  return '<div class="rsec">'
+    +'<div class="rsec-title">What this free check does not verify yet'
+    +' <span class="tag" style="background:transparent;border-color:rgba(255,255,255,.1);color:var(--muted)">'+items.length+' items</span>'
+    +'</div>'
+    +rows
+  +'</div>';
+}
+
+// ── RISK NOTES ───────────────────────────────────────────────────
+function buildRiskNotes(block,addrType,cm,lga,heritage,flood,bushfire){
+  var notes = [];
+  if(block>0)    notes.push('\u2139 Land size entered by user must be verified against title, contract or survey before relying.');
+  else           notes.push('\u26a0 Land size not provided. Development and yield calculations are limited until land size is entered or professionally verified.');
+  if(addrType==='range') notes.push('\u26a0 Range address — may involve more than one parcel. Enter the advertised total land size and verify with title/survey.');
+  if(addrType==='lot')   notes.push('\u26a0 Lot-based address — lot number is not a street number. Verify lot/DP/title before relying on any facts from this check.');
+  if(!cm||!cm.data)      notes.push('\u2139 Council DA timeline data is not available in SiteVerdict for '+(cm&&cm.name?cm.name:lga||'this council')+' yet. Check council website directly.');
+  if(heritage)           notes.push('\u26a0 Heritage overlay detected. This can significantly affect DA timeframes, design and cost.');
+  if(flood)              notes.push('\u26a0 Flood planning area detected. This affects floor levels, building type and DA requirements.');
+  if(bushfire)           notes.push('\u26a0 Bushfire prone land detected. Construction standards and APZ requirements apply.');
+  notes.push('\u2717 Professional verification required before any purchase, sale, finance or development decision.');
+
+  var html = notes.map(function(n){
+    var isWarn = n[0]==='\u26a0'||n[0]==='\u2717';
+    var isInfo = n[0]==='\u2139';
+    var c = isWarn?'var(--amber)':isInfo?'var(--blue)':'var(--muted)';
+    return '<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)">'
+      +'<div style="color:'+c+';flex-shrink:0;font-size:.8rem;margin-top:1px">'+n[0]+'</div>'
+      +'<div style="font-size:.7rem;color:var(--muted);line-height:1.6">'+n.slice(2)+'</div>'
+    +'</div>';
+  }).join('');
+
+  return '<div class="rsec">'
+    +'<div class="rsec-title">Risk notes'
+    +' <span class="tag" style="background:transparent;border-color:rgba(255,255,255,.1);color:var(--muted)">'+notes.length+' items</span>'
+    +'</div>'
+    +html
+  +'</div>';
+}
+
 
 // ── EVIDENCE LEDGER ──────────────────────────────────────────────
 function buildEvidenceLedger(zone,block,mls,lga,cm,geoConf,blockSource,addrType,matchedAddr,councilSource,locationType,heritage,flood,bushfire,acid,contaminated,riparian){
@@ -1891,7 +2057,11 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
   try{
     var ctaBox=rcard.querySelector('.cta-box');
     var newSections=document.createElement('div');
-    newSections.innerHTML=buildEvidenceLedger(zone,block,mls,lga,cm,geoConf,blockSource,addrType,matchedAddr,councilSource,locationType,heritage,flood,bushfire,acidSulfate,contaminated,riparian)
+    newSections.innerHTML=buildSiteContextSection(zone,block,front,cm,lga,geoConf,addrType,blockSource,skipLotCount)
+      +buildConstraintChecklist(heritage,flood,bushfire,acidSulfate,contaminated,riparian,landReserve,foreshore,fsr,height)
+      +buildMissingInfoSection(zone,block,addrType,cm)
+      +buildRiskNotes(block,addrType,cm,lga,heritage,flood,bushfire)
+      +buildEvidenceLedger(zone,block,mls,lga,cm,geoConf,blockSource,addrType,matchedAddr,councilSource,locationType,heritage,flood,bushfire,acidSulfate,contaminated,riparian)
       +buildRiskRegister(heritage,flood,bushfire,acidSulfate,contaminated,riparian,landReserve,foreshore,cm,n,zone,block,mls,geoConf,addrType,blockSource,lga,front)
       +buildDevPathway(zone,block,mls,n,heritage,flood,cm,geoConf,addrType)
       +buildCouncilBehaviour(lga,cm)
