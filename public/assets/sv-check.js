@@ -1135,7 +1135,7 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
 
   // Overlay list HTML
   function ovRow(label,clear,src,warn){
-    if(clear)  return '<div class="ov ok"><div class="ov-icon">\u2713</div><div class="ov-body"><div class="ov-title ok">'+label+' \u2014 Clear</div><div class="ov-src">'+src+'</div></div></div>';
+    if(clear)  return '<div class="ov ok"><div class="ov-icon">\u2713</div><div class="ov-body"><div class="ov-title ok">'+label+' — Not detected in available layer</div><div class="ov-src">'+src+'</div></div></div>';
     return '<div class="ov warn"><div class="ov-icon">\u26a0</div><div class="ov-body"><div class="ov-title warn">'+label+' \u2014 '+(warn||'Overlay present')+'</div><div class="ov-src">'+src+'</div></div></div>';
   }
 
@@ -1202,7 +1202,7 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
             // Overlay analysis
     +'<div class="rsec">'
       +'<div class="rsec-title">Overlay analysis <span class="tag tag-live">&#9679; 9 live government checks</span></div>'
-      +(ovAllClear?'<div style="background:var(--greenl);border:1px solid var(--greenb);border-radius:var(--r);padding:8px 12px;margin-bottom:8px;font-size:.76rem;color:var(--green)">&#10003; All 9 overlays clear \u2014 no additional reports required for DA</div>':'')
+      +(ovAllClear?'<div style="background:var(--greenl);border:1px solid var(--greenb);border-radius:var(--r);padding:8px 12px;margin-bottom:8px;font-size:.76rem;color:var(--green)">No mapped indicators detected in available layers — professional verification required.</div>':'')
       +'<div class="ov-list">'
         +ovRow('Heritage',!heritage,'Layer 8 \u00b7 NSW Planning Portal',heritage&&heritage.name?'Heritage item: '+esc(heritage.name||'',40):'Heritage overlay present')
         +ovRow('Flood planning area',!flood,'NSW EPI Flood Planning Area')
@@ -1499,7 +1499,7 @@ function buildSiteContextSection(addr,matchedAddr,zone,zoneName,block,mls,front,
     +factRow('Address confidence', geoConf||'Needs review', confNote, confColor)
     +factRow('Council', cmName, councilConf, councilConfColor)
     +factRow('Zone', zone?zone+(zFull?' \u2014 '+zFull:''):'Not detected', zoneConf, zoneColor)
-    +factRow('Entered land size', _lsUserVal?_lsUserVal+'m\u00b2':'Not provided', _lsUserVal?'Entered by user \u2014 verify against title or survey.':'Enter land size for development calculations.', lsSrcColor)
+    +factRow('Entered land size', _lsUserVal?_lsUserVal+'m\u00b2':'Not provided', _lsUserVal?'Entered by user \u2014 verify against title, contract or survey before relying.':'Enter land size for development calculations.', lsSrcColor)
     +factRow('Land size source', lsSrcLabel, _lsUserVal?'Professional verification required before relying.':'', lsSrcColor)
     +(mls?factRow('Minimum lot size', mls+'m\u00b2', 'From NSW Planning Portal LEP. Subject to DCP frontage and width controls.', 'var(--text)'):'')
     +(front?factRow('Street frontage', front+'m', 'User-entered. Check DCP minimum frontage for proposed use.', 'var(--text)'):'')
@@ -1510,7 +1510,7 @@ function buildSiteContextSection(addr,matchedAddr,zone,zoneName,block,mls,front,
     '<div style="margin-top:10px;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid var(--border)">'
     +'<div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted2);margin-bottom:4px">Zone context</div>'
     +'<div style="font-size:.7rem;color:var(--muted);line-height:1.6">'+zDesc+'</div>'
-    +'<div style="font-size:.62rem;color:var(--muted2);margin-top:6px">This is a planning signal only. It is not approval advice. LEP and DCP controls must be verified with council or a town planner.</div>'
+    +'<div style="font-size:.62rem;color:var(--muted2);margin-top:6px">This is a planning signal only. It is not legal, planning, financial, credit, valuation or investment advice. Professional verification required before any reliance.</div>'
     +'</div>'
   ) : '';
 
