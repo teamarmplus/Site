@@ -334,6 +334,17 @@ function _showAddrNotFound(resultEl, n, addr, reason){
     "</div>"
   ].join("");
   resultEl.classList.add("show");
+  // QA record for testing
+  window._svLastQA = {
+    build:              "sitecheck-expanded-report-2026-05-22",
+    reportGenerated:    false,
+    fakeAddressRejected:true,
+    reason:             "Address not matched",
+    enteredAddress:     addr||"",
+    matchedAddress:     null,
+    zoneCode:           null,
+    overallResult:      "Address not matched"
+  };
   setSt("");
   n.disabled = false;
   n.textContent = "Check this property \u2192";
@@ -2153,31 +2164,86 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
   // Phase 2: AI interpretation layer — async, does not block render
   // ── QA copy button (launch testing helper — no user data exposed) ──────
   try{
+    // Build QA result object with all spec fields
+    var _daLabel = (cm&&cm.data&&cm.data.days) ? cm.data.days+'d median ('+cm.data.n+' DAs)' : 'Not available for '+(( cm&&cm.name)||lga||'this council');
+    var _overlays = [];
+    if(heritage)   _overlays.push('Heritage');
+    if(flood)      _overlays.push('Flood');
+    if(bushfire)   _overlays.push('Bushfire');
+    if(acidSulfate)_overlays.push('Acid sulfate');
+    if(contaminated)_overlays.push('Contaminated land');
+    if(riparian)   _overlays.push('Riparian');
+    if(landReserve)_overlays.push('Reserved land');
+    if(foreshore)  _overlays.push('Foreshore');
+    var _overlaySummary = _overlays.length ? _overlays.join(', ') : 'None detected';
+
+    var _parcelConf = window._parcelConfidence||'Not checked';
+
+    var _lsSrc = blockSource==='auto-detected' ? 'NSW Cadastre (auto)'
+      : blockSource==='estimated'    ? 'NSW Cadastre (estimated)'
+      : block>0 ? 'Manual / advertised entry'
+      : 'Not provided';
+
+    var _overallResult = (geoConf==='Verified'&&zone&&window._parcelConfidence==='Verified'&&block>0)
+      ? 'Address verified · Parcel matched · planning data needs review'
+      : (geoConf==='Verified'&&zone&&block>0)
+      ? 'Address verified · parcel/planning data needs review'
+      : (geoConf==='Verified'&&zone)
+      ? 'Address verified · land size and parcel need review'
+      : skipLotCount||!block
+      ? 'Limited facts · land size needed for full analysis'
+      : 'Limited facts · professional review required';
+
+    var _councilConf = councilSource==='planning-portal' ? 'Verified (NSW Planning Portal)'
+      : councilSource==='suburb-postcode-fallback' ? 'Inferred (suburb/postcode)'
+      : 'Not identified';
+
+    var _qs = {
+      build:                   'sitecheck-expanded-report-2026-05-22',
+      reportGenerated:         true,
+      fakeAddressRejected:     false,
+      enteredAddress:          addr||'',
+      matchedAddress:          matchedAddr||'',
+      addressType:             addrType||'normal',
+      addressConfidence:       geoConf||'',
+      geocodeSource:           geoSource||'',
+      locationType:            locationType||'',
+      council:                 (cm&&cm.name)||lga||'',
+      councilConfidence:       _councilConf,
+      zoneCode:                zone||'',
+      zoneName:                zoneName||'',
+      minLotSize:              mls||'',
+      enteredLandSize:         block||'',
+      landSizeSource:          _lsSrc,
+      parcelConfidence:        _parcelConf,
+      daTimelineCoverage:      _daLabel,
+      overlaySummary:          _overlaySummary,
+      overallResult:           _overallResult,
+      missingInformationShown: true,
+      riskNotesShown:          true,
+      fullReportCtaShown:      true,
+      possibleNextPathwaysShown: true,
+      sectionsShown:           ['SiteContext','ConstraintChecklist','MissingInfo','RiskNotes',
+                                 'EvidenceLedger','RiskRegister','DevPathway','CouncilBehaviour',
+                                 'PersonaSteps','ProVerification','Checklist','Shareable',
+                                 'FullReportPreview','NextPathways']
+    };
+
+    // Store on window for programmatic access during testing
+    window._svLastQA = _qs;
+
     var qaBtn = document.createElement('button');
     qaBtn.textContent = 'Copy QA result';
     qaBtn.style.cssText = 'font-size:.62rem;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted2);cursor:pointer;margin:8px 0 0 4px';
-    qaBtn.title = 'Copy QA summary to clipboard for launch testing';
+    qaBtn.title = 'Copy QA JSON summary to clipboard (launch testing helper)';
     qaBtn.onclick = function(){
-      var _qs = {
-        enteredAddress:     addr||'',
-        matchedAddress:     matchedAddr||'',
-        addressConfidence:  geoConf||'',
-        council:            (cm&&cm.name)||lga||'',
-        zone:               zone||'',
-        minLot:             mls||'',
-        enteredLandSize:    block||'',
-        landSizeSource:     blockSource||'',
-        overallResult:      (geoConf==='Verified'&&zone&&block>0?'Facts available':skipLotCount?'Limited facts — add land size':'Limited facts'),
-        fakeAddressRejected: false,
-        sectionsShown:      ['SiteContext','ConstraintChecklist','MissingInfo','RiskNotes','EvidenceLedger','RiskRegister','DevPathway','CouncilBehaviour','PersonaSteps','ProVerification','Checklist','Shareable','FullReportPreview','NextPathways'],
-        pathwaysShown:      true
-      };
       try{
         navigator.clipboard.writeText(JSON.stringify(_qs, null, 2));
         qaBtn.textContent = 'Copied!';
         setTimeout(function(){ qaBtn.textContent = 'Copy QA result'; }, 2000);
       }catch(e){
         qaBtn.textContent = 'Copy failed';
+        setTimeout(function(){ qaBtn.textContent = 'Copy QA result'; }, 2000);
       }
     };
     var _qaTarget = rcard.querySelector('.rsec') || rcard;
