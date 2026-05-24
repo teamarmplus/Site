@@ -8,6 +8,8 @@
     "fakeAddressRejected": true,
     "expandedBaseReport": true,
     "overlayWordingSafe": true,
-    "safeOverlayWording": true
+    "safeOverlayWording": true,
+    "sellLeasePage": true,
+    "sitePathwayCards": true
   }
 }

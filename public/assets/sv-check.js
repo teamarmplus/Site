@@ -918,12 +918,12 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
   return '<div class="verdict-section">'
     +'<div class="vs-header">'
       +'<div class="vs-left">'
-        +'<div class="vs-label">Executive intelligence verdict</div>'
+        +'<div class="vs-label">Planning-risk summary</div>'
         +'<div class="vs-verdict-text" style="color:'+verdictColor+'">'+verdict+'</div>'
         +'<div class="vs-summary" style="margin-bottom:10px">'
           +zLabel+' site in '+(lga||'unknown LGA')+(n>=2?'. '+n+'-lot LEP yield estimate':'')+'. '
           +(mlsReal?'Confirmed LEP min lot '+mls+'m\u00b2 \u2014 verified from NSW Planning Portal.':'Zone default min lot '+mls+'m\u00b2 applied \u2014 confirm real LEP value with council.')
-          +(riskCount===0?' All 9 government overlays clear.':' '+riskCount+' overlay warning'+(riskCount>1?'s':'')+' detected.')
+          +(riskCount===0?' No mapped indicators detected in available layers — professional verification required.':' '+riskCount+' overlay warning'+(riskCount>1?'s':'')+' detected — professional verification required.')
           +(days?' Council DA median '+days+'d.':'')
         +'</div>'
         +'<div class="verdict-callouts">'
@@ -1927,21 +1927,30 @@ function buildFullReportPreview(){
 
 
 function buildNextPathways(){
-  return '<div class="rsec" style="background:rgba(91,156,242,.04);border-color:rgba(91,156,242,.2)">'
-    +'<div class="rsec-title" style="color:var(--text)">Possible next pathways</div>'
-    +'<div style="font-size:.7rem;color:var(--muted);line-height:1.7;margin-bottom:12px">'
-      +'SiteVerdict does not tell you what to do. Based on the facts and confidence level, these are practical next pathways you may consider. '
-      +'Professional advice may be required before any decision.'
+  function card(icon, title, text, href, gold){
+    var bg = gold ? 'rgba(200,168,75,.08)' : 'var(--bg2)';
+    var bc = gold ? 'rgba(200,168,75,.3)' : 'var(--border)';
+    var bch = gold ? 'rgba(200,168,75,.6)' : 'rgba(255,255,255,.18)';
+    var tc = gold ? 'var(--gold)' : 'var(--text)';
+    return '<a href="'+href+'" style="display:block;text-decoration:none;background:'+bg+';border:1px solid '+bc+';border-radius:10px;padding:14px 16px">'
+      +'<div style="font-size:.82rem;margin-bottom:4px">'+icon+' <strong style="color:'+tc+'">'+title+'</strong></div>'
+      +'<div style="font-size:.67rem;color:var(--muted);line-height:1.6">'+text+'</div>'
+    +'</a>';
+  }
+  return '<div class="rsec" style="background:rgba(91,156,242,.03);border-color:rgba(91,156,242,.15)">'
+    +'<div class="rsec-title" style="color:var(--text)">What do you want to do with this site?</div>'
+    +'<div style="font-size:.7rem;color:var(--muted);margin-bottom:12px;line-height:1.6">'
+      +'Use this Site Check to choose the next practical pathway. SiteVerdict helps show facts, risk, missing information and next steps. Professional verification may be required.'
     +'</div>'
-    +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">'
-      +'<a href="/full-report.html" class="btn btn-gold" style="text-align:center;text-decoration:none">Get Full Report</a>'
-      +'<a href="https://wa.me/61402623628?text=I%20want%20to%20understand%20selling%20or%20leasing%20my%20site" target="_blank" class="btn btn-outline" style="text-align:center;text-decoration:none">Sell or lease the site</a>'
-      +'<a href="/services" class="btn btn-outline" style="text-align:center;text-decoration:none">Development services</a>'
-      +'<a href="/finance" class="btn btn-outline" style="text-align:center;text-decoration:none">Finance / lender support</a>'
-      +'<a href="/hot-list" class="btn btn-outline" style="text-align:center;text-decoration:none">Hot List updates</a>'
-      +'<a href="/terms.html" class="btn btn-outline" style="text-align:center;text-decoration:none;font-size:.7rem">Terms &amp; limits</a>'
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-bottom:12px">'
+      +card('\u{1F4C4}','Sell / lease','Use this site summary to discuss selling, leasing or preparing the land for market.','/sell-lease.html', false)
+      +card('\u{1F50E}','Full Report / Professional Review','Go deeper with title, survey, planning, civil, cost and professional verification where required.','/full-report.html', true)
+      +card('\u{1F3D7}','Development / services','Use the site facts and risk notes to request development, civil, drainage, access or external works support.','/services', false)
+      +card('\u{1F3E6}','Finance / lender support','Use planning-risk context for broker/lender conversations where appropriate.','/finance', false)
+      +card('\u{1F525}','Hot List / watch opportunities','Watch similar opportunity signals. Exact addresses remain protected in beta.','/hot-list', false)
+      +card('\u{1F4CB}','Terms / limits','Understand what SiteVerdict can and cannot verify.','/terms.html', false)
     +'</div>'
-    +'<div style="font-size:.62rem;color:var(--muted2);margin-top:10px;line-height:1.6">'
+    +'<div style="font-size:.6rem;color:var(--muted2);line-height:1.6">'
       +'Not legal, planning, financial, credit, valuation or investment advice. '
       +'Subject to verification. Professional verification required.'
     +'</div>'
@@ -2193,7 +2202,7 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
       var w2=document.createElement('div');
       w2.className='whtm';
       w2.style.marginBottom='8px';
-      w2.innerHTML='<strong>Why this matters:</strong> Each overlay adds cost, time or constraints to the DA process. A clean result here is the best possible planning outcome — it means no additional reports are required at DA stage.';
+      w2.innerHTML='<strong>Why this matters:</strong> Each mapped indicator can add cost, time or constraints to the DA process. If no indicator is detected in available layers, this is still not a final clearance. Confirm overlays, title, DCP controls and required reports with council or a qualified professional.';
       ovList.insertAdjacentElement('beforebegin',w2);
     }
   }catch(e){}
