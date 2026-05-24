@@ -10,6 +10,7 @@
     "overlayWordingSafe": true,
     "safeOverlayWording": true,
     "sellLeasePage": true,
-    "sitePathwayCards": true
+    "sitePathwayCards": true,
+    "developmentWorksLabel": true
   }
 }
