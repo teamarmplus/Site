@@ -131,25 +131,48 @@ exports.handler = async function(event) {
           else if (isRouteOnly) addressQuality = 'route_only';
           else if (isSuburbOnly) addressQuality = 'suburb_only';
 
+          // Public confidence must be downgraded for range and lot-style inputs.
+          // Google can return ROOFTOP for a range, or match "Lot 109" to street number 109,
+          // but SiteVerdict must not treat those as parcel/title verified.
+          let publicConfidence = (lType === 'ROOFTOP' || lType === 'RANGE_INTERPOLATED') ? 'Verified' : 'Needs review';
+          if (_isRangeAddr) publicConfidence = 'Estimated';
+          if (_isLotAddr)   publicConfidence = 'Needs review';
+
+          if (_isLotAddr && addressQuality === 'exact') {
+            addressQuality = 'interpolated';
+          }
+
           const postcode = googlePc;
           const council  = extractCouncilFromGoogleResult(hit);
+          const payload = {
+            found:        true,
+            lat:          loc.lat,
+            lon:          loc.lng,
+            source:       'Google Geocoding API',
+            confidence:   publicConfidence,
+            matchedAddr:  hit.formatted_address,
+            locationType: lType,
+            placeId:      hit.place_id || '',
+            paidApiUsed:  true,
+            addressQuality,
+            postcode,
+            council
+          };
+
+          if (_isRangeAddr) {
+            payload.isRangeAddress = true;
+            payload.rangeWarning = 'Range address detected. This may involve more than one parcel. Verify title, DP, survey and advertised land size before relying.';
+          }
+
+          if (_isLotAddr) {
+            payload.isLotAddress = true;
+            payload.lotWarning = 'Lot-based address detected. Lot number is not a street number. Verify lot/DP/title details before relying on parcel, zoning or planning conclusions.';
+          }
+
           return {
             statusCode: 200,
             headers: CORS,
-            body: JSON.stringify({
-              found:        true,
-              lat:          loc.lat,
-              lon:          loc.lng,
-              source:       'Google Geocoding API',
-              confidence:   (lType === 'ROOFTOP' || lType === 'RANGE_INTERPOLATED') ? 'Verified' : 'Needs review',
-              matchedAddr:  hit.formatted_address,
-              locationType: lType,
-              placeId:      hit.place_id || '',
-              paidApiUsed:  true,
-              addressQuality,
-              postcode,
-              council
-            })
+            body: JSON.stringify(payload)
           };
         }
       }

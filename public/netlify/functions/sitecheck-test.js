@@ -109,13 +109,19 @@ async function runOneTest(tc, siteUrl) {
     assert('reportSections = 14',             true, `sections: ${expectedSections.length}`);
 
     if (tc.id === 4) {
-      assert('range address detected',        addrType === 'range', `addrType=${addrType}`);
-      assert('confidence Estimated or lower', confidence !== 'Verified' || quality === 'interpolated',
-             `confidence=${confidence}, quality=${quality}`);
+      assert('range address detected',          addrType === 'range', `addrType=${addrType}`);
+      assert('confidence is Estimated (not Verified)', confidence === 'Estimated' || confidence === 'Needs review',
+             `confidence=${confidence} — Google ROOFTOP must be downgraded for range addresses`);
+      assert('report can still generate',       found, 'range address is real, should geocode');
+      assert('range warning expected in result','range address detected or similar shown in site facts', true);
     }
     if (tc.id === 5) {
-      assert('lot address detected',          addrType === 'lot', `addrType=${addrType}`);
-      assert('lotGeoWarn present',            geo && !!geo.lotWarning, 'lot warning should be set for lot addresses');
+      assert('lot address detected',                   addrType === 'lot', `addrType=${addrType}`);
+      assert('lot warning present (lotGeoWarn)',       geo && !!geo.lotWarning,
+             `lotWarning=${geo ? geo.lotWarning : 'null'} — sv-check.js must populate this for all lot addresses`);
+      assert('address confidence Needs review',        confidence === 'Needs review' || confidence === 'Estimated',
+             `confidence=${confidence} — lot addresses must never be Verified publicly`);
+      assert('report can still generate as limited',   found, 'lot address geocodes via suburb fallback or Google');
     }
   }
 

@@ -656,7 +656,9 @@ async function runCheck(){var e=normalizeAddressInput(document.getElementById("a
     var _locationType  = _geo.locationType || '';
     var _paidApiUsed   = _geo.paidApiUsed || false;
     var _isLotGeocode  = _geo.isLotAddress || false;
-    var _lotGeoWarn    = _geo.lotWarning || null;
+    var _lotGeoWarn    = _isLot
+      ? (_geo.lotWarning || 'Lot-based address detected. Lot number is not a street number. Verify lot/DP/title details before relying on parcel, zoning or planning conclusions.')
+      : null;
     // For Google: ROOFTOP = exact; RANGE_INTERPOLATED = estimated; GEOMETRIC_CENTER/APPROXIMATE = suburb
     var _googleLocConf = _locationType==='ROOFTOP'?'Verified'
       :_locationType==='RANGE_INTERPOLATED'?'Estimated'
@@ -664,7 +666,9 @@ async function runCheck(){var e=normalizeAddressInput(document.getElementById("a
     // Recalculate addrConfidence using Google locationType when available
     if(_geoIsGoogle && _googleLocConf) _addrConfidence = _googleLocConf;
     // Street-only and lot-geocoded-by-suburb are always Needs review
-    if(_addrType==='street-only' || _isLotGeocode) _addrConfidence = 'Needs review';
+    // Range and lot addresses: downgrade confidence regardless of Google locationType
+    if(_isRange) _addrConfidence = 'Estimated';  // ROOFTOP may match first number only
+    if(_isLot || _addrType==='street-only' || _isLotGeocode) _addrConfidence = 'Needs review';
     _geoResult.addrType      = _addrType;
     _geoResult.isRange       = _isRange;
     _geoResult.isLot         = _isLot;
