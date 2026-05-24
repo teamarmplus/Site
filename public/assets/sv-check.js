@@ -718,7 +718,9 @@ function hideSkeleton(){
       // Always re-enable button so repeat searches always work
       var btn = document.getElementById('run-btn');
       if(btn){ btn.disabled = false; btn.textContent = 'Check this property →'; }
-      setSt('');
+      // Only clear status if it does not contain an error message
+      var stEl = document.getElementById('status');
+      if(stEl && !stEl.textContent){ setSt(''); }
     }
   };
 })();
@@ -1501,6 +1503,8 @@ function buildSiteContextSection(addr,matchedAddr,zone,zoneName,block,mls,front,
     +factRow('Zone', zone?zone+(zFull?' \u2014 '+zFull:''):'Not detected', zoneConf, zoneColor)
     +factRow('Entered land size', _lsUserVal?_lsUserVal+'m\u00b2':'Not provided', _lsUserVal?'Entered by user \u2014 verify against title, contract or survey before relying.':'Enter land size for development calculations.', lsSrcColor)
     +factRow('Land size source', lsSrcLabel, _lsUserVal?'Professional verification required before relying.':'', lsSrcColor)
+    +factRow('Parcel match', window._parcelConfidence&&window._parcelConfidence!=='Not found'?window._parcelConfidence:'Not matched', window._parcelConfidence==='Verified'?'\u2713 NSW Cadastre coordinate match':window._parcelConfidence==='Estimated'?'\u26a0 Approximate match \u2014 verify with title':window._parcelConfidence==='Not found'?'\u2717 No parcel match \u2014 professional verification required':'\u26a0 Not checked \u2014 parcel data requires verification', window._parcelConfidence==='Verified'?'var(--green)':window._parcelConfidence?'var(--amber)':'var(--amber)')
+    +factRow('Block size confidence', blockSource==='auto-detected'?'Verified parcel area':blockSource==='estimated'?'Estimated \u2014 professional verification required':_lsUserVal?'Manual / advertised \u2014 verify against title, contract or survey':'Not provided', blockSource==='auto-detected'?'NSW Cadastre parcel area':blockSource==='estimated'?'Approximate \u2014 confirm with title/survey':_lsUserVal?'Entered by user':'Enter land size for development calculations', blockSource==='auto-detected'?'var(--green)':_lsUserVal?'var(--blue)':'var(--amber)')
     +(mls?factRow('Minimum lot size', mls+'m\u00b2', 'From NSW Planning Portal LEP. Subject to DCP frontage and width controls.', 'var(--text)'):'')
     +(front?factRow('Street frontage', front+'m', 'User-entered. Check DCP minimum frontage for proposed use.', 'var(--text)'):'')
     +factRow('DA timeline', daRow, cm&&cm.data?'Based on comparable DAs in SiteVerdict database. Indicative only.':'Check council website directly.', daColor);
@@ -1515,11 +1519,17 @@ function buildSiteContextSection(addr,matchedAddr,zone,zoneName,block,mls,front,
   ) : '';
 
   // ── Confidence summary ────────────────────────────────────────
-  var overallLabel = geoConf==='Verified'&&zone&&block>0 ? 'Facts available \u2014 professional verification required'
+  var _parcelOk = window._parcelConfidence==='Verified';
+  var overallLabel = geoConf==='Verified'&&zone&&_parcelOk&&block>0
+    ? 'Address verified \u2714 \u00b7 Parcel matched \u2714 \u2014 planning data needs review'
+    : geoConf==='Verified'&&zone&&block>0
+    ? 'Address verified \u2714 \u2014 parcel/planning data needs review'
+    : geoConf==='Verified'&&zone
+    ? 'Address verified \u2714 \u2014 land size and parcel need review'
     : skip||!block ? 'Limited facts \u2014 land size needed for full analysis'
-    : zone ? 'Facts available (limited) \u2014 professional review required'
     : 'Limited facts \u2014 professional review required';
-  var overallColor = geoConf==='Verified'&&zone&&block>0 ? 'var(--green)' : 'var(--amber)';
+  var overallColor = geoConf==='Verified'&&zone&&_parcelOk ? 'var(--green)'
+    : geoConf==='Verified'&&zone ? 'var(--amber)' : 'var(--amber)';
 
   var confSummary = '<div style="margin-top:10px;padding:8px 12px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;gap:10px">'
     +'<div style="font-size:.75rem;font-weight:600;color:'+overallColor+'">'+overallLabel+'</div>'
