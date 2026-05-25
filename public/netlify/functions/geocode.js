@@ -133,6 +133,16 @@ exports.handler = async function(event) {
 
           const postcode = googlePc;
           const council  = extractCouncilFromGoogleResult(hit);
+          // Downgrade confidence for range and lot addresses
+          // regardless of Google locationType (ROOFTOP on first number != full parcel)
+          let googleConf = (lType === 'ROOFTOP' || lType === 'RANGE_INTERPOLATED') ? 'Verified' : 'Needs review';
+          if (_isRangeAddr) googleConf = 'Estimated';
+          if (_isLotAddr)   googleConf = 'Needs review';
+
+          const lotWarning = _isLotAddr
+            ? 'Lot-based address detected. Lot number is not a street number. Verify lot/DP/title details before relying on parcel, zoning or planning conclusions.'
+            : null;
+
           return {
             statusCode: 200,
             headers: CORS,
@@ -141,14 +151,16 @@ exports.handler = async function(event) {
               lat:          loc.lat,
               lon:          loc.lng,
               source:       'Google Geocoding API',
-              confidence:   (lType === 'ROOFTOP' || lType === 'RANGE_INTERPOLATED') ? 'Verified' : 'Needs review',
+              confidence:   googleConf,
               matchedAddr:  hit.formatted_address,
               locationType: lType,
               placeId:      hit.place_id || '',
               paidApiUsed:  true,
               addressQuality,
               postcode,
-              council
+              council,
+              lotWarning,
+              isLotAddress: _isLotAddr
             })
           };
         }
