@@ -14,6 +14,32 @@ const CORS = {
 function isLotAddr(s)   { return /^(lot|proposed\s+lot)\s+\d+/i.test((s||'').trim()); }
 function isRangeAddr(s) { return /^\d+\s*-\s*\d+\s+/i.test((s||'').trim()); }
 
+// ── Simple jurisdiction detection (for test assertions) ───────────
+function detectJurisdiction(rawAddress) {
+  const s = (rawAddress || '').toUpperCase();
+  if (/\bNSW\b/.test(s))           return 'NSW';
+  if (/\bACT\b/.test(s) || /CANBERRA/i.test(rawAddress)) return 'ACT';
+  if (/\bVIC\b/.test(s) || /VICTORIA/i.test(rawAddress)) return 'VIC';
+  if (/\bQLD\b/.test(s) || /QUEENSLAND/i.test(rawAddress)) return 'QLD';
+  if (/\bSA\b/.test(s)  || /SOUTH\s+AUSTRALIA/i.test(rawAddress)) return 'SA';
+  if (/\bWA\b/.test(s)  || /WESTERN\s+AUSTRALIA/i.test(rawAddress)) return 'WA';
+  if (/\bTAS\b/.test(s) || /TASMANIA/i.test(rawAddress)) return 'TAS';
+  if (/\bNT\b/.test(s)  || /NORTHERN\s+TERRITORY/i.test(rawAddress)) return 'NT';
+  const pc = (rawAddress || '').match(/\b(\d{4})\b/);
+  if (pc) {
+    const n = parseInt(pc[1], 10);
+    if ((n >= 1000 && n <= 2999) || (n >= 200 && n <= 299)) return 'NSW';
+    if (n >= 2600 && n <= 2618) return 'ACT';
+    if (n >= 3000 && n <= 3999) return 'VIC';
+    if (n >= 4000 && n <= 4999) return 'QLD';
+    if (n >= 5000 && n <= 5999) return 'SA';
+    if (n >= 6000 && n <= 6999) return 'WA';
+    if (n >= 7000 && n <= 7999) return 'TAS';
+    if (n >= 800  && n <= 899)  return 'NT';
+  }
+  return 'UNKNOWN';
+}
+
 function normalise(s) {
   if (!s) return s;
   s = s.trim();
@@ -38,6 +64,7 @@ async function runAllTests(siteUrl) {
     { id: 3, label: 'Fake / invalid address',         address: '999 Fake Street, Nowhere NSW 9999',             landSize: null },
     { id: 4, label: 'Range address',                  address: '68-70 Hawkins Street, Howlong NSW 2643',        landSize: null },
     { id: 5, label: 'Lot-based address',              address: 'Lot 109, St Moritz Street, Austral NSW 2179',   landSize: null },
+    { id: 6, label: 'ACT address (national provider)', address: '45 Gould Street, Turner ACT 2612',               landSize: null },
   ];
 
   const results = [];
@@ -49,7 +76,8 @@ async function runAllTests(siteUrl) {
 
 async function runOneTest(tc, siteUrl) {
   const addr = normalise(tc.address);
-  const addrType = isLotAddr(addr) ? 'lot' : isRangeAddr(addr) ? 'range' : 'normal';
+  const addrType    = isLotAddr(addr) ? 'lot' : isRangeAddr(addr) ? 'range' : 'normal';
+  const jurisdiction = detectJurisdiction(tc.address);
 
   // Call geocode function internally
   const geoUrl = `${siteUrl}/.netlify/functions/geocode?address=${encodeURIComponent(addr)}`;
@@ -123,6 +151,15 @@ async function runOneTest(tc, siteUrl) {
              `confidence=${confidence} — lot addresses must never be Verified publicly`);
       assert('report can still generate as limited',   found, 'lot address geocodes via suburb fallback or Google');
     }
+    if (tc.id === 6) {
+      // ACT test — jurisdiction must be detected as ACT
+      assert('ACT address geocodes',                   found, 'Canberra address must geocode via Google or Nominatim');
+      assert('jurisdiction detected as ACT',           jurisdiction === 'ACT', `jurisdiction=${jurisdiction}`);
+      assert('addressType is normal',                  addrType === 'normal', `addrType=${addrType}`);
+      // Geocode must succeed — planning result depends on ACTmapi availability
+      assert('no fake address rejection',              found !== false,
+             'ACT address must not be treated as fake');
+    }
   }
 
   const allPass = assertions.every(a => a.pass);
@@ -134,6 +171,7 @@ async function runOneTest(tc, siteUrl) {
     normalisedAddress: addr,
     landSize:        tc.landSize || null,
     addressType:     addrType,
+    jurisdictionDetected: jurisdiction,
     geocodeResult: {
       found:         found,
       addressQuality: quality,

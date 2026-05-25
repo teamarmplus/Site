@@ -11,6 +11,8 @@
     "safeOverlayWording": true,
     "sellLeasePage": true,
     "sitePathwayCards": true,
-    "developmentWorksLabel": true
+    "developmentWorksLabel": true,
+    "nationalSiteCheckLayer": true,
+    "providerRegistry": true
   }
 }

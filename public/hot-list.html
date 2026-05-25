@@ -159,7 +159,7 @@ footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-c
     <div class="sc-confidence">Tier: <span style="color:var(--muted)">Entry opportunity &middot; Professional verification required</span></div>
     <div class="sc-btns">
       <a href='/' class="fbtn-out" style="text-decoration:none;display:inline-flex;align-items:center">Run your own Site Check &#8594;</a>
-      <a href='/services' class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request Development Works quote &#8594;</a>
+      <a href='/services' class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request cost / services quote &#8594;</a>
       <a href='/full-report.html' class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report</a>
     </div>
   </div>
@@ -186,7 +186,7 @@ footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-c
     <div class="sc-confidence">Tier: <span style="color:var(--muted)">Entry opportunity &middot; Professional verification required</span></div>
     <div class="sc-btns">
       <a href='/' class="fbtn-out" style="text-decoration:none;display:inline-flex;align-items:center">Run your own Site Check &#8594;</a>
-      <a href='/services' class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request Development Works quote &#8594;</a>
+      <a href='/services' class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request cost / services quote &#8594;</a>
       <a href='/full-report.html' class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report</a>
     </div>
   </div>
@@ -311,9 +311,9 @@ footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-c
   </div>
   <div class="sc-notes">DA approved &mdash; stage unverified. Driveway, drainage and landscaping may be required &mdash; verify scope before committing. <strong>Verify stage and scope before any commitment.</strong></div>
   <div class="sc-foot">
-    <div class="sc-confidence">Pathway: <span style="color:var(--green)">External works &middot; Development Works quote &middot; Cost review</span></div>
+    <div class="sc-confidence">Pathway: <span style="color:var(--green)">External works &middot; Services quote &middot; Cost review</span></div>
     <div class="sc-btns">
-      <a href='/services' class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request Development Works quote &#8594;</a>
+      <a href='/services' class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request cost / services quote &#8594;</a>
       <a href='/full-report.html' class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report</a>
     </div>
   </div>
@@ -400,9 +400,9 @@ footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-c
   </div>
   <div class="sc-notes">Dual occupancy Torrens title &mdash; stage unverified. Driveway, turf and fencing may be required &mdash; verify stage and scope before committing. <strong>Verify stage and scope before any commitment.</strong></div>
   <div class="sc-foot">
-    <div class="sc-confidence">Pathway: <span style="color:var(--green)">External works &middot; Development Works quote</span></div>
+    <div class="sc-confidence">Pathway: <span style="color:var(--green)">External works &middot; Services quote</span></div>
     <div class="sc-btns">
-      <a href='/services' class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request Development Works quote &#8594;</a>
+      <a href='/services' class="fbtn-gold" style="text-decoration:none;display:inline-flex;align-items:center">Request cost / services quote &#8594;</a>
       <a href='/full-report.html' class="fbtn-out2" style="text-decoration:none;display:inline-flex;align-items:center">Unlock full report</a>
     </div>
   </div>
@@ -447,7 +447,7 @@ footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-c
 
 </div>
 
-<!-- Development Works CTA -->
+<!-- Services CTA -->
 <div style="max-width:860px;margin:0 auto 16px;padding:0 5%">
   <div style="background:linear-gradient(135deg,rgba(200,168,75,.1),rgba(200,168,75,.04));border:1px solid rgba(200,168,75,.28);border-radius:16px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
     <div style="font-size:.82rem;color:var(--text);line-height:1.6">
@@ -597,7 +597,7 @@ function buildCard(site, idx, total, isFallback){
   var safeSuburb = escapeHTML(site.suburb||(site.council?site.council+' LGA':'NSW approved DA'));
   var addrDisplay = safeSuburb
     + ' <span style="font-size:.62rem;color:var(--muted2);font-weight:400">&#8212; Exact address hidden in beta</span>';
-  var safeDesc = escapeHTML(site.description||'DA approved \u2014 stage unverified. Delivery planning, cost review, finance support or Development Works quote may be useful. Professional verification required.');
+  var safeDesc = escapeHTML(site.description||'DA approved \u2014 stage unverified. Delivery planning, cost review, finance support or services quote may be useful. Professional verification required.');
   var safeTierLabel = escapeHTML(site.label||'Approved DA \u2014 stage unverified');
   var tier = (site.tier||'entry').toLowerCase();
 
@@ -613,7 +613,7 @@ function buildCard(site, idx, total, isFallback){
       +"<a href='/services' class='fbtn-out2' style='text-decoration:none;display:inline-flex;align-items:center'>Request quote</a>";
   } else {
     // entry (default)
-    ctaHtml = "<a href='/services' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Request Development Works quote \u2192</a>"
+    ctaHtml = "<a href='/services' class='fbtn-gold' style='text-decoration:none;display:inline-flex;align-items:center'>Request cost / services quote \u2192</a>"
       +"<a href='/full-report.html' class='fbtn-out2' style='text-decoration:none;display:inline-flex;align-items:center'>Unlock full report</a>";
   }
 
@@ -648,7 +648,7 @@ function buildCard(site, idx, total, isFallback){
       +"<div class='sc-confidence'>Pathway: <span style='color:var(--muted2)'>"
       +(tier==='high'?'Professional review &middot; Finance &middot; Lender-ready report'
        :tier==='medium'?'Full report &middot; Finance support &middot; Civil works'
-       :'Development Works quote &middot; Cost review &middot; Full report')+"</span></div>"
+       :'Services quote &middot; Cost review &middot; Full report')+"</span></div>"
       +"<div style='display:flex;gap:6px;flex-wrap:wrap'>"+ctaHtml+"</div>"
     +"</div>"
   +"</div>";
