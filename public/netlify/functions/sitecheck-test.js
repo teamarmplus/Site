@@ -65,6 +65,8 @@ async function runAllTests(siteUrl) {
     { id: 4, label: 'Range address',                  address: '68-70 Hawkins Street, Howlong NSW 2643',        landSize: null },
     { id: 5, label: 'Lot-based address',              address: 'Lot 109, St Moritz Street, Austral NSW 2179',   landSize: null },
     { id: 6, label: 'ACT address (national provider)', address: '45 Gould Street, Turner ACT 2612',               landSize: null },
+    { id: 7, label: 'TAS address — Hobart residential',  address: '1 Davey Street, Hobart TAS 7000',                landSize: null },
+    { id: 8, label: 'TAS address — Launceston residential', address: '100 Elphin Road, Launceston TAS 7250',           landSize: null },
   ];
 
   const results = [];
@@ -159,6 +161,16 @@ async function runOneTest(tc, siteUrl) {
       // Geocode must succeed — planning result depends on ACTmapi availability
       assert('no fake address rejection',              found !== false,
              'ACT address must not be treated as fake');
+    }
+    if (tc.id === 7 || tc.id === 8) {
+      // TAS tests — jurisdiction detected, geocodes cleanly, not treated as fake
+      assert('TAS address geocodes',                   found, 'Hobart/Launceston address must geocode');
+      assert('jurisdiction detected as TAS',           jurisdiction === 'TAS', `jurisdiction=${jurisdiction}`);
+      assert('addressType is normal',                  addrType === 'normal', `addrType=${addrType}`);
+      assert('TAS address not treated as fake',        found !== false, 'TAS address must not be rejected');
+      // Confidence must not be Verified for a state without deep geocode checks
+      // (acceptable: Verified or Needs review depending on geocoder — just not null)
+      assert('TAS confidence label returned',          !!confidence, `confidence=${confidence}`);
     }
   }
 

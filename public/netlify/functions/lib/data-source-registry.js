@@ -102,32 +102,113 @@ const REGISTRY = [
 
   // ── TAS ────────────────────────────────────────────────────────
   {
-    id:           'tas_list',
-    label:        'TAS LIST ArcGIS REST (Land Information System Tasmania)',
+    id:           'tas_list_planning_zones',
+    label:        'TAS Tasmanian Planning Scheme Zones (theLIST)',
     jurisdiction: 'TAS',
     source_type:  'official_open_data',
-    base_url:     'https://services.thelist.tas.gov.au/arcgis/rest/services',
+    base_url:     'https://services.thelist.tas.gov.au/arcgis/rest/services/Public/PlanningOnline/MapServer',
     key_env_var:  null,
-    fields:       ['zone','parcel_id','parcel_area'],
+    fields:       ['zone_no','zone_label','lps_ref'],
     confidence:   'Medium',
-    notes:        'TAS LIST public ArcGIS REST services. No key required. '
-                + 'Consult https://www.thelist.tas.gov.au for terms of use.',
-    live:         false, // prepared, not yet wired
+    notes:        'Layer 13: Tasmanian Planning Scheme Zones. Authorised under s80M LUPAA. '
+                + 'Licence: metadata check recommended. '
+                + 'Attribution: Tasmanian Planning Scheme Zones from theLIST © State of Tasmania. '
+                + 'T&Cs: listdata.thelist.tas.gov.au/public/LISTWebServicesTermsConditions.pdf',
+    live:         true,
+  },
+  {
+    id:           'tas_list_cadastre',
+    label:        'TAS Cadastral Parcels (theLIST)',
+    jurisdiction: 'TAS',
+    source_type:  'official_open_data',
+    base_url:     'https://services.thelist.tas.gov.au/arcgis/rest/services/Public/CadastreAndAdministrative/MapServer',
+    key_env_var:  null,
+    fields:       ['pid','parcel_area','prop_add'],
+    confidence:   'Medium',
+    notes:        'Layer 38: CC BY 3.0 AU CONFIRMED in Copyright Text. '
+                + 'Attribution: Cadastral Parcels from theLIST © State of Tasmania. '
+                + 'NOTE: PID links to VISTAS/TASFOL (title/valuation) — do not query those systems.',
+    live:         true,
+  },
+  {
+    id:           'tas_list_lga',
+    label:        'TAS Local Government Areas (theLIST)',
+    jurisdiction: 'TAS',
+    source_type:  'official_open_data',
+    base_url:     'https://services.thelist.tas.gov.au/arcgis/rest/services/Public/CadastreAndAdministrative/MapServer',
+    key_env_var:  null,
+    fields:       ['lga_name','lga_code'],
+    confidence:   'High',
+    notes:        'Layer 4: 29 Tasmania municipalities. Gazetted 1993. '
+                + 'Attribution: Local Government Areas from theLIST © State of Tasmania. '
+                + 'Metadata check recommended at thelist.tas.gov.au/app/content/data.',
+    live:         true,
+  },
+  {
+    id:           'tas_list_overlays',
+    label:        'TAS TPS Code Overlay (theLIST) — PENDING',
+    jurisdiction: 'TAS',
+    source_type:  'official_open_data',
+    base_url:     'https://services.thelist.tas.gov.au/arcgis/rest/services/Public/PlanningOnline/MapServer',
+    key_env_var:  null,
+    fields:       ['overlay_name'],
+    confidence:   'Low',
+    notes:        'Layer 14: OV_NAME field. Copyright Text EMPTY in REST service. '
+                + 'Licence clarification pending — email listhelp@nre.tas.gov.au. '
+                + 'Do NOT use until CC BY 3.0 AU confirmed.',
+    live:         false,
   },
 
   // ── QLD ────────────────────────────────────────────────────────
+  // ── QSCF: cadastre layer — confirmed CC BY 4.0, received 25-05-2026 ──
+  // DO NOT commit raw GDB/GeoJSON to public GitHub.
+  // Process offline → PostGIS → backend query only.
   {
-    id:           'qld_dams',
-    label:        'QLD Development Assessment Management System (DAMS)',
+    id:           'qld_qscf_cadastre',
+    label:        'QLD Spatial Cadastral Fabric (QSCF) — whole of state',
     jurisdiction: 'QLD',
-    source_type:  'official_api',
-    base_url:     'https://api.prod.qldgov.co/arcgis/rest/services',
-    key_env_var:  'QLD_SPATIAL_API_KEY',
-    fields:       ['zone','overlay'],
+    source_type:  'official_open_data',
+    base_url:     'https://qldspatial.information.qld.gov.au/catalogue/',
+    key_env_var:  null,
+    fields:       ['lot_area','shire_name','locality','tenure','parcel_typ','surv_ind','acc_code'],
+    confidence:   'Medium',
+    notes:        'CADASTRE ONLY — not a planning dataset. '
+                + 'File: DP_QLD_QSCF_WOS_CUR.zip received 25-05-2026 via QSpatial order '
+                + 'JobID: 20260525_175309737236-17072. '
+                + 'Licence: CC BY 4.0 confirmed (QLD DNRMMRRD). Commercial use permitted. '
+                + 'Attribution: © State of Queensland (DNRMMRRD) 2026. CC BY 4.0. '
+                + 'Integration method: ogr2ogr → PostGIS (PGCONNSTRING_QLD env var). '
+                + 'Available fields: lot_area (m²), shire_name (LGA), locality (suburb), '
+                + 'tenure, parcel_typ, surv_ind, acc_code. '
+                + 'NOT available: planning zones, overlays, min lot size, heritage, flood, bushfire. '
+                + 'Download available until 01/06/2026 — re-order from QSpatial when needed. '
+                + 'Data update cadence: weekly (QSCF replaces DCDB as of April 2026). '
+                + 'DCDB remains available as reference until 2027.',
+    live:         false,  // activate when PGCONNSTRING_QLD is set and PostGIS is loaded
+  },
+  // ── QLD planning zones: NO SINGLE STATE LAYER EXISTS ─────────────────
+  // QLD planning zones are held by each of 77 individual councils separately.
+  // There is no unified state-level planning zone dataset.
+  // Each council maintains its own planning scheme under the Planning Act 2016.
+  // Workaround options (none suitable for automated Site Check yet):
+  //   - MapsOnline API: asynchronous email delivery — not real-time
+  //   - Individual council GIS APIs: 77 separate integrations required
+  //   - State Planning Policy overlays (env.qld.gov.au): partial coverage only
+  // Status: SAVE_FOR_LATER — no viable automated integration path currently.
+  {
+    id:           'qld_planning_zones',
+    label:        'QLD Planning Zones — council-by-council (not yet integrated)',
+    jurisdiction: 'QLD',
+    source_type:  'fallback',
+    base_url:     null,
+    key_env_var:  null,
+    fields:       [],
     confidence:   'Low',
-    notes:        'QLD State Planning Policy zones via QSpatial. '
-                + 'Free registration required. Set QLD_SPATIAL_API_KEY env var when ready. '
-                + 'Not yet integrated — returns not_integrated status.',
+    notes:        'NO single state planning zone layer for QLD. '
+                + '77 individual council schemes under Planning Act 2016. '
+                + 'MapsOnline API is asynchronous (email delivery) — not suitable for live Site Check. '
+                + 'Show honest not-connected message for QLD planning zones. '
+                + 'Verify at planning.qld.gov.au or with the relevant council.',
     live:         false,
   },
 

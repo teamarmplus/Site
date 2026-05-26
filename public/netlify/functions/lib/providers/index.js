@@ -17,6 +17,7 @@
 
 const actProvider      = require('./act');
 const nswProvider      = require('./nsw');
+const qldProvider      = require('./qld');
 const vicProvider      = require('./vic');
 const saProvider       = require('./sa');
 const tasProvider      = require('./tas');
@@ -26,10 +27,11 @@ const fallbackProvider = require('./fallback');
 const PROVIDERS = {
   ACT: actProvider,     // live: ACTmapi ArcGIS REST, no key
   NSW: nswProvider,     // live: NSW ePlanning + SIX Maps + Protection layers
-  VIC: vicProvider,     // prepared — pending VaaS registration
+  QLD: qldProvider,     // stub: QSCF cadastre received — PostGIS load pending; planning zones gap documented
+  VIC: vicProvider,     // prepared — pending PostGIS load of Vicmap Planning GDB
   SA:  saProvider,      // stub — pending GeoJSON PostGIS integration
-  TAS: tasProvider,     // prepared — pending LIST T&Cs review
-  // QLD, WA, NT — not yet integrated, fall through to fallback
+  TAS: tasProvider,     // live: LIST ArcGIS REST (zone + cadastre + LGA, CC BY 3.0 AU)
+  // WA, NT — not yet integrated, fall through to fallback
 };
 
 /**
