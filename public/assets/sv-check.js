@@ -318,10 +318,10 @@ function _showAddrNotFound(resultEl, n, addr, reason){
   resultEl.innerHTML = [
     "<div style=\"max-width:620px;margin:0 auto;padding:24px;background:var(--bg2);border:1px solid var(--border);border-radius:16px\">",
     "  <div style=\"font-size:.72rem;color:var(--amber);margin-bottom:8px\">&#9888; Address not matched</div>",
-    "  <div style=\"font-size:.84rem;font-weight:500;margin-bottom:10px\">" + addr + " could not be matched in NSW address data.</div>",
+    "  <div style=\"font-size:.84rem;font-weight:500;margin-bottom:10px\">" + addr + " could not be matched in Australian address data.</div>",
     "  <div style=\"font-size:.74rem;color:var(--muted);line-height:1.8;margin-bottom:10px\">If address lookup is temporarily unavailable, try again shortly. Otherwise:</div>",
     "  <ul style=\"font-size:.72rem;color:var(--muted);line-height:2;margin-bottom:14px;padding-left:18px\">",
-    "    <li>Include full street number, street name, suburb, NSW and postcode</li>",
+    "    <li>Include full street number, street name, suburb, state and postcode</li>",
     "    <li>Messy or abbreviated addresses (e.g. canley heigh,2166) are automatically cleaned — try once more after a small correction</li>",
     "    <li>For Lot addresses (e.g. Lot 109), include suburb and postcode</li>",
     "    <li>For range addresses (e.g. 39-45), the first number is used automatically</li>",
@@ -336,7 +336,7 @@ function _showAddrNotFound(resultEl, n, addr, reason){
   resultEl.classList.add("show");
   // QA record for testing
   window._svLastQA = {
-    build:              "sitecheck-expanded-report-2026-05-22",
+    build:              "sitecheck-release-check-75",
     reportGenerated:    false,
     fakeAddressRejected:true,
     reason:             "Address not matched",
@@ -350,12 +350,36 @@ function _showAddrNotFound(resultEl, n, addr, reason){
   n.textContent = "Check this property \u2192";
 }
 
+
+function detectAUStateForSiteCheck(input, geo){
+  var raw = [input||'', geo&&geo.matchedAddr||'', geo&&geo.raw&&geo.raw.display_name||''].join(' ').toUpperCase();
+  var m = raw.match(/\b(NSW|ACT|VIC|QLD|SA|WA|TAS|NT)\b/);
+  if(m) return m[1];
+  var pc = (raw.match(/\b(\d{4})\b/)||[])[1] || (geo&&geo.postcode?String(geo.postcode):'');
+  if(pc){
+    var n = parseInt(pc,10);
+    if((n>=200 && n<=299) || (n>=2600 && n<=2618) || (n>=2900 && n<=2920)) return 'ACT';
+    if((n>=1000 && n<=2599) || (n>=2619 && n<=2899) || (n>=2921 && n<=2999)) return 'NSW';
+    if((n>=3000 && n<=3999) || (n>=8000 && n<=8999)) return 'VIC';
+    if((n>=4000 && n<=4999) || (n>=9000 && n<=9999)) return 'QLD';
+    if(n>=5000 && n<=5999) return 'SA';
+    if(n>=6000 && n<=6999) return 'WA';
+    if(n>=7000 && n<=7999) return 'TAS';
+    if(n>=800 && n<=999) return 'NT';
+  }
+  return 'NSW';
+}
+
 async function geocodeWithConfidence(addr){
   // Try server-side geocode first (stronger, no CORS issues, Google API if configured)
   try {
     var res = await fetch('/.netlify/functions/geocode?address=' + encodeURIComponent(addr));
     if (res.ok) {
       var data = await res.json();
+      if (data.found === false) {
+        // Server returned found:false (still 200 OK) — pass the reason back
+        return { found: false, reason: data.reason||null, addressQuality: data.addressQuality||'failed', attempted: data.attempted||addr };
+      }
       if (data.found) {
         console.log('Geocode (server):', data.source, data.lat, data.lon, data.matchedAddr);
         return {
@@ -682,9 +706,128 @@ async function runCheck(){var e=normalizeAddressInput(document.getElementById("a
     _geoResult.lotGeoWarn    = _lotGeoWarn;
     if(_isLot||_isRange||(_isStreetLevel&&!_geoIsGoogle)){
       setSt('Address found — verifying parcel data…');
-    }var v=_geo.lat,u=_geo.lon,m=20037508.34*u/180,p=Math.log(Math.tan((90+v)*Math.PI/360))/(Math.PI/180)*20037508.34/180,g=encodeURIComponent(JSON.stringify({x:m,y:p,spatialReference:{wkid:102100}})),y="https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer";setSt("Checking zone, heritage, flood and overlays...");var[f,h,b,L,S,R,A,E,w,P,C,I]=await Promise.all([fetch(y+"/11/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,SYM_CODE,LGA_NAME&returnGeometry=false&f=json"),fetch(y+"/14/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LOT_SIZE&returnGeometry=false&f=json"),fetch(y+"/8/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=H_NAME,H_ID,LEGIS_REF_CLAUSE&returnGeometry=false&f=json"),fetch(y+"/4/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=FSR_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/7/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=HEIGHT_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Flood_Planning_Area/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json"),fetch(y+"/16/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=RESERVE_TYPE,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/18/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/15/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,ACID_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/17/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/13/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Bush_Fire_Prone_Land/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})}))]),[N,k,x,M,U,T,B,D,H,F,_,O]=await Promise.all([f.json(),h.json(),b.json(),L.json(),S.json(),R.json(),A.json(),E.json(),w.json(),P.json(),C.json(),I.json()]),j=B.features&&B.features.length?B.features[0].attributes.RESERVE_TYPE||B.features[0].attributes.LAY_CLASS||"Yes":null,z=D.features&&D.features.length>0,G=H.features&&H.features.length?H.features[0].attributes.ACID_CLASS||H.features[0].attributes.LAY_CLASS||"Yes":null,W=F.features&&F.features.length>0,q=_.features&&_.features.length>0,Y=O.features&&O.features.length>0,Z="",K="",V="";if(N.features&&N.features.length){var $=N.features[0].attributes;Z=$.SYM_CODE||"",K=$.LAY_CLASS||"",V=$.LGA_NAME||""}var X={R1:450,R2:450,R3:400,R4:350,R5:2e3,R6:450,RU1:4e3,RU2:4e3,RU3:4e3,RU4:2e3,RU5:2e3,RU6:4e3,E3:2e3,E4:500,C4:400,UR:500,MU1:400,MU2:400,SP1:2e3,SP2:4e3},Q=!1,J=X[Z]||450;if(k.features&&k.features.length&&k.features[0].attributes.LOT_SIZE){var ee=k.features[0].attributes.LOT_SIZE;ee>=({R1:50,R2:50,R3:50,R4:50,R5:100,R6:100,RU1:500,RU2:500,RU3:500,RU4:500,RU5:500,RU6:500,E4:100}[Z]||50)?(J=ee,Q=!0):(Q=!1,J=X[Z]||450,console.warn("Min lot size sanity fail: "+ee+"m² for zone "+Z+" — using zone default"))}var te=["R1","R2","R3","R4","R5","R6","RU1","RU2","RU3","RU4","RU5","RU6","E4","E3","C4","UR","MU1","MU2","B4","SP1","SP2"].indexOf(Z)>-1,ae=null;if(x.features&&x.features.length){var re=x.features[0].attributes;ae={name:re.H_NAME,clause:re.LEGIS_REF_CLAUSE}}var se=M.features&&M.features.length?M.features[0].attributes.FSR_MAX||M.features[0].attributes.LAY_CLASS:null,ne=U.features&&U.features.length?U.features[0].attributes.HEIGHT_MAX||U.features[0].attributes.LAY_CLASS:null,ie=T.features&&T.features.length>0;setSt("Loading infrastructure and comparable projects...");var oe=gc(V,_geoResult&&_geoResult.suburbHint,_geoResult&&_geoResult.postcodeHint),le=(oe&&oe.name,fetch("/.netlify/functions/daleads?mode=comps&council="+encodeURIComponent(V||"")+"&lat="+v+"&lng="+u).catch(()=>null)),de=fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent('[out:json];(node["railway"~"station|halt"](around:5000,'+v+","+u+');node["amenity"~"hospital"](around:5000,'+v+","+u+');node["shop"~"supermarket"](around:2000,'+v+","+u+"););out;")}).catch(()=>null),[ce,ve]=await Promise.all([le,de]),ue=[];if(ce)try{var me=await ce.json();for(var pe of me.comps||[])if(ue.push({addr:pe.address||"",lots:pe.lots||2,cost:pe.cost||0,days:pe.days||0}),ue.length>=3)break}catch(e){console.warn("DA Leads comps parse failed",e);ue=[];}var ge={transport:[],health:[],shopping:[]};if(ve)try{var ye=await ve.json();for(var fe of ye.elements||[]){var he=fe.tags||{},be=he.name;if(be){var Le=Math.round(1110*Math.sqrt(Math.pow((fe.lat||0)-v,2)+Math.pow((fe.lon||0)-u,2)))/10,Se=he.railway?"transport":"hospital"==he.amenity?"health":"shopping";ge[Se].length<3&&ge[Se].push({name:be,dist:Le})}}}catch(e){}var seppStation400=null,seppStation800=null,seppLightRail800=null;(ge.transport||[]).forEach(function(_st){if(_st.dist<=0.4&&!seppStation400)seppStation400=_st;if(_st.dist<=0.8&&!seppStation800)seppStation800=_st;});setSt("");var Re=calcLots(t,r,J,Z);s&&(Re=0),renderResult(e,Z,K,V,J,t,r,Re,oe,ae,ie,se,ne,ge,ue,j,z,te,Q,G,W,q,Y,seppStation400,seppStation800,seppLightRail800,s,(s&&window._parcelConfidence&&window._parcelConfidence!=='Not found'?window._parcelConfidence==='Verified'?'auto-detected':window._parcelConfidence==='Estimated'?'estimated':window._parcelConfidence==='Needs review'?'needs-review':'auto-detected':s?'auto-detected':'manual'),_geoResult&&_geoResult.source?_geoResult.source:'',_geoResult&&_geoResult.addrConfidence?_geoResult.addrConfidence:(_geoResult&&_geoResult.confidence?_geoResult.confidence:''),_geoResult&&_geoResult.matchedAddr?_geoResult.matchedAddr:'',_geoResult&&_geoResult.addrType?_geoResult.addrType:'normal',_geoResult&&_geoResult.lotNum?_geoResult.lotNum:null,oe&&oe.councilSource?oe.councilSource:'',_geoResult&&_geoResult.locationType?_geoResult.locationType:'',_geoResult&&_geoResult.paidApiUsed?_geoResult.paidApiUsed:false,_geoResult&&_geoResult.lotGeoWarn?_geoResult.lotGeoWarn:null)}catch(e){console.error("SiteVerdict runCheck failed:",e);setSt("Something went wrong: "+(e&&e.message?e.message:"Unknown error. Check browser console."));}n.disabled=!1,n.textContent="Check this property →"}else setSt("Please enter a property address.")}
+    }var _detState=detectAUStateForSiteCheck(e,_geoResult);if(_detState!=='NSW'){_showNonNSWResult(e,_detState,_geoResult,t,r,_addrType);n.disabled=false;n.textContent='Check this property →';return;}var v=_geo.lat,u=_geo.lon,m=20037508.34*u/180,p=Math.log(Math.tan((90+v)*Math.PI/360))/(Math.PI/180)*20037508.34/180,g=encodeURIComponent(JSON.stringify({x:m,y:p,spatialReference:{wkid:102100}})),y="https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer";setSt("Checking zone, heritage, flood and overlays...");var[f,h,b,L,S,R,A,E,w,P,C,I]=await Promise.all([fetch(y+"/11/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,SYM_CODE,LGA_NAME&returnGeometry=false&f=json"),fetch(y+"/14/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LOT_SIZE&returnGeometry=false&f=json"),fetch(y+"/8/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=H_NAME,H_ID,LEGIS_REF_CLAUSE&returnGeometry=false&f=json"),fetch(y+"/4/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=FSR_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/7/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=HEIGHT_MAX,LAY_CLASS&returnGeometry=false&f=json"),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Flood_Planning_Area/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json"),fetch(y+"/16/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=RESERVE_TYPE,LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/18/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json"),fetch(y+"/15/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,ACID_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/17/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch(y+"/13/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),fetch("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Bush_Fire_Prone_Land/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})}))]),[N,k,x,M,U,T,B,D,H,F,_,O]=await Promise.all([f.json(),h.json(),b.json(),L.json(),S.json(),R.json(),A.json(),E.json(),w.json(),P.json(),C.json(),I.json()]),j=B.features&&B.features.length?B.features[0].attributes.RESERVE_TYPE||B.features[0].attributes.LAY_CLASS||"Yes":null,z=D.features&&D.features.length>0,G=H.features&&H.features.length?H.features[0].attributes.ACID_CLASS||H.features[0].attributes.LAY_CLASS||"Yes":null,W=F.features&&F.features.length>0,q=_.features&&_.features.length>0,Y=O.features&&O.features.length>0,Z="",K="",V="";if(N.features&&N.features.length){var $=N.features[0].attributes;Z=$.SYM_CODE||"",K=$.LAY_CLASS||"",V=$.LGA_NAME||""}var X={R1:450,R2:450,R3:400,R4:350,R5:2e3,R6:450,RU1:4e3,RU2:4e3,RU3:4e3,RU4:2e3,RU5:2e3,RU6:4e3,E3:2e3,E4:500,C4:400,UR:500,MU1:400,MU2:400,SP1:2e3,SP2:4e3},Q=!1,J=X[Z]||450;if(k.features&&k.features.length&&k.features[0].attributes.LOT_SIZE){var ee=k.features[0].attributes.LOT_SIZE;ee>=({R1:50,R2:50,R3:50,R4:50,R5:100,R6:100,RU1:500,RU2:500,RU3:500,RU4:500,RU5:500,RU6:500,E4:100}[Z]||50)?(J=ee,Q=!0):(Q=!1,J=X[Z]||450,console.warn("Min lot size sanity fail: "+ee+"m² for zone "+Z+" — using zone default"))}var te=["R1","R2","R3","R4","R5","R6","RU1","RU2","RU3","RU4","RU5","RU6","E4","E3","C4","UR","MU1","MU2","B4","SP1","SP2"].indexOf(Z)>-1,ae=null;if(x.features&&x.features.length){var re=x.features[0].attributes;ae={name:re.H_NAME,clause:re.LEGIS_REF_CLAUSE}}var se=M.features&&M.features.length?M.features[0].attributes.FSR_MAX||M.features[0].attributes.LAY_CLASS:null,ne=U.features&&U.features.length?U.features[0].attributes.HEIGHT_MAX||U.features[0].attributes.LAY_CLASS:null,ie=T.features&&T.features.length>0;setSt("Loading infrastructure and comparable projects...");var oe=gc(V,_geoResult&&_geoResult.suburbHint,_geoResult&&_geoResult.postcodeHint),le=(oe&&oe.name,fetch("/.netlify/functions/daleads?mode=comps&council="+encodeURIComponent(V||"")+"&lat="+v+"&lng="+u).catch(()=>null)),de=fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent('[out:json];(node["railway"~"station|halt"](around:5000,'+v+","+u+');node["amenity"~"hospital"](around:5000,'+v+","+u+');node["shop"~"supermarket"](around:2000,'+v+","+u+"););out;")}).catch(()=>null),[ce,ve]=await Promise.all([le,de]),ue=[];if(ce)try{var me=await ce.json();for(var pe of me.comps||[])if(ue.push({addr:pe.address||"",lots:pe.lots||2,cost:pe.cost||0,days:pe.days||0}),ue.length>=3)break}catch(e){console.warn("DA Leads comps parse failed",e);ue=[];}var ge={transport:[],health:[],shopping:[]};if(ve)try{var ye=await ve.json();for(var fe of ye.elements||[]){var he=fe.tags||{},be=he.name;if(be){var Le=Math.round(1110*Math.sqrt(Math.pow((fe.lat||0)-v,2)+Math.pow((fe.lon||0)-u,2)))/10,Se=he.railway?"transport":"hospital"==he.amenity?"health":"shopping";ge[Se].length<3&&ge[Se].push({name:be,dist:Le})}}}catch(e){}var seppStation400=null,seppStation800=null,seppLightRail800=null;(ge.transport||[]).forEach(function(_st){if(_st.dist<=0.4&&!seppStation400)seppStation400=_st;if(_st.dist<=0.8&&!seppStation800)seppStation800=_st;});setSt("");var Re=calcLots(t,r,J,Z);s&&(Re=0),renderResult(e,Z,K,V,J,t,r,Re,oe,ae,ie,se,ne,ge,ue,j,z,te,Q,G,W,q,Y,seppStation400,seppStation800,seppLightRail800,s,(s&&window._parcelConfidence&&window._parcelConfidence!=='Not found'?window._parcelConfidence==='Verified'?'auto-detected':window._parcelConfidence==='Estimated'?'estimated':window._parcelConfidence==='Needs review'?'needs-review':'auto-detected':s?'auto-detected':'manual'),_geoResult&&_geoResult.source?_geoResult.source:'',_geoResult&&_geoResult.addrConfidence?_geoResult.addrConfidence:(_geoResult&&_geoResult.confidence?_geoResult.confidence:''),_geoResult&&_geoResult.matchedAddr?_geoResult.matchedAddr:'',_geoResult&&_geoResult.addrType?_geoResult.addrType:'normal',_geoResult&&_geoResult.lotNum?_geoResult.lotNum:null,oe&&oe.councilSource?oe.councilSource:'',_geoResult&&_geoResult.locationType?_geoResult.locationType:'',_geoResult&&_geoResult.paidApiUsed?_geoResult.paidApiUsed:false,_geoResult&&_geoResult.lotGeoWarn?_geoResult.lotGeoWarn:null)}catch(e){console.error("SiteVerdict runCheck failed:",e);setSt("Something went wrong: "+(e&&e.message?e.message:"Unknown error. Check browser console."));}n.disabled=!1,n.textContent="Check this property →"}else setSt("Please enter a property address.")}
 
 
+
+
+// ── NON-NSW RESULT RENDERER ───────────────────────────────────────
+// Renders an honest, state-appropriate card when address is not NSW.
+// NSW deep planning layers do NOT run for non-NSW addresses.
+function _showNonNSWResult(addr, state, geo, landSizeInput, frontage, addrType){
+  var resultEl = document.getElementById('result');
+  if(!resultEl) return;
+
+  var conf   = (geo && geo.confidence)  || 'Low';
+  var mAddr  = (geo && geo.matchedAddr) || addr;
+  var src    = (geo && geo.source)      || 'Geocode';
+  var council= (geo && geo.council)     || '';
+  var geoConf= conf;
+
+  // State-specific status messages
+  var stateInfo = {
+    ACT: {
+      name: 'Australian Capital Territory',
+      status: 'ACT Territory Plan data — basic site context available.',
+      detail: 'Zone and cadastre returned from ACTmapi (ArcGIS REST). Overlay layer licence confirmation pending.',
+      next:   'Verify planning controls at actmapi.act.gov.au or with a licensed ACT planner.',
+    },
+    TAS: {
+      name: 'Tasmania',
+      status: 'Tasmania LIST data — basic site context available.',
+      detail: 'Tasmanian Planning Scheme zones and cadastre from theLIST (CC BY 3.0 AU). Overlay layers pending licence confirmation.',
+      next:   'Verify planning controls at eplanningtas.com.au or with a licensed Tasmanian planner.',
+    },
+    VIC: {
+      name: 'Victoria',
+      status: 'Victoria — Vicmap Planning data received. PostGIS integration pending.',
+      detail: 'Vicmap Planning GDB received (DataVic, 20-05-2026, CC BY 4.0). Planning zones and overlays not yet connected. PostGIS integration in preparation.',
+      next:   'Verify planning controls at planning.vic.gov.au or with a licensed Victorian planner.',
+    },
+    QLD: {
+      name: 'Queensland',
+      status: 'Queensland — QSCF cadastre received. Planning zones not connected.',
+      detail: 'QSCF cadastre data received (QSpatial, CC BY 4.0, 25-05-2026). PostGIS integration pending. No single state planning zone layer exists for QLD — zones are held by 77 individual councils separately.',
+      next:   'Verify planning controls with the relevant council or at planning.qld.gov.au.',
+    },
+    SA: {
+      name: 'South Australia',
+      status: 'South Australia — P&D Code data in preparation. PostGIS integration pending.',
+      detail: 'SA Planning and Design Code GeoJSON received (data.sa.gov.au, CC BY 4.0). PostGIS integration not yet complete.',
+      next:   'Verify planning controls at saplanningportal.sa.gov.au or with a licensed SA planner.',
+    },
+    WA: {
+      name: 'Western Australia',
+      status: 'Western Australia — not yet connected.',
+      detail: 'WA SLIP registration pending. Planning zone and cadastre integration not yet available.',
+      next:   'Verify planning controls at myplanning.wa.gov.au or with a licensed WA planner.',
+    },
+    NT: {
+      name: 'Northern Territory',
+      status: 'Northern Territory — not yet connected.',
+      detail: 'NT planning data integration not yet available.',
+      next:   'Verify planning controls at nt.gov.au or with a licensed NT planner.',
+    },
+  };
+
+  var info = stateInfo[state] || {
+    name: state || 'Unknown state',
+    status: 'State planning layers not yet connected.',
+    detail: 'Planning data integration not yet available for this state.',
+    next: 'Verify planning controls with the relevant council or a licensed planner.',
+  };
+
+  // Geocode confidence label
+  var confColor = conf==='Verified'?'var(--green)':conf==='Estimated'?'var(--amber)':'var(--muted)';
+  var confIcon  = conf==='Verified'?'✓':conf==='Estimated'?'~':'?';
+
+  resultEl.innerHTML = [
+    '<div class="rcard" style="max-width:620px;margin:0 auto;padding:24px;background:var(--bg2);border:1px solid var(--border);border-radius:16px">',
+
+    // Header
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">',
+      '<div style="flex:1">',
+        '<div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:3px">Site Check — Basic National Screening</div>',
+        '<div style="font-size:.95rem;font-weight:600">',escapeHTML(mAddr),'</div>',
+        '<div style="font-size:.72rem;color:'+confColor+';margin-top:3px">'+confIcon+' Geocode: '+escapeHTML(geoConf)+'</div>',
+      '</div>',
+    '</div>',
+
+    // State status card
+    '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px">',
+      '<div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:6px">'+escapeHTML(info.name)+' — Provider Status</div>',
+      '<div style="font-size:.82rem;font-weight:500;margin-bottom:6px;color:var(--amber)">'+escapeHTML(info.status)+'</div>',
+      '<div style="font-size:.74rem;color:var(--muted);line-height:1.7">'+escapeHTML(info.detail)+'</div>',
+    '</div>',
+
+    // Geocode facts
+    council ? '<div style="font-size:.74rem;color:var(--muted);margin-bottom:10px">Council: '+escapeHTML(council)+'<span style="color:var(--muted2);font-size:.65rem"> — indicator only</span></div>' : '',
+
+    // Honest disclaimer
+    '<div style="background:rgba(255,165,0,.07);border:1px solid rgba(255,165,0,.2);border-radius:8px;padding:10px 12px;font-size:.74rem;color:var(--amber);margin-bottom:12px">',
+      'NSW deep planning layers are not applicable for this address.<br>',
+      'Planning controls must be verified with the relevant council or a licensed planner.',
+    '</div>',
+
+    // Next step
+    '<div style="font-size:.74rem;color:var(--muted);line-height:1.7;margin-bottom:14px">',
+      '<strong style="color:var(--text)">Next step:</strong> '+escapeHTML(info.next),
+    '</div>',
+
+    // Standard disclaimer
+    '<div style="font-size:.65rem;color:var(--muted2);line-height:1.8;border-top:1px solid var(--border);padding-top:10px">',
+      'Based on available official, public, and verifiable data. Planning-risk context only.<br>',
+      'Professional verification required before purchase, finance, or development decisions.<br>',
+      'Not a planning certificate, valuation, legal, financial, or investment advice.',
+    '</div>',
+
+    '</div>',
+  ].join('');
+
+  resultEl.classList.add('show');
+  setSt('');
+}
+// ── END NON-NSW RESULT RENDERER ─────────────────────────────────────
 
 // ── LOADING STATE MANAGER ─────────────────────────────
 var _loadingTimer = null;
@@ -1221,7 +1364,8 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
       +'<div class="rsec-title">Overlay analysis <span class="tag tag-live">&#9679; 9 live government checks</span></div>'
       +(ovAllClear?'<div style="background:var(--greenl);border:1px solid var(--greenb);border-radius:var(--r);padding:8px 12px;margin-bottom:8px;font-size:.76rem;color:var(--green)">No mapped indicators detected in available layers — professional verification required.</div>':'')
       +'<div class="ov-list">'
-        +ovRow('Heritage',!heritage,'Layer 8 \u00b7 NSW Planning Portal',heritage&&heritage.name?'Heritage item: '+esc(heritage.name||'',40):'Heritage overlay present')
+        +((_isNSWAddr||!_addrForState)?(
+          ovRow('Heritage',!heritage,'Layer 8 \u00b7 NSW Planning Portal',heritage&&heritage.name?'Heritage item: '+esc(heritage.name||'',40):'Heritage overlay present')
         +ovRow('Flood planning area',!flood,'NSW EPI Flood Planning Area')
         +ovRow('Bushfire prone land',!bushfire,'NSW RFS Bush Fire Prone Land')
         +ovRow('Acid sulfate soils',!acidSulfate,'Layer 15 \u00b7 NSW Planning Portal')
@@ -1230,6 +1374,17 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
         +ovRow('Land reservation',!landReserve,'Layer 16 \u00b7 NSW Planning Portal',landReserve?'Reserved: '+esc(String(landReserve),40):'')
         +ovRow('Foreshore building line',!foreshore,'Layer 18 \u00b7 NSW Planning Portal')
         +seppNote
+      ):(
+          '<div style="font-size:.72rem;color:var(--muted);padding:8px 0">'
+          +((/\bACT\b/.test(_addrForState))?'ACT Territory Plan data \u2014 zones and cadastre returned above. Overlay layer licence confirmation pending.'
+          :(/\bTAS\b/.test(_addrForState))?'Tasmania LIST data \u2014 zones and cadastre returned above. Overlay layers pending licence confirmation.'
+          :(/\bVIC\b/.test(_addrForState))?'Victoria Vicmap Planning \u2014 PostGIS integration pending. Planning zones and overlays not yet connected.'
+          :(/\bQLD\b/.test(_addrForState))?'Queensland \u2014 Planning zones not yet connected. No single state layer exists. QSCF cadastre integration pending.'
+          :(/\bSA\b/.test(_addrForState))?'South Australia P\u0026D Code \u2014 PostGIS integration pending. Planning zones and overlays not yet connected.'
+          :'Planning overlay data not yet connected for this state. Verify planning controls with the relevant council or a licensed planner.')
+          +'<br><span style="color:var(--muted2)">NSW deep planning check not applicable for this address.</span>'
+          +'</div>'
+      ))
       +'</div>'
     +'</div>'
 

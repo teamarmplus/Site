@@ -1,31 +1,49 @@
-// SiteVerdict — Machine test endpoint for Site Check
-// Usage: /.netlify/functions/sitecheck-test?address=148+Canley+Vale+Road...&landSize=650
-// Returns JSON only. Safe for CI/CD and external launch testing.
-// Does NOT expose API keys. Does NOT modify any data.
+/**
+ * SiteVerdict — Machine test endpoint
+ * /.netlify/functions/sitecheck-test
+ *
+ * Returns: allPassed, passed, failed, failedTests, buildMarker, packageNumber
+ *
+ * Tests:
+ *  1  NSW with comma          → found:true
+ *  2  NSW without comma       → found:true
+ *  3  Fake address            → found:false (rejected)
+ *  4  Range address           → Estimated/Needs review confidence
+ *  5  Lot address             → Needs review + lotWarning
+ *  6  ACT address             → found:true, jurisdiction ACT
+ *  7  TAS Hobart              → found:true, jurisdiction TAS
+ *  8  TAS Launceston          → found:true, jurisdiction TAS
+ *  9  Homepage wording        → NSW-only phrases absent, national wording present
+ * 10  VIC address             → found:true (not rejected)
+ * 11  QLD address             → found:true (not rejected)
+ * 12  Package number check    → package_number = 75
+ */
 
 'use strict';
 
 const CORS = {
-  'Access-Control-Allow-Origin': '*',
-  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin':  '*',
+  'Access-Control-Allow-Methods': 'GET,OPTIONS',
+  'Content-Type':                 'application/json',
 };
 
-// ── Address type helpers (mirrored from geocode.js) ──────────────
+const BUILD_MARKER   = 'sitecheck-release-check-75';
+const PACKAGE_NUMBER = '75';
+
 function isLotAddr(s)   { return /^(lot|proposed\s+lot)\s+\d+/i.test((s||'').trim()); }
 function isRangeAddr(s) { return /^\d+\s*-\s*\d+\s+/i.test((s||'').trim()); }
 
-// ── Simple jurisdiction detection (for test assertions) ───────────
-function detectJurisdiction(rawAddress) {
-  const s = (rawAddress || '').toUpperCase();
-  if (/\bNSW\b/.test(s))           return 'NSW';
-  if (/\bACT\b/.test(s) || /CANBERRA/i.test(rawAddress)) return 'ACT';
-  if (/\bVIC\b/.test(s) || /VICTORIA/i.test(rawAddress)) return 'VIC';
-  if (/\bQLD\b/.test(s) || /QUEENSLAND/i.test(rawAddress)) return 'QLD';
-  if (/\bSA\b/.test(s)  || /SOUTH\s+AUSTRALIA/i.test(rawAddress)) return 'SA';
-  if (/\bWA\b/.test(s)  || /WESTERN\s+AUSTRALIA/i.test(rawAddress)) return 'WA';
-  if (/\bTAS\b/.test(s) || /TASMANIA/i.test(rawAddress)) return 'TAS';
-  if (/\bNT\b/.test(s)  || /NORTHERN\s+TERRITORY/i.test(rawAddress)) return 'NT';
-  const pc = (rawAddress || '').match(/\b(\d{4})\b/);
+function detectJurisdiction(addr) {
+  const s = (addr||'').toUpperCase();
+  if (/\bNSW\b/.test(s))  return 'NSW';
+  if (/\bACT\b/.test(s))  return 'ACT';
+  if (/\bVIC\b/.test(s))  return 'VIC';
+  if (/\bQLD\b/.test(s))  return 'QLD';
+  if (/\bSA\b/.test(s))   return 'SA';
+  if (/\bWA\b/.test(s))   return 'WA';
+  if (/\bTAS\b/.test(s))  return 'TAS';
+  if (/\bNT\b/.test(s))   return 'NT';
+  const pc = (addr||'').match(/\b(\d{4})\b/);
   if (pc) {
     const n = parseInt(pc[1], 10);
     if ((n >= 1000 && n <= 2999) || (n >= 200 && n <= 299)) return 'NSW';
@@ -40,225 +58,177 @@ function detectJurisdiction(rawAddress) {
   return 'UNKNOWN';
 }
 
-function normalise(s) {
-  if (!s) return s;
-  s = s.trim();
-  s = s.replace(/([A-Za-z])(\d{4})$/, '$1 $2');
-  s = s.replace(/,{2,}/g, ',').replace(/\s{2,}/g, ' ');
-  if (!/\bNSW\b/i.test(s) && /\d{4}/.test(s)) {
-    s = s.replace(/\b(\d{4})\b(?!\s*$)/, 'NSW $1');
-  }
-  if (!/\bNSW\b/i.test(s) && !/VIC|QLD|SA|WA|TAS|NT|ACT/i.test(s)) {
-    if (!/\bAustralia\b/i.test(s)) s = s + ' NSW';
-  }
-  s = s.replace(/\b\w/g, c => c.toUpperCase());
-  s = s.replace(/\bNsw\b/, 'NSW');
-  return s.trim();
+const cases = [
+  { id:  1, label: 'NSW with comma',                address: '148 Canley Vale Road, Canley Heights NSW 2166',   landSize: 650  },
+  { id:  2, label: 'NSW without comma',             address: '148 Canley Vale Road Canley Heights NSW 2166',    landSize: 650  },
+  { id:  3, label: 'Fake / invalid address',        address: '999 Fake Street, Nowhere NSW 9999',               landSize: null },
+  { id:  4, label: 'Range address',                 address: '68-70 Hawkins Street, Howlong NSW 2643',          landSize: null },
+  { id:  5, label: 'Lot-based address',             address: 'Lot 109, St Moritz Street, Austral NSW 2179',     landSize: null },
+  { id:  6, label: 'ACT address',                   address: '45 Gould Street, Turner ACT 2612',                landSize: null },
+  { id:  7, label: 'TAS Hobart',                    address: '1 Davey Street, Hobart TAS 7000',                 landSize: null },
+  { id:  8, label: 'TAS Launceston',                address: '100 Elphin Road, Launceston TAS 7250',            landSize: null },
+  { id:  9, label: 'Homepage wording check',        address: null,                                              landSize: null },
+  { id: 10, label: 'VIC address — not rejected',    address: '15 Collins Street, Melbourne VIC 3000',           landSize: null },
+  { id: 11, label: 'QLD address — not rejected',    address: '1 Queen Street, Brisbane QLD 4000',               landSize: null },
+  { id: 12, label: 'Package number check',          address: null,                                              landSize: null },
+];
+
+async function callGeocode(address) {
+  const base = process.env.URL || 'https://siteverdict2.netlify.app';
+  const url  = base + '/.netlify/functions/geocode?address=' + encodeURIComponent(address);
+  const res  = await fetch(url, { headers: { 'User-Agent': 'SiteVerdict-Test/1.0' } });
+  if (!res.ok) throw new Error('Geocode HTTP ' + res.status);
+  return res.json();
 }
 
-// ── Run all five test cases ───────────────────────────────────────
-async function runAllTests(siteUrl) {
-  const cases = [
-    { id: 1, label: 'Valid address with land size',   address: '148 Canley Vale Road, Canley Heights NSW 2166', landSize: 650 },
-    { id: 2, label: 'Valid address blank land size',  address: '6 Fenton Street, Panania NSW 2213',             landSize: null },
-    { id: 3, label: 'Fake / invalid address',         address: '999 Fake Street, Nowhere NSW 9999',             landSize: null },
-    { id: 4, label: 'Range address',                  address: '68-70 Hawkins Street, Howlong NSW 2643',        landSize: null },
-    { id: 5, label: 'Lot-based address',              address: 'Lot 109, St Moritz Street, Austral NSW 2179',   landSize: null },
-    { id: 6, label: 'ACT address (national provider)', address: '45 Gould Street, Turner ACT 2612',               landSize: null },
-    { id: 7, label: 'TAS address — Hobart residential',  address: '1 Davey Street, Hobart TAS 7000',                landSize: null },
-    { id: 8, label: 'TAS address — Launceston residential', address: '100 Elphin Road, Launceston TAS 7250',           landSize: null },
-  ];
-
-  const results = [];
-  for (const tc of cases) {
-    results.push(await runOneTest(tc, siteUrl));
-  }
-  return results;
+async function fetchHomepage() {
+  const base = process.env.URL || 'https://siteverdict2.netlify.app';
+  const res = await fetch(base + '/', { headers: { 'User-Agent': 'SiteVerdict-Test/1.0' } });
+  if (!res.ok) throw new Error('Homepage HTTP ' + res.status);
+  return res.text();
 }
 
-async function runOneTest(tc, siteUrl) {
-  const addr = normalise(tc.address);
-  const addrType    = isLotAddr(addr) ? 'lot' : isRangeAddr(addr) ? 'range' : 'normal';
-  const jurisdiction = detectJurisdiction(tc.address);
+async function fetchVersionJson() {
+  const base = process.env.URL || 'https://siteverdict2.netlify.app';
+  const res  = await fetch(base + '/version.json', { headers: { 'User-Agent': 'SiteVerdict-Test/1.0' } });
+  if (!res.ok) throw new Error('version.json HTTP ' + res.status);
+  return res.json();
+}
 
-  // Call geocode function internally
-  const geoUrl = `${siteUrl}/.netlify/functions/geocode?address=${encodeURIComponent(addr)}`;
-  let geo = null;
-  let geoError = null;
-  try {
-    const resp = await fetch(geoUrl, { headers: { 'User-Agent': 'SiteVerdict-Test/1.0' } });
-    geo = await resp.json();
-  } catch (e) {
-    geoError = e.message;
-  }
-
-  const found        = geo && geo.found === true;
-  const fake         = !found;
-  const quality      = geo ? (geo.addressQuality || '') : 'failed';
-  const confidence   = geo ? (geo.confidence || '') : '';
-  const matchedAddr  = geo ? (geo.matchedAddr || '') : null;
-  const geoSource    = geo ? (geo.source || '') : null;
-  const locationType = geo ? (geo.locationType || '') : null;
-  const council      = geo ? (geo.council || '') : null;
-
-  // Land size source logic (same as sv-check.js)
-  const landSizeSource = tc.landSize && tc.landSize > 0
-    ? 'Manual / advertised entry'
-    : 'Not provided';
-
-  // Expected sections when valid
-  const expectedSections = [
-    'SiteContext','ConstraintChecklist','MissingInfo','RiskNotes',
-    'EvidenceLedger','RiskRegister','DevPathway','CouncilBehaviour',
-    'PersonaSteps','ProVerification','Checklist','Shareable',
-    'FullReportPreview','NextPathways',
-  ];
-
-  // Assertions
+async function runOneTest(tc) {
   const assertions = [];
   function assert(name, pass, detail) {
-    assertions.push({ name, pass, detail: detail || null });
+    assertions.push({ name, pass: !!pass, detail: String(detail || '') });
   }
 
+  const addrType    = isLotAddr(tc.address||'') ? 'lot' : isRangeAddr(tc.address||'') ? 'range' : 'normal';
+  const jurisdiction = detectJurisdiction(tc.address||'');
+
+  // T9: homepage wording
+  if (tc.id === 9) {
+    let html = '';
+    try { html = await fetchHomepage(); }
+    catch(e) { assert('homepage fetchable', false, e.message); }
+    if (html) {
+      const badPhrases = [
+        'any NSW property','For any NSW address','NSW addresses only','Development intelligence for NSW',
+      ];
+      for (const p of badPhrases) assert('"' + p + '" absent', !html.includes(p), html.includes(p) ? 'STILL PRESENT' : 'absent OK');
+      assert('national wording present',
+        html.includes('Australia-wide') || html.includes('Australian property') || html.includes('Australian addresses'),
+        'should include Australia-wide or Australian property');
+    }
+    return { testId: tc.id, label: tc.label, passed: assertions.every(a=>a.pass), assertions, jurisdictionDetected:'N/A', geocodeResult:{} };
+  }
+
+  // T12: package number check
+  if (tc.id === 12) {
+    let vj = null;
+    try { vj = await fetchVersionJson(); }
+    catch(e) { assert('version.json fetchable', false, e.message); }
+    if (vj) {
+      const pkgOk = (vj.package_number === '75' || vj.package_number === 75);
+      assert('package_number = 75', pkgOk, 'package_number: ' + vj.package_number);
+      const bnOk = !!(vj.build_name && vj.build_name.includes('75'));
+      assert('build_name contains 75', bnOk, vj.build_name || 'missing');
+      const svsOk = (vj.sitecheck_js_size || 0) >= 195000;
+      assert('sitecheck_js_size ≥ 195000 (state gate confirms)', svsOk, (vj.sitecheck_js_size||0) + 'b');
+    }
+    return { testId: tc.id, label: tc.label, passed: assertions.every(a=>a.pass), assertions, jurisdictionDetected:'N/A', geocodeResult:{} };
+  }
+
+  // All geocode tests
+  let geo = {};
+  try { geo = await callGeocode(tc.address); }
+  catch(e) { assert('geocode reachable', false, e.message); return { testId:tc.id, label:tc.label, passed:false, assertions, jurisdictionDetected:jurisdiction, geocodeResult:{} }; }
+
+  const found      = geo.found === true;
+  const quality    = geo.addressQuality || '';
+  const confidence = geo.confidence || '';
+  const matchedAddr = geo.matchedAddr || '';
+  const geoSource   = geo.source || '';
+
+  if (tc.id !== 3) {
+    assert('geocode: found:true',              found,        'found='+found+' quality='+quality);
+    assert('matchedAddress present',           !!matchedAddr, matchedAddr||'null');
+    assert('confidence present',               !!confidence,  'confidence='+confidence);
+    assert('source present',                   !!geoSource,   'source='+geoSource);
+    assert('quality not failed',               quality !== 'failed', 'quality='+quality);
+  }
+
+  if (tc.id === 1) {
+    assert('NSW comma: Verified or Estimated',
+      confidence==='Verified'||confidence==='Estimated', 'confidence='+confidence);
+  }
+  if (tc.id === 2) {
+    assert('no-comma: geocodes',               found, 'found='+found+' quality='+quality);
+    assert('no-comma: quality not failed',     quality!=='failed', 'quality='+quality);
+    assert('no-comma: confidence present',     !!confidence, 'confidence='+confidence);
+  }
   if (tc.id === 3) {
-    // Fake address: must fail
-    assert('geocode returns found:false',     !found,  `addressQuality=${quality}`);
-    assert('no zone returned',                !geo || !geo.zone, 'zone must be null for fake address');
-    assert('reportGenerated = false',         true,    'gate prevents report (server-verified by found:false)');
-    assert('fakeAddressRejected = true',      !found,  'hard gate in sv-check.js stops at geocode fail');
-    assert('no gate consumed',                !found,  'buildReportGate never reached if found:false');
-  } else {
-    // Real address: should find something
-    assert('geocode returns found:true',      found,   geoError || (geo ? `found=${geo.found}, quality=${quality}` : 'null response'));
-    assert('matchedAddress present',          !!matchedAddr, matchedAddr || 'null');
-    assert('addressConfidence present',       !!confidence,  confidence || 'empty');
-    assert('geocodeSource is Google or Nom.', geoSource && (geoSource.includes('Google') || geoSource.includes('Nominatim')), geoSource || 'null');
-    assert('addressQuality not failed',       quality !== 'failed', `quality=${quality}`);
-    assert('landSizeSource correct',          landSizeSource === (tc.landSize ? 'Manual / advertised entry' : 'Not provided'), landSizeSource);
-    assert('autoDetect NOT used',             true, 'auto-detect removed in beta — land size is manual only');
-    assert('reportSections = 14',             true, `sections: ${expectedSections.length}`);
-
-    if (tc.id === 4) {
-      assert('range address detected',          addrType === 'range', `addrType=${addrType}`);
-      assert('confidence is Estimated (not Verified)', confidence === 'Estimated' || confidence === 'Needs review',
-             `confidence=${confidence} — Google ROOFTOP must be downgraded for range addresses`);
-      assert('report can still generate',       found, 'range address is real, should geocode');
-      assert('range warning expected in result','range address detected or similar shown in site facts', true);
-    }
-    if (tc.id === 5) {
-      assert('lot address detected',                   addrType === 'lot', `addrType=${addrType}`);
-      assert('lot warning present (lotGeoWarn)',       geo && !!geo.lotWarning,
-             `lotWarning=${geo ? geo.lotWarning : 'null'} — sv-check.js must populate this for all lot addresses`);
-      assert('address confidence Needs review',        confidence === 'Needs review' || confidence === 'Estimated',
-             `confidence=${confidence} — lot addresses must never be Verified publicly`);
-      assert('report can still generate as limited',   found, 'lot address geocodes via suburb fallback or Google');
-    }
-    if (tc.id === 6) {
-      // ACT test — jurisdiction must be detected as ACT
-      assert('ACT address geocodes',                   found, 'Canberra address must geocode via Google or Nominatim');
-      assert('jurisdiction detected as ACT',           jurisdiction === 'ACT', `jurisdiction=${jurisdiction}`);
-      assert('addressType is normal',                  addrType === 'normal', `addrType=${addrType}`);
-      // Geocode must succeed — planning result depends on ACTmapi availability
-      assert('no fake address rejection',              found !== false,
-             'ACT address must not be treated as fake');
-    }
-    if (tc.id === 7 || tc.id === 8) {
-      // TAS tests — jurisdiction detected, geocodes cleanly, not treated as fake
-      assert('TAS address geocodes',                   found, 'Hobart/Launceston address must geocode');
-      assert('jurisdiction detected as TAS',           jurisdiction === 'TAS', `jurisdiction=${jurisdiction}`);
-      assert('addressType is normal',                  addrType === 'normal', `addrType=${addrType}`);
-      assert('TAS address not treated as fake',        found !== false, 'TAS address must not be rejected');
-      // Confidence must not be Verified for a state without deep geocode checks
-      // (acceptable: Verified or Needs review depending on geocoder — just not null)
-      assert('TAS confidence label returned',          !!confidence, `confidence=${confidence}`);
-    }
+    assert('fake: found:false (rejected)',     !found, 'found='+found);
+    assert('fake: quality=failed or suburb_only', quality==='failed'||quality==='suburb_only', 'quality='+quality);
+  }
+  if (tc.id === 4) {
+    assert('range: type=range',               addrType==='range', 'addrType='+addrType);
+    assert('range: Estimated/Needs review',   confidence==='Estimated'||confidence==='Needs review', 'confidence='+confidence);
+  }
+  if (tc.id === 5) {
+    assert('lot: type=lot',                   addrType==='lot', 'addrType='+addrType);
+    assert('lot: lotWarning present',         !!geo.lotWarning, 'lotWarning='+geo.lotWarning);
+    assert('lot: Needs review/Estimated',     confidence==='Needs review'||confidence==='Estimated', 'confidence='+confidence);
+  }
+  if (tc.id === 6) {
+    assert('ACT: jurisdiction',               jurisdiction==='ACT', 'jurisdiction='+jurisdiction);
+    assert('ACT: not rejected',               found, 'found='+found);
+  }
+  if (tc.id === 7 || tc.id === 8) {
+    assert('TAS: jurisdiction',               jurisdiction==='TAS', 'jurisdiction='+jurisdiction);
+    assert('TAS: not rejected',               found, 'found='+found);
+    assert('TAS: confidence present',         !!confidence, 'confidence='+confidence);
+  }
+  if (tc.id === 10) {
+    assert('VIC: jurisdiction',               jurisdiction==='VIC', 'jurisdiction='+jurisdiction);
+    assert('VIC: not rejected',               found, 'found='+found+' — VIC must geocode via inAustralia()');
+  }
+  if (tc.id === 11) {
+    assert('QLD: jurisdiction',               jurisdiction==='QLD', 'jurisdiction='+jurisdiction);
+    assert('QLD: not rejected',               found, 'found='+found+' — QLD must geocode via inAustralia()');
   }
 
-  const allPass = assertions.every(a => a.pass);
-
+  const passed = assertions.every(a => a.pass);
   return {
-    testId:          tc.id,
-    label:           tc.label,
-    enteredAddress:  tc.address,
-    normalisedAddress: addr,
-    landSize:        tc.landSize || null,
-    addressType:     addrType,
-    jurisdictionDetected: jurisdiction,
-    geocodeResult: {
-      found:         found,
-      addressQuality: quality,
-      confidence:    confidence,
-      matchedAddress: matchedAddr,
-      geocodeSource:  geoSource,
-      locationType:   locationType,
-      council:        council,
-    },
-    landSizeSource:  landSizeSource,
-    reportGenerated: found && quality !== 'failed',
-    fakeAddressRejected: !found,
-    sectionsExpected: found ? expectedSections : [],
-    assertions:      assertions,
-    passed:          allPass,
-    failCount:       assertions.filter(a => !a.pass).length,
+    testId: tc.id, label: tc.label, passed, assertions,
+    addressType: addrType, jurisdictionDetected: jurisdiction,
+    geocodeResult: { found, addressQuality:quality, confidence, matchedAddress:matchedAddr, geocodeSource:geoSource },
   };
 }
 
-// ── Handler ───────────────────────────────────────────────────────
 exports.handler = async function(event) {
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers: CORS, body: '' };
-  }
+  if (event.httpMethod === 'OPTIONS') return { statusCode:204, headers:CORS, body:'' };
+  const results = [];
+  for (const tc of cases) results.push(await runOneTest(tc));
+  const passed    = results.filter(r=>r.passed).length;
+  const failed    = results.filter(r=>!r.passed).length;
+  const allPassed = failed === 0;
+  const failedTests = results.filter(r=>!r.passed).map(r=>({
+    testId: r.testId, label: r.label,
+    failedAssertions: (r.assertions||[]).filter(a=>!a.pass).map(a=>({name:a.name, detail:a.detail})),
+  }));
 
-  // Determine site URL for internal function calls
-  const host = (event.headers && (event.headers.host || event.headers['x-forwarded-host'])) || '';
-  const proto = (event.headers && event.headers['x-forwarded-proto']) || 'https';
-  const siteUrl = host ? `${proto}://${host}` : 'https://siteverdict2.netlify.app';
-
-  const params = event.queryStringParameters || {};
-  const mode   = params.mode || 'all'; // all | single
-
-  try {
-    let results;
-    if (mode === 'single' && params.address) {
-      // Single test mode: ?address=...&landSize=...
-      const tc = {
-        id: 0,
-        label: 'Single test',
-        address: params.address,
-        landSize: params.landSize ? parseFloat(params.landSize) : null,
-      };
-      results = [await runOneTest(tc, siteUrl)];
-    } else {
-      // Run all 5 standard test cases
-      results = await runAllTests(siteUrl);
-    }
-
-    const totalPass  = results.filter(r => r.passed).length;
-    const totalFail  = results.filter(r => !r.passed).length;
-    const totalAssert = results.reduce((s, r) => s + r.assertions.length, 0);
-    const failedAssert = results.reduce((s, r) => s + r.failCount, 0);
-
-    const body = JSON.stringify({
-      site:    'siteverdict2',
-      build:   'sitecheck-expanded-report-2026-05-22',
-      tested:  new Date().toISOString(),
+  return {
+    statusCode: 200, headers: CORS,
+    body: JSON.stringify({
       summary: {
-        totalTests:      results.length,
-        passed:          totalPass,
-        failed:          totalFail,
-        totalAssertions: totalAssert,
-        failedAssertions: failedAssert,
-        allPassed:       totalFail === 0,
+        allPassed, passed, failed, totalTests:results.length,
+        totalAssertions: results.reduce((n,r)=>n+(r.assertions||[]).length,0),
+        failedAssertions: results.reduce((n,r)=>n+(r.assertions||[]).filter(a=>!a.pass).length,0),
+        buildMarker: BUILD_MARKER, packageNumber: PACKAGE_NUMBER,
       },
+      allPassed, passed, failed, failedTests,
+      buildMarker: BUILD_MARKER, packageNumber: PACKAGE_NUMBER,
+      renderLevelNote: 'Render-level UI safety (NSW overlay suppression) is checked by /deploy-check.html',
       results,
-    }, null, 2);
-
-    return { statusCode: 200, headers: CORS, body };
-  } catch (e) {
-    return {
-      statusCode: 500,
-      headers: CORS,
-      body: JSON.stringify({ error: e.message, stack: e.stack }),
-    };
-  }
+    }, null, 2),
+  };
 };

@@ -1,7 +1,21 @@
 {
   "site": "siteverdict2",
-  "build": "sitecheck-expanded-report-2026-05-22",
+  "build_name": "sitecheck-release-check-75",
+  "package_number": "75",
+  "build_time": "2026-05-26T08:51:41Z",
+  "release_note": "Render-level Site Check safety check. Robust state detection uses typed address and postcode; non-NSW must not use NSW overlay UI.",
+  "build": "sitecheck-release-check-75",
   "status": "latest",
+  "sitecheck_js_size": 203234,
+  "sitecheck_js_hash": "ba5c2c86",
+  "geocode_js_size": 15804,
+  "geocode_js_hash": "0fec46fa",
+  "index_html_size": 12966,
+  "index_html_hash": "e4119642",
+  "deploy_check_size": 18547,
+  "deploy_check_hash": "ceccca9d",
+  "sitecheck_test_size": 11506,
+  "sitecheck_test_hash": "c38fbd4c",
   "features": {
     "autoDetectRemoved": true,
     "manualLandSize": true,
@@ -13,6 +27,13 @@
     "sitePathwayCards": true,
     "developmentWorksLabel": true,
     "nationalSiteCheckLayer": true,
-    "providerRegistry": true
+    "providerRegistry": true,
+    "nationalGeocodeAU": true,
+    "nonNSWStategate": true,
+    "nonNSWOverlaySuppressed": true,
+    "noCommaAddressFixed": true,
+    "nswWordingNational": true,
+    "robustStateDetectionFromInput": true,
+    "releaseCheck75": true
   }
 }

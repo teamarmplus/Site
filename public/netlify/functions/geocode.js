@@ -331,10 +331,18 @@ function cleanAddress(s) {
 }
 
 function parseAddressParts(s) {
-  const m = s.match(/^(\d+)\s+(.+?),\s*([A-Za-z][A-Za-z\s]+?)(?:\s+NSW)?\s*(\d{4})?\s*$/i)
-    || s.match(/^(\d+)\s+(.+?)\s{1,}([A-Za-z][A-Za-z\s]+?)(?:\s+NSW)?\s*(\d{4})?\s*$/i);
-  if (!m) return null;
-  return { number: m[1], street: m[2].trim(), suburb: m[3].trim(), postcode: m[4] || '' };
+  // Road type suffix anchors street name — handles both comma and no-comma formats
+  const RT = 'Road|Street|Avenue|Drive|Place|Court|Crescent|Close|Lane|Way|Boulevard|Parade|Terrace|Highway|Circuit|Esplanade|Grove|Rise|Walk|Track';
+  // With comma: '123 Canley Vale Road, Canley Heights NSW 2166'
+  const m1 = s.match(/^(\d+)\s+(.+?),\s*([A-Za-z][A-Za-z\s]+?)(?:\s+(?:NSW|VIC|QLD|SA|WA|TAS|ACT|NT))?\s*(\d{4})?\s*$/i);
+  if (m1) return { number: m1[1], street: m1[2].trim(), suburb: m1[3].trim(), postcode: m1[4] || '' };
+  // No comma, road-type anchor: '123 Canley Vale Road Canley Heights NSW 2166'
+  const m2 = s.match(new RegExp(`^(\\d+)\\s+(.+?\\b(?:${RT}))\\s+([A-Za-z][A-Za-z\\s]+?)\\s+(?:NSW|VIC|QLD|SA|WA|TAS|ACT|NT)\\s*(\\d{4})?\\s*$`, 'i'));
+  if (m2) return { number: m2[1], street: m2[2].trim(), suburb: m2[3].trim(), postcode: m2[4] || '' };
+  // Fallback: original space-split
+  const m3 = s.match(/^(\d+)\s+(.+?)\s{1,}([A-Za-z][A-Za-z\s]+?)(?:\s+NSW)?\s*(\d{4})?\s*$/i);
+  if (!m3) return null;
+  return { number: m3[1], street: m3[2].trim(), suburb: m3[3].trim(), postcode: m3[4] || '' };
 }
 
 function extractSuburbPostcode(addr) {
