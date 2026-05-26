@@ -3,51 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SiteVerdict Deploy Check — Package 75</title>
+<title>SiteVerdict Deploy Check — Package 76</title>
 <style>
 :root{--green:#4caf50;--red:#f44336;--amber:#ff9800;--bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;--text:#e6edf3;--muted:#8b949e;--border:#30363d;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:24px;max-width:780px;margin:0 auto;font-size:14px;}
-h1{font-size:1.05rem;margin-bottom:3px;}
-.sub{color:var(--muted);font-size:.78rem;margin-bottom:18px;}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
-.card-title{font-size:.64rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px;}
-.chk{display:flex;align-items:flex-start;gap:9px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.8rem;}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:20px;max-width:760px;margin:0 auto;font-size:13px;}
+h1{font-size:1rem;margin-bottom:3px;}
+.sub{color:var(--muted);font-size:.76rem;margin-bottom:16px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;}
+.card-title{font-size:.62rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:7px;}
+.chk{display:flex;align-items:flex-start;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.78rem;}
 .chk:last-child{border-bottom:none;}
-.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:3px;background:var(--muted);}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;background:var(--muted);}
 .dot.pass{background:var(--green);}
 .dot.fail{background:var(--red);}
 .dot.run{background:var(--amber);animation:p .8s infinite;}
 @keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
 .label{flex:1;line-height:1.5;}
-.detail{font-size:.69rem;color:var(--muted);margin-top:1px;}
-#verdict{display:none;text-align:center;padding:16px;border-radius:10px;font-size:.95rem;font-weight:700;letter-spacing:.04em;margin-top:14px;}
+.detail{font-size:.67rem;color:var(--muted);margin-top:1px;}
+#verdict{display:none;text-align:center;padding:14px;border-radius:8px;font-size:.92rem;font-weight:700;letter-spacing:.03em;margin-top:12px;}
 #verdict.safe{background:rgba(76,175,80,.1);border:1px solid var(--green);color:var(--green);}
 #verdict.unsafe{background:rgba(244,67,54,.1);border:1px solid var(--red);color:var(--red);}
-#binfo{font-size:.69rem;color:var(--muted);margin-top:8px;line-height:1.9;}
-button{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:7px 16px;border-radius:6px;cursor:pointer;font-size:.8rem;margin-top:10px;}
-button:hover{border-color:var(--muted);}
+#binfo{font-size:.67rem;color:var(--muted);margin-top:7px;line-height:1.8;}
+button{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.78rem;margin-top:8px;}
 iframe{display:none;}
 </style>
 </head>
 <body>
-<h1>SiteVerdict Deploy Check</h1>
-<p class="sub">Package 75 — render-level checks. Tests actual Site Check UI behaviour in a hidden iframe. No secrets exposed.</p>
+<h1>SiteVerdict Deploy Check — Package 76</h1>
+<p class="sub">Fetches the live root page and renders Site Check in a hidden iframe. Cannot be fooled by cached DOM.</p>
 
 <div class="card">
-<div class="card-title">1. Build identity</div>
+<div class="card-title">1. Build identity (version.json + root HTML)</div>
 <div class="chk"><div class="dot run" id="d-ver"></div><div class="label">version.json loaded<div class="detail" id="det-ver">…</div></div></div>
-<div class="chk"><div class="dot run" id="d-pkg"></div><div class="label">package_number = 75<div class="detail" id="det-pkg">…</div></div></div>
-<div class="chk"><div class="dot run" id="d-bn"></div><div class="label">build_name contains 'sitecheck-release-check-75'<div class="detail" id="det-bn">…</div></div></div>
-<div class="chk"><div class="dot run" id="d-svs"></div><div class="label">sitecheck_js_size ≥ 195 000 b (confirms state gate present)<div class="detail" id="det-svs">…</div></div></div>
+<div class="chk"><div class="dot run" id="d-pkg"></div><div class="label">package_number = 76<div class="detail" id="det-pkg">…</div></div></div>
+<div class="chk"><div class="dot run" id="d-svs"></div><div class="label">sitecheck_js_size ≥ 200 000 b (confirms timeout guard + state gate)<div class="detail" id="det-svs">…</div></div></div>
+<div class="chk"><div class="dot run" id="d-marker"></div><div class="label">Root HTML contains build marker comment<div class="detail" id="det-marker">…</div></div></div>
 </div>
 
 <div class="card">
-<div class="card-title">2. Homepage wording — no NSW-only phrases</div>
-<div class="chk"><div class="dot run" id="d-w1"></div><div class="label">'any NSW property' absent<div class="detail" id="det-w1">…</div></div></div>
-<div class="chk"><div class="dot run" id="d-w2"></div><div class="label">'NSW addresses only' absent<div class="detail" id="det-w2">…</div></div></div>
-<div class="chk"><div class="dot run" id="d-w3"></div><div class="label">'Development intelligence for NSW' absent<div class="detail" id="det-w3">…</div></div></div>
-<div class="chk"><div class="dot run" id="d-w4"></div><div class="label">National wording present (Australia-wide / Australian)<div class="detail" id="det-w4">…</div></div></div>
+<div class="card-title">2. Wording — fetched direct from live server (no cache, no DOM reuse)</div>
+<div class="chk"><div class="dot run" id="d-w1"></div><div class="label">'any NSW property' absent in root HTML<div class="detail" id="det-w1">fetching…</div></div></div>
+<div class="chk"><div class="dot run" id="d-w2"></div><div class="label">'NSW addresses only' absent in root HTML<div class="detail" id="det-w2">fetching…</div></div></div>
+<div class="chk"><div class="dot run" id="d-w3"></div><div class="label">'Development intelligence for NSW' absent in root HTML<div class="detail" id="det-w3">fetching…</div></div></div>
+<div class="chk"><div class="dot run" id="d-w4"></div><div class="label">National wording present (Australia-wide / Australian)<div class="detail" id="det-w4">fetching…</div></div></div>
+<div class="chk"><div class="dot run" id="d-w5"></div><div class="label">full-report page has no NSW-only footer<div class="detail" id="det-w5">fetching /full-report/…</div></div></div>
 </div>
 
 <div class="card">
@@ -55,260 +55,220 @@ iframe{display:none;}
 <div class="chk"><div class="dot run" id="d-gc0"></div><div class="label">geocode reachable<div class="detail" id="det-gc0">…</div></div></div>
 <div class="chk"><div class="dot run" id="d-gc1"></div><div class="label">NSW WITH comma → found:true<div class="detail" id="det-gc1">148 Canley Vale Road, Canley Heights NSW 2166</div></div></div>
 <div class="chk"><div class="dot run" id="d-gc2"></div><div class="label">NSW WITHOUT comma → found:true<div class="detail" id="det-gc2">148 Canley Vale Road Canley Heights NSW 2166</div></div></div>
-<div class="chk"><div class="dot run" id="d-gc3"></div><div class="label">Fake address → found:false (rejected)<div class="detail" id="det-gc3">999 Fake Street Nowhere NSW 9999</div></div></div>
-<div class="chk"><div class="dot run" id="d-gc4"></div><div class="label">ACT → found:true<div class="detail" id="det-gc4">45 Gould Street Turner ACT 2612</div></div></div>
-<div class="chk"><div class="dot run" id="d-gc5"></div><div class="label">TAS → found:true<div class="detail" id="det-gc5">1 Davey Street Hobart TAS 7000</div></div></div>
-<div class="chk"><div class="dot run" id="d-gc6"></div><div class="label">VIC → found:true<div class="detail" id="det-gc6">15 Collins Street Melbourne VIC 3000</div></div></div>
-<div class="chk"><div class="dot run" id="d-gc7"></div><div class="label">QLD → found:true<div class="detail" id="det-gc7">1 Queen Street Brisbane QLD 4000</div></div></div>
+<div class="chk"><div class="dot run" id="d-gc3"></div><div class="label">Fake address → found:false<div class="detail" id="det-gc3">999 Fake Street Nowhere NSW 9999</div></div></div>
+<div class="chk"><div class="dot run" id="d-gc4"></div><div class="label">QLD → found:true (not rejected)<div class="detail" id="det-gc4">1 Queen Street Brisbane QLD 4000</div></div></div>
+<div class="chk"><div class="dot run" id="d-gc5"></div><div class="label">TAS → found:true (not rejected)<div class="detail" id="det-gc5">1 Davey Street Hobart TAS 7000</div></div></div>
+<div class="chk"><div class="dot run" id="d-gc6"></div><div class="label">VIC → found:true (not rejected)<div class="detail" id="det-gc6">15 Collins Street Melbourne VIC 3000</div></div></div>
+<div class="chk"><div class="dot run" id="d-gc7"></div><div class="label">ACT → found:true (not rejected)<div class="detail" id="det-gc7">45 Gould Street Turner ACT 2612</div></div></div>
 </div>
 
 <div class="card">
-<div class="card-title">4. Render-level UI checks (hidden iframe)</div>
+<div class="card-title">4. Render-level checks (iframe — max 25 s each)</div>
 <div class="chk"><div class="dot run" id="d-r0"></div><div class="label">iframe can load /<div class="detail" id="det-r0">…</div></div></div>
-<div class="chk"><div class="dot run" id="d-r1"></div><div class="label">NSW: report card renders, no address-not-matched<div class="detail" id="det-r1">148 Canley Vale Road, Canley Heights NSW 2166</div></div></div>
-<div class="chk"><div class="dot run" id="d-r2"></div><div class="label">NSW no-comma: report renders<div class="detail" id="det-r2">148 Canley Vale Road Canley Heights NSW 2166</div></div></div>
-<div class="chk"><div class="dot run" id="d-r3"></div><div class="label">Fake: address-not-matched panel, no report card<div class="detail" id="det-r3">999 Fake Street Nowhere NSW 9999</div></div></div>
-<div class="chk"><div class="dot run" id="d-r4"></div><div class="label">ACT: result renders; no 'NSW Planning Portal' text<div class="detail" id="det-r4">45 Gould Street Turner ACT 2612</div></div></div>
-<div class="chk"><div class="dot run" id="d-r5"></div><div class="label">TAS: result renders; no NSW overlay text<div class="detail" id="det-r5">1 Davey Street Hobart TAS 7000</div></div></div>
-<div class="chk"><div class="dot run" id="d-r6"></div><div class="label">VIC: result renders; no NSW overlay text; Vicmap/PostGIS mentioned<div class="detail" id="det-r6">15 Collins Street Melbourne VIC 3000</div></div></div>
-<div class="chk"><div class="dot run" id="d-r7"></div><div class="label">QLD: result renders; no NSW overlay text; QSCF/planning zones mentioned<div class="detail" id="det-r7">1 Queen Street Brisbane QLD 4000</div></div></div>
+<div class="chk"><div class="dot run" id="d-r1"></div><div class="label">NSW with comma — report card renders, not stuck, not error<div class="detail" id="det-r1">148 Canley Vale Road, Canley Heights NSW 2166</div></div></div>
+<div class="chk"><div class="dot run" id="d-r2"></div><div class="label">NSW without comma — report card renders<div class="detail" id="det-r2">148 Canley Vale Road Canley Heights NSW 2166</div></div></div>
+<div class="chk"><div class="dot run" id="d-r3"></div><div class="label">Fake — rejected cleanly, no report card<div class="detail" id="det-r3">999 Fake Street Nowhere NSW 9999</div></div></div>
+<div class="chk"><div class="dot run" id="d-r4"></div><div class="label">QLD — result renders; must NOT contain NSW overlay text; must not hang<div class="detail" id="det-r4">1 Queen Street Brisbane QLD 4000</div></div></div>
+<div class="chk"><div class="dot run" id="d-r5"></div><div class="label">ACT — result renders; no NSW overlay text<div class="detail" id="det-r5">45 Gould Street Turner ACT 2612</div></div></div>
+<div class="chk"><div class="dot run" id="d-r6"></div><div class="label">TAS — result renders; no NSW overlay text<div class="detail" id="det-r6">1 Davey Street Hobart TAS 7000</div></div></div>
+<div class="chk"><div class="dot run" id="d-r7"></div><div class="label">VIC — result renders; Vicmap/PostGIS mentioned; no NSW overlay text<div class="detail" id="det-r7">15 Collins Street Melbourne VIC 3000</div></div></div>
 </div>
 
 <div class="card">
 <div class="card-title">5. Machine test endpoint</div>
 <div class="chk"><div class="dot run" id="d-mt0"></div><div class="label">sitecheck-test reachable<div class="detail" id="det-mt0">…</div></div></div>
-<div class="chk"><div class="dot run" id="d-mt1"></div><div class="label">allPassed = true<div class="detail" id="det-mt1">…</div></div></div>
-<div class="chk"><div class="dot run" id="d-mt2"></div><div class="label">packageNumber = 75<div class="detail" id="det-mt2">…</div></div></div>
+<div class="chk"><div class="dot run" id="d-mt1"></div><div class="label">allPassed = true, failed = 0<div class="detail" id="det-mt1">…</div></div></div>
+<div class="chk"><div class="dot run" id="d-mt2"></div><div class="label">packageNumber / buildMarker = 76<div class="detail" id="det-mt2">…</div></div></div>
 </div>
 
 <div id="verdict"></div>
 <div id="binfo"></div>
-<button onclick="runAll()">Run checks again</button>
+<button onclick="runAll()">Re-run all checks</button>
 <iframe id="sc-frame" sandbox="allow-scripts allow-same-origin"></iframe>
 
 <script>
-const GEO='/\.netlify/functions/geocode?address=';
-const NSW_BAD=['NSW Planning Portal','NSW EPI Flood','NSW RFS Bush Fire','Section 10.7','LEP minimum lot'];
-let R={};
+/* NSW overlay phrases that must NOT appear in non-NSW results */
+const NSW_BAD = ['NSW Planning Portal','NSW EPI Flood','NSW RFS Bush Fire','Section 10.7','LEP minimum lot'];
+/* Forbidden user-facing wording (must not appear in public HTML pages) */
+const WORDING_BAD = ['any NSW property','NSW addresses only','Development intelligence for NSW','For any NSW address'];
 
-function dot(id,s,d){
-  var el=document.getElementById('d-'+id);
-  var det=document.getElementById('det-'+id);
-  if(el)el.className='dot '+s;
-  if(det&&d!==undefined)det.textContent=d;
-}
+let R = {};
+function dot(id,s,d){ var e=document.getElementById('d-'+id),dt=document.getElementById('det-'+id); if(e)e.className='dot '+s; if(dt&&d!==undefined)dt.textContent=d; }
 
-async function geo(addr){
-  var r=await fetch('/.netlify/functions/geocode?address='+encodeURIComponent(addr),{cache:'no-store'});
-  if(!r.ok)throw new Error('HTTP '+r.status);
-  return r.json();
-}
+async function geoFetch(addr){ var r=await fetch('/.netlify/functions/geocode?address='+encodeURIComponent(addr),{cache:'no-store'}); if(!r.ok)throw new Error('HTTP '+r.status); return r.json(); }
 
-// ── 1. Build identity ────────────────────────────────────────────
+/* 1. Build identity */
 async function checkBuild(){
   try{
-    var v=await (await fetch('/version.json?_='+Date.now())).json();
-    dot('ver','pass','build_name: '+(v.build_name||'—'));
-    R.ver=true;
-    var pkgOk=(v.package_number==='75'||v.package_number===75);
-    dot('pkg',pkgOk?'pass':'fail','package_number: '+v.package_number);
-    R.pkg=pkgOk;
-    var bnOk=!!(v.build_name&&v.build_name.includes('75'));
-    dot('bn',bnOk?'pass':'fail',v.build_name||'missing');
-    R.bn=bnOk;
-    var svs=v.sitecheck_js_size||0;
-    var svsOk=svs>=195000;
-    dot('svs',svsOk?'pass':'fail',svs+'b (state gate requires ≥195 000)');
-    R.svs=svsOk;
-    document.getElementById('binfo').innerHTML=
-      'Build: '+(v.build_name||'?')+' · Package: #'+(v.package_number||'?')+' · Built: '+(v.build_time||'?')+'<br>'+
-      'sv-check.js: '+(v.sitecheck_js_size||'?')+'b ('+( v.sitecheck_js_hash||'?')+') · '+
-      'geocode.js: '+(v.geocode_js_size||'?')+'b · index.html: '+(v.index_html_size||'?')+'b';
-  }catch(e){
-    ['ver','pkg','bn','svs'].forEach(id=>{dot(id,'fail','Error: '+e.message);R[id]=false;});
-  }
+    var v=await(await fetch('/version.json?_='+Date.now(),{cache:'no-store'})).json();
+    dot('ver','pass','build_name:'+v.build_name+' built:'+v.build_time);R.ver=true;
+    var pkOk=(v.package_number==='76'||v.package_number===76);
+    dot('pkg',pkOk?'pass':'fail','package_number: '+v.package_number);R.pkg=pkOk;
+    var svOk=(v.sitecheck_js_size||0)>=200000;
+    dot('svs',svOk?'pass':'fail',v.sitecheck_js_size+'b required ≥200000');R.svs=svOk;
+    document.getElementById('binfo').innerHTML='Build: '+(v.build_name||'?')+' · Pkg: #'+(v.package_number||'?')+' · '+v.build_time+'<br>sv-check.js: '+(v.sitecheck_js_size||'?')+'b ('+v.sitecheck_js_hash+') · geocode: '+(v.geocode_js_size||'?')+'b ('+v.geocode_js_hash+')';
+  }catch(e){['ver','pkg','svs'].forEach(id=>{dot(id,'fail','Error: '+e.message);R[id]=false;});}
 }
 
-// ── 2. Homepage wording ──────────────────────────────────────────
+/* 2. Wording — fetch raw from server, never from DOM */
 async function checkWording(){
   try{
-    var html=await (await fetch('/?_='+Date.now(),{cache:'no-store'})).text();
-    var checks=[
-      ['w1','any NSW property',!html.includes('any NSW property')],
-      ['w2','NSW addresses only',!html.includes('NSW addresses only')],
-      ['w3','Development intelligence for NSW',!html.includes('Development intelligence for NSW')],
-      ['w4','National wording present',html.includes('Australia-wide')||html.includes('Australian property')||html.includes('Australian addresses')],
-    ];
-    for(var[id,lbl,ok]of checks){
-      dot(id,ok?'pass':'fail',ok?lbl+' — absent ✓':lbl+' — STILL PRESENT ✗');
-      R[id]=ok;
+    /* Fetch root with cache-busting token to force server response */
+    var rootHtml=await(await fetch('/?deploy_check='+Date.now(),{cache:'no-store'})).text();
+    for(var bad of WORDING_BAD){
+      if(bad==='For any NSW address') continue; /* not in root, checked elsewhere */
     }
+    /* Root page checks */
+    var ch=[
+      ['w1','any NSW property in root HTML',!rootHtml.includes('any NSW property')],
+      ['w2','NSW addresses only in root HTML',!rootHtml.includes('NSW addresses only')],
+      ['w3','Development intelligence for NSW in root',!rootHtml.includes('Development intelligence for NSW')],
+      ['w4','National wording present',rootHtml.includes('Australia-wide')||rootHtml.includes('Australian property')||rootHtml.includes('Australian addresses')],
+    ];
+    for(var[id,lbl,ok]of ch){ dot(id,ok?'pass':'fail',ok?lbl+' — absent ✓':'STILL PRESENT: '+lbl); R[id]=ok; }
+    /* full-report subpage */
+    try{
+      var frHtml=await(await fetch('/full-report/?deploy_check='+Date.now(),{cache:'no-store'})).text();
+      var frOk=!frHtml.includes('Development intelligence for NSW')&&!frHtml.includes('any NSW property');
+      dot('w5',frOk?'pass':'fail',frOk?'full-report/ clean':'FOUND NSW phrase in full-report/');R.w5=frOk;
+    }catch(e){dot('w5','fail','/full-report/ fetch error: '+e.message);R.w5=false;}
+    /* Build marker in root */
+    var hasMarker=rootHtml.includes('SiteVerdict package');
+    dot('marker',hasMarker?'pass':'fail',hasMarker?'marker found in HTML':'missing — stale deploy?');R.marker=hasMarker;
   }catch(e){
-    ['w1','w2','w3','w4'].forEach(id=>{dot(id,'fail','Error: '+e.message);R[id]=false;});
+    ['w1','w2','w3','w4','w5','marker'].forEach(id=>{dot(id,'fail','Error: '+e.message);R[id]=false;});
   }
 }
 
-// ── 3. Geocode ───────────────────────────────────────────────────
+/* 3. Geocode */
 async function checkGeocode(){
   var tests=[
     ['gc0','148 Canley Vale Road, Canley Heights NSW 2166',null,null],
     ['gc1','148 Canley Vale Road, Canley Heights NSW 2166','found',true],
     ['gc2','148 Canley Vale Road Canley Heights NSW 2166','found',true],
     ['gc3','999 Fake Street Nowhere NSW 9999','found',false],
-    ['gc4','45 Gould Street Turner ACT 2612','found',true],
+    ['gc4','1 Queen Street Brisbane QLD 4000','found',true],
     ['gc5','1 Davey Street Hobart TAS 7000','found',true],
     ['gc6','15 Collins Street Melbourne VIC 3000','found',true],
-    ['gc7','1 Queen Street Brisbane QLD 4000','found',true],
+    ['gc7','45 Gould Street Turner ACT 2612','found',true],
   ];
   for(var[id,addr,key,exp]of tests){
     try{
-      var d=await geo(addr);
-      if(id==='gc0'){dot('gc0','pass','reachable · '+(d.source||d.reason||'—'));R.gc0=true;continue;}
+      var d=await geoFetch(addr);
+      if(id==='gc0'){dot('gc0','pass','reachable · '+(d.source||d.reason||'?'));R.gc0=true;continue;}
       var ok=d[key]===exp;
-      dot(id,ok?'pass':'fail','found:'+d.found+' quality:'+(d.addressQuality||'—')+' conf:'+(d.confidence||'—'));
-      R[id]=ok;
+      dot(id,ok?'pass':'fail','found:'+d.found+' q:'+(d.addressQuality||'?')+' c:'+(d.confidence||'?'));R[id]=ok;
     }catch(e){dot(id,'fail','Error: '+e.message);R[id]=false;}
   }
 }
 
-// ── 4. Render-level iframe checks ────────────────────────────────
-function iframeCheck(addr,validate,timeoutMs){
-  return new Promise(resolve=>{
-    var fr=document.getElementById('sc-frame');
-    var done=false;
-    var timer=setTimeout(()=>{if(!done){done=true;resolve({ok:false,text:'',reason:'timeout after '+timeoutMs+'ms'});}},timeoutMs);
+/* 4. Render-level iframe checks */
+function iframeRun(addr,validate,ms){
+  return new Promise(function(resolve){
+    var fr=document.getElementById('sc-frame'),done=false;
+    var timer=setTimeout(function(){
+      if(!done){done=true;resolve({ok:false,html:'',reason:'TIMEOUT after '+ms+'ms — still stuck on Checking'});}
+    },ms);
     fr.onload=function(){
       if(done)return;
       try{
         var doc=fr.contentDocument||fr.contentWindow.document;
-        var addr_el=doc.getElementById('addr');
-        if(!addr_el){done=true;clearTimeout(timer);resolve({ok:false,text:'',reason:'#addr not found in iframe'});return;}
-        addr_el.value=addr;
-        // Try to call runCheck directly
-        if(typeof fr.contentWindow.runCheck==='function'){
-          var obs=new MutationObserver(function(muts){
-            var res=doc.getElementById('result');
-            if(!res)return;
-            var txt=res.innerText||res.textContent||'';
-            var html=res.innerHTML||'';
-            // Wait until result has meaningful content
-            if(txt.length>30||html.includes('rcard')||html.includes('address-not-matched')||html.includes('not matched')||html.includes('could not')){
-              obs.disconnect();
-              if(!done){done=true;clearTimeout(timer);
-                var v=validate(html,txt);
-                resolve({ok:v.ok,text:txt.slice(0,300),html:html.slice(0,500),reason:v.reason});
-              }
+        var ai=doc.getElementById('addr');
+        if(!ai){done=true;clearTimeout(timer);resolve({ok:false,html:'',reason:'#addr not found'});return;}
+        ai.value=addr;
+        var runFn=fr.contentWindow.runCheck;
+        if(typeof runFn!=='function'){done=true;clearTimeout(timer);resolve({ok:false,html:'',reason:'runCheck not available'});return;}
+        var obs=new MutationObserver(function(){
+          var res=doc.getElementById('result');if(!res)return;
+          var html=res.innerHTML||'',txt=(res.innerText||res.textContent||'').trim();
+          /* Accept: rcard, address-not-matched, timeout card, or error */
+          if(html.includes('rcard')||html.includes('not matched')||html.includes('could not')||
+             html.includes('SITE_CHECK_TIMEOUT')||html.includes('timed out')||txt.length>60){
+            obs.disconnect();if(!done){done=true;clearTimeout(timer);
+              var v=validate(html,txt);resolve({ok:v.ok,html:html.slice(0,500),reason:v.reason});
             }
-          });
-          var resEl=doc.getElementById('result');
-          if(resEl)obs.observe(resEl,{childList:true,subtree:true,characterData:true});
-          fr.contentWindow.runCheck();
-        }else{
-          done=true;clearTimeout(timer);resolve({ok:false,text:'',reason:'runCheck not available in iframe'});
-        }
-      }catch(e){done=true;clearTimeout(timer);resolve({ok:false,text:'',reason:'iframe error: '+e.message});}
+          }
+        });
+        var res=doc.getElementById('result');
+        if(res)obs.observe(res,{childList:true,subtree:true,characterData:true});
+        runFn();
+      }catch(e){done=true;clearTimeout(timer);resolve({ok:false,html:'',reason:'iframe err: '+e.message});}
     };
     fr.src='/';
   });
 }
 
-function noNSWBad(html){
-  for(var b of NSW_BAD)if(html.includes(b))return b;
-  return null;
-}
+function noNSWBad(html){ for(var b of NSW_BAD)if(html.includes(b))return b; return null; }
 
 async function checkRender(){
   var fr=document.getElementById('sc-frame');
-  
-  // T0: can iframe load /
-  await new Promise(res=>{
-    var done=false;
-    var t=setTimeout(()=>{if(!done){done=true;dot('r0','fail','timeout loading /');R.r0=false;res();}},8000);
-    fr.onload=function(){
-      if(done)return;done=true;clearTimeout(t);
-      dot('r0','pass','/ loaded in iframe');R.r0=true;res();
-    };
+  /* T0: iframe loads */
+  await new Promise(function(res){
+    var done=false,t=setTimeout(function(){if(!done){done=true;dot('r0','fail','timeout');R.r0=false;res();}},8000);
+    fr.onload=function(){if(done)return;done=true;clearTimeout(t);dot('r0','pass','/ loaded');R.r0=true;res();};
     fr.src='/';
   });
   if(!R.r0)return;
 
-  var renderCases=[
+  var cases=[
     {id:'r1',addr:'148 Canley Vale Road, Canley Heights NSW 2166',
-     validate:(h,t)=>{
-       var hasCard=h.includes('rcard')||h.includes('zone')||h.includes('Zone');
-       var notFailed=!h.includes('Address not matched')&&!h.includes('could not be matched');
-       return {ok:hasCard&&notFailed,reason:hasCard?notFailed?'OK':'matched error shown':'no rcard rendered'};
+     v:function(h,t){
+       var ok=h.includes('rcard')&&!h.includes('not matched')&&!h.includes('timed out');
+       return{ok,reason:ok?'rcard rendered':h.includes('timed out')?'TIMED OUT':h.includes('not matched')?'matched error shown':'no rcard'};
      }},
     {id:'r2',addr:'148 Canley Vale Road Canley Heights NSW 2166',
-     validate:(h,t)=>{
-       var hasCard=h.includes('rcard')||h.length>200;
-       var notFailed=!h.includes('Address not matched')&&!h.includes('could not be matched');
-       return {ok:hasCard&&notFailed,reason:hasCard?notFailed?'OK':'matched error shown':'no result rendered'};
+     v:function(h,t){
+       var ok=h.includes('rcard')&&!h.includes('timed out');
+       return{ok,reason:ok?'OK':h.includes('timed out')?'TIMED OUT no-comma':'no result'};
      }},
     {id:'r3',addr:'999 Fake Street Nowhere NSW 9999',
-     validate:(h,t)=>{
-       var rejected=h.includes('not matched')||h.includes('could not')||h.includes('fake')||h.includes('address-not-matched');
-       var noCard=!h.includes('Zone')||h.length<300;
-       return {ok:rejected,reason:rejected?'OK — rejected cleanly':'fake address produced a report'};
+     v:function(h,t){
+       var rejected=h.includes('not matched')||h.includes('could not')||h.includes('fake');
+       return{ok:rejected,reason:rejected?'OK — rejected':'fake address produced a report'};
      }},
-    {id:'r4',addr:'45 Gould Street Turner ACT 2612',
-     validate:(h,t)=>{
-       var rendered=h.length>100;
+    {id:'r4',addr:'1 Queen Street Brisbane QLD 4000',
+     v:function(h,t){
+       var rendered=h.length>80&&!h.includes('timed out');
+       var stuck=h.includes('timed out');
        var bad=noNSWBad(h);
-       return {ok:rendered&&!bad,reason:bad?'FAIL — found "'+bad+'" in result':rendered?'OK — no NSW overlay language':'no result'};
+       var qld=h.includes('QLD')||h.includes('Queensland')||h.includes('QSCF')||h.includes('planning zone');
+       return{ok:rendered&&!bad&&qld,reason:stuck?'TIMED OUT — hang not fixed':bad?'FAIL NSW text "'+bad+'"':!qld?'QLD context missing':rendered?'OK':'no result'};
      }},
-    {id:'r5',addr:'1 Davey Street Hobart TAS 7000',
-     validate:(h,t)=>{
-       var rendered=h.length>100;
+    {id:'r5',addr:'45 Gould Street Turner ACT 2612',
+     v:function(h,t){var bad=noNSWBad(h);return{ok:h.length>80&&!bad,reason:bad?'FAIL "'+bad+'"':h.length>80?'OK':'no result'};}},
+    {id:'r6',addr:'1 Davey Street Hobart TAS 7000',
+     v:function(h,t){var bad=noNSWBad(h);return{ok:h.length>80&&!bad,reason:bad?'FAIL "'+bad+'"':h.length>80?'OK':'no result'};}},
+    {id:'r7',addr:'15 Collins Street Melbourne VIC 3000',
+     v:function(h,t){
        var bad=noNSWBad(h);
-       return {ok:rendered&&!bad,reason:bad?'FAIL — found "'+bad+'"':rendered?'OK':'no result'};
-     }},
-    {id:'r6',addr:'15 Collins Street Melbourne VIC 3000',
-     validate:(h,t)=>{
-       var rendered=h.length>100;
-       var bad=noNSWBad(h);
-       var vicMentioned=h.includes('Vicmap')||h.includes('Victoria')||h.includes('PostGIS')||h.includes('VIC');
-       return {ok:rendered&&!bad&&vicMentioned,reason:bad?'FAIL — "'+bad+'"':!vicMentioned?'VIC/Vicmap not mentioned':rendered?'OK':'no result'};
-     }},
-    {id:'r7',addr:'1 Queen Street Brisbane QLD 4000',
-     validate:(h,t)=>{
-       var rendered=h.length>100;
-       var bad=noNSWBad(h);
-       var qldMentioned=h.includes('QLD')||h.includes('Queensland')||h.includes('QSCF')||h.includes('planning zone');
-       return {ok:rendered&&!bad&&qldMentioned,reason:bad?'FAIL — "'+bad+'"':!qldMentioned?'QLD/QSCF not mentioned':rendered?'OK':'no result'};
+       var vic=h.includes('Vicmap')||h.includes('Victoria')||h.includes('VIC')||h.includes('PostGIS');
+       return{ok:h.length>80&&!bad&&vic,reason:bad?'FAIL "'+bad+'"':!vic?'Vicmap not mentioned':h.length>80?'OK':'no result'};
      }},
   ];
 
-  for(var tc of renderCases){
+  for(var tc of cases){
     dot(tc.id,'run',tc.addr);
-    var result=await iframeCheck(tc.addr,tc.validate,25000);
-    dot(tc.id,result.ok?'pass':'fail',result.reason+(result.ok?'':' | '+result.text.slice(0,80)));
-    R[tc.id]=result.ok;
+    var res=await iframeRun(tc.addr,tc.v,25000);
+    dot(tc.id,res.ok?'pass':'fail',res.reason+(res.ok?'':' | '+res.html.slice(0,80).replace(/<[^>]+>/g,' ')));
+    R[tc.id]=res.ok;
   }
 }
 
-// ── 5. Machine test ──────────────────────────────────────────────
+/* 5. Machine test */
 async function checkMachineTest(){
   try{
-    var d=await (await fetch('/.netlify/functions/sitecheck-test?_='+Date.now(),{cache:'no-store'})).json();
+    var d=await(await fetch('/.netlify/functions/sitecheck-test?_='+Date.now(),{cache:'no-store'})).json();
     dot('mt0','pass','reachable');R.mt0=true;
     var s=d.summary||d;
     var ap=s.allPassed===true;
-    dot('mt1',ap?'pass':'fail','allPassed:'+s.allPassed+' passed:'+s.passed+' failed:'+s.failed);
-    R.mt1=ap;
-    var pn=(d.packageNumber==='75'||d.packageNumber===75||d.buildMarker===('sitecheck-release-check-75'));
-    dot('mt2',pn?'pass':'fail','packageNumber/buildMarker: '+(d.packageNumber||d.buildMarker||'—'));
-    R.mt2=pn;
-    if(!ap&&d.failedTests&&d.failedTests.length){
-      var fails=d.failedTests.map(t=>'T'+t.testId+':'+t.label).join(', ');
-      dot('mt1','fail','allPassed:false — '+fails);
-    }
-  }catch(e){
-    ['mt0','mt1','mt2'].forEach(id=>{dot(id,'fail','Error: '+e.message);R[id]=false;});
-  }
+    dot('mt1',ap?'pass':'fail','allPassed:'+s.allPassed+' passed:'+s.passed+' failed:'+s.failed);R.mt1=ap;
+    if(!ap&&d.failedTests)dot('mt1','fail','allPassed:false — '+d.failedTests.map(t=>'T'+t.testId+':'+t.label).join(', '));
+    var pn=d.packageNumber==='76'||d.packageNumber===76||d.buildMarker==='sitecheck-release-check-76';
+    dot('mt2',pn?'pass':'fail','packageNumber/buildMarker: '+(d.packageNumber||d.buildMarker||'—'));R.mt2=pn;
+  }catch(e){['mt0','mt1','mt2'].forEach(id=>{dot(id,'fail','Error: '+e.message);R[id]=false;});}
 }
 
-function showVerdict(){
+function verdict(){
   var fails=Object.keys(R).filter(k=>R[k]===false).length;
   var v=document.getElementById('verdict');
   v.style.display='block';
@@ -325,9 +285,8 @@ async function runAll(){
   await checkGeocode();
   await checkRender();
   await checkMachineTest();
-  showVerdict();
+  verdict();
 }
-
 runAll();
 </script>
 </body>

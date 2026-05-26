@@ -16,7 +16,7 @@
  *  9  Homepage wording        → NSW-only phrases absent, national wording present
  * 10  VIC address             → found:true (not rejected)
  * 11  QLD address             → found:true (not rejected)
- * 12  Package number check    → package_number = 75
+ * 12  Package number check    → package_number = 76
  */
 
 'use strict';
@@ -27,8 +27,8 @@ const CORS = {
   'Content-Type':                 'application/json',
 };
 
-const BUILD_MARKER   = 'sitecheck-release-check-75';
-const PACKAGE_NUMBER = '75';
+const BUILD_MARKER   = 'sitecheck-release-check-76';
+const PACKAGE_NUMBER = '76';
 
 function isLotAddr(s)   { return /^(lot|proposed\s+lot)\s+\d+/i.test((s||'').trim()); }
 function isRangeAddr(s) { return /^\d+\s*-\s*\d+\s+/i.test((s||'').trim()); }
@@ -127,10 +127,10 @@ async function runOneTest(tc) {
     try { vj = await fetchVersionJson(); }
     catch(e) { assert('version.json fetchable', false, e.message); }
     if (vj) {
-      const pkgOk = (vj.package_number === '75' || vj.package_number === 75);
-      assert('package_number = 75', pkgOk, 'package_number: ' + vj.package_number);
-      const bnOk = !!(vj.build_name && vj.build_name.includes('75'));
-      assert('build_name contains 75', bnOk, vj.build_name || 'missing');
+      const pkgOk = (vj.package_number === '76' || vj.package_number === 76);
+      assert('package_number = 76', pkgOk, 'package_number: ' + vj.package_number);
+      const bnOk = !!(vj.build_name && vj.build_name.includes('76'));
+      assert('build_name contains 76', bnOk, vj.build_name || 'missing');
       const svsOk = (vj.sitecheck_js_size || 0) >= 195000;
       assert('sitecheck_js_size ≥ 195000 (state gate confirms)', svsOk, (vj.sitecheck_js_size||0) + 'b');
     }
