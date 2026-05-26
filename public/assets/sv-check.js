@@ -870,7 +870,7 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
   if(heritage)    red_flags.push('Heritage overlay');
   if(flood)       red_flags.push('Flood planning area');
   if(bushfire)    red_flags.push('Bushfire prone land');
-  if(!zone)       red_flags.push('Zone not detected');
+  if(!zone){var _addrForState=(_geoResult&&_geoResult.matchedAddr||'').toUpperCase();var _isNSWAddr=/\bNSW\b/.test(_addrForState)||(/\b(1[0-9]{3}|2[0-9]{3})\b/.test(_addrForState)&&!/\b(ACT|VIC|QLD|SA|WA|TAS|NT)\b/.test(_addrForState));if(_isNSWAddr||!_addrForState)red_flags.push('Zone not detected');};
   if(zone==='E2'||zone==='RE1'||zone==='RU1') red_flags.push('Non-residential or environmental zone');
 
   var strongZone    = zone&&(['R3','R4','MU1','B1','B2','B4'].indexOf(zone)>-1);
@@ -1190,7 +1190,7 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
         +'<span style="font-size:.57rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted2)">Address:</span> '
         +'<span style="font-weight:600;color:'+(geoConf==='Verified'?'var(--green)':geoConf==='Estimated'?'var(--amber)':'var(--amber)')+'">'+(geoConf||'Needs review')+'</span>'
         +' &middot; <span style="font-size:.57rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted2)">Zone:</span> '
-        +'<span style="color:'+(zone?'var(--green)':'var(--red)')+'">'+(zone||'Not detected')+'</span>'
+        +'<span style="color:'+(zone?'var(--green)':(_addrForState&&!/\bNSW\b/.test(_addrForState)&&/\b(VIC|QLD|TAS|ACT|SA|WA|NT)\b/.test(_addrForState))?'var(--amber)':'var(--red)')+'">'+(zone||((_addrForState&&!/\bNSW\b/.test(_addrForState)&&/\b(VIC|QLD|TAS|ACT|SA|WA|NT)\b/.test(_addrForState))?'Not connected \u00b7 NSW deep check only':'Not detected'))+'</span>'
         +' &middot; <span style="font-size:.57rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted2)">Parcel:</span> '
         +'<span style="color:'+(blockSource==='auto-detected'?'var(--green)':'var(--amber)')+'">'+(blockSource==='auto-detected'?'Verified':'Needs review')+'</span>'
         +'</div>'

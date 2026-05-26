@@ -29,9 +29,15 @@ exports.handler = async function(event) {
 
   // NSW bounding box
   const NSW_BBOX = { latMin: -37.6, latMax: -28.5, lonMin: 140.9, lonMax: 153.7 };
+  // Australia bounding box — used for national geocoding
+  const AUS_BBOX = { latMin: -44.0, latMax: -10.0, lonMin: 113.0, lonMax: 154.0 };
   function inNSW(lat, lon) {
     return lat >= NSW_BBOX.latMin && lat <= NSW_BBOX.latMax
         && lon >= NSW_BBOX.lonMin && lon <= NSW_BBOX.lonMax;
+  }
+  function inAustralia(lat, lon) {
+    return lat >= AUS_BBOX.latMin && lat <= AUS_BBOX.latMax
+        && lon >= AUS_BBOX.lonMin && lon <= AUS_BBOX.lonMax;
   }
 
   // ── Address type detection ──────────────────────────────────
@@ -45,8 +51,8 @@ exports.handler = async function(event) {
   if (googleKey) {
     try {
       const gUrl = 'https://maps.googleapis.com/maps/api/geocode/json'
-        + '?address=' + encodeURIComponent(addr + ' NSW Australia')
-        + '&components=country:AU|administrative_area:NSW'
+        + '?address=' + encodeURIComponent(addr + ' Australia')
+        + '&components=country:AU'
         + '&key=' + googleKey;
       const gRes  = await fetch(gUrl);
       const gData = await gRes.json();
@@ -56,7 +62,7 @@ exports.handler = async function(event) {
         const lType = hit.geometry.location_type || '';
         const isPartial = !!(hit.partial_match);
 
-        if (inNSW(loc.lat, loc.lng)) {
+        if (inAustralia(loc.lat, loc.lng)) {
           // ── Google validation gate ──────────────────────────
           // Reject suburb/route-only matches for normal street addresses
           const addressTypes = hit.types || [];
@@ -181,7 +187,7 @@ exports.handler = async function(event) {
 
   // Lot address: suburb-only geocode, clearly marked as Needs review
   if (_isLotAddr) {
-    const lotSuburb = suburb ? suburb + ' NSW Australia' : null;
+    const lotSuburb = suburb ? suburb + ' Australia' : null;
     if (lotSuburb) {
       try {
         const lotUrl = nom + '&q=' + enc(lotSuburb);
@@ -190,7 +196,7 @@ exports.handler = async function(event) {
         if (lotHits && lotHits.length) {
           const h = lotHits[0];
           const lat = parseFloat(h.lat), lon = parseFloat(h.lon);
-          if (inNSW(lat, lon)) {
+          if (inAustralia(lat, lon)) {
             return {
               statusCode: 200, headers: CORS,
               body: JSON.stringify({
@@ -224,9 +230,9 @@ exports.handler = async function(event) {
           + '&country=AU',
         label: 'Structured', conf: 'Estimated' },
       // 2. Cleaned full address + NSW
-      { url: nom + '&q=' + enc(cleaned + ' NSW Australia'), label: 'Cleaned+NSW', conf: 'Estimated' },
+      { url: nom + '&q=' + enc(cleaned + ' Australia'), label: 'Cleaned+AU', conf: 'Estimated' },
       // 3. Range: first number + street + suburb
-      _isRangeAddr ? { url: nom + '&q=' + enc(addr.replace(/^(\d+)-\d+\s/, '$1 ') + ' NSW Australia'), label: 'Range first', conf: 'Estimated' } : null,
+      _isRangeAddr ? { url: nom + '&q=' + enc(addr.replace(/^(\d+)-\d+\s/, '$1 ') + ' Australia'), label: 'Range first', conf: 'Estimated' } : null,
     ].filter(Boolean);
 
     for (const s of nomStrategies) {
@@ -237,7 +243,7 @@ exports.handler = async function(event) {
           for (const hit of hits) {
             const lat = parseFloat(hit.lat);
             const lon = parseFloat(hit.lon);
-            if (!inNSW(lat, lon)) continue;
+            if (!inAustralia(lat, lon)) continue;
 
             // Validation: display_name must contain the street name from input
             const dispLower = (hit.display_name || '').toLowerCase();
