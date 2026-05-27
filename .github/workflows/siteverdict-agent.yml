@@ -34,43 +34,28 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           show_full_output: true
           prompt: |
-            You are SiteVerdict Autonomous Operating Agent.
+            You are SiteVerdict Claude Agent.
 
-            This is a safe first-run agent.
+            This is a diagnostic run only.
 
-            Do only ONE small task.
+            Do not edit files.
+            Do not create commits.
+            Do not create PRs.
+            Do not deploy.
+            Do not run extra tests.
 
-            Read:
-            - CLAUDE.md
+            Read only:
             - RELEASE_STATUS.md
             - AGENT_QUEUE.md
             - FOUNDER_ACTIONS.md
-            - docs/NATIONAL_DATA_ROADMAP.md
 
-            Choose the first unblocked P1 or P2 task.
+            Output only:
+            1. Current release status
+            2. First unblocked task you would choose next
+            3. Any founder action needed
+            4. Final line: DIAGNOSTIC COMPLETE
 
-            Rules:
-            - Do not deploy production.
-            - Do not push directly to main.
-            - Do not create a GitHub-ready zip.
-            - Do not expose secrets.
-            - Do not change business model.
-            - Do not add raw data to public/.
-            - Do not make large code changes.
-            - Keep changes under 3 files.
-            - If blocked, update FOUNDER_ACTIONS.md and stop.
-            - If no safe task exists, update DAILY_LOG.md and stop.
-
-            Required:
-            1. Run npm run release-check before changes.
-            2. Make one tiny safe improvement only.
-            3. Run npm run release-check after changes.
-            4. If tests fail, revert your own change and write NOT_READY_REPORT.md.
-            5. End with one of:
-               - READY PR CREATED
-               - BLOCKED BUT CONTINUED
-               - NOT READY
-
-            This is a safety test. Small success is better than big risky work.
+            Keep response short.
           claude_args: |
-            --max-turns 10
+            --max-turns 15
+            
