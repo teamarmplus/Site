@@ -17,6 +17,48 @@ SiteVerdict must be:
 - Professionally caveated — not a planning certificate, not legal/financial advice
 - Never misleading — especially about state data availability
 
+## Paid Agent Run Rule
+
+Every paid Claude Agent run must complete one small, specific, testable task tied to a real current SiteVerdict problem.
+
+A valid task must include:
+- the exact problem
+- why it matters
+- allowed files
+- acceptance test
+- done condition
+- rollback/blocker rule
+
+The agent must not spend a run only analysing, rewriting strategy, or expanding the queue unless AGENT_QUEUE.md or RELEASE_STATUS.md is missing/broken.
+
+Each run must end with exactly one of:
+- SMALL FIX COMPLETE
+- TESTED DOC/POLICY UPDATE COMPLETE
+- BLOCKED BUT CONTINUED
+- NOT READY
+
+The agent must prefer real immediate problems:
+1. release-check failure
+2. deploy-check failure
+3. Site Check hang
+4. non-NSW wrong NSW wording
+5. fake address not handled clearly
+6. provider/state status unclear
+7. protected public route exposure
+8. package/version mismatch
+9. user-facing wording that overclaims
+10. missing professional verification warning
+
+Each task should normally touch no more than 1–3 files.
+
+Every code change must run the relevant test and update DAILY_LOG.md with:
+- task picked
+- files changed
+- test run
+- result
+- blocker if any
+- next task recommendation
+
 ---
 
 ## Hard rules — never violate
