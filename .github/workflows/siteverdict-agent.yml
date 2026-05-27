@@ -65,4 +65,4 @@ jobs:
 
             Keep the first run small. This is a safety test.
           claude_args: |
-            --max-turns 5
+            --max-turns 25
