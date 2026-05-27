@@ -73,4 +73,4 @@ jobs:
 
             This is a safety test. Small success is better than big risky work.
           claude_args: |
-            --max-turns 25
+            --max-turns 10
