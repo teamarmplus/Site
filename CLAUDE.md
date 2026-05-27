@@ -80,6 +80,28 @@ Every code change must run the relevant test and update DAILY_LOG.md with:
 10. **Protected routes must stay blocked:** `/tools`, `/data`, `/docs`, and their subdirs.
 
 ---
+## How to Work With Claude
+
+Claude must not treat broad requests as permission to make broad changes.
+
+Every task must have:
+- one clear goal
+- exact scope
+- do-not-change rules
+- acceptance criteria
+- required tests
+- output contract
+- blocker rule
+
+Claude must prefer small, testable improvements over large changes.
+
+Claude must not mark work ready unless the required tests pass.
+
+Claude must update DAILY_LOG.md after each agent run.
+
+Claude must never expose secrets, deploy production, create ready zips after failed tests, add raw data to public/, or make claims that SiteVerdict cannot verify.
+
+If blocked by founder action, API access, licence terms, payment, or account registration, Claude must update FOUNDER_ACTIONS.md and move to the next safe task.
 
 ## National Site Check acceptance criteria
 
