@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!-- SiteVerdict render test page — for deploy-check.html iframe use only.
+     This page is intentionally minimal. X-Frame-Options is SAMEORIGIN (not DENY)
+     so deploy-check.html (same origin) can load it in an iframe.
+     It loads the real sv-check.js and the real CSS to test actual UI behaviour.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<title>SiteVerdict render test</title>
+<link rel="stylesheet" href="/assets/sv-tokens.css">
+<link rel="stylesheet" href="/assets/sv-base.css">
+<link rel="stylesheet" href="/assets/sv-components.css">
+<link rel="stylesheet" href="/assets/sv-layout.css">
+<style>
+  body { padding: 12px; background: var(--bg, #0d1117); }
+  #test-status { font-family: monospace; font-size: 11px;
+    color: #8b949e; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div id="test-status">render-test-ready</div>
+<div class="form-card" style="max-width:500px">
+  <input class="fi" id="addr" type="text" autocomplete="off"
+         onkeydown="if(event.key==='Enter')runCheck()">
+  <input class="fi" id="block" type="number" style="margin-top:6px">
+  <input class="fi" id="front" type="number" style="margin-top:6px;display:none"
+         value="15">
+  <button class="run-btn" id="run-btn" onclick="runCheck()"
+          style="margin-top:8px">Check &#8594;</button>
+</div>
+<div class="st-bar"><div id="status"></div></div>
+<div class="result-wrap">
+  <div id="result-skeleton" style="display:none">
+    <div class="sk-card">
+      <div class="skeleton sk-head"></div>
+    </div>
+  </div>
+  <div id="result"></div>
+</div>
+<script src="/assets/sv-check.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "name": "siteverdict",
+  "version": "0.87.0",
+  "description": "SiteVerdict \u2014 national Site Check CI release system (package 87)",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "test:syntax": "node scripts/predeploy.js --syntax-only",
+    "test:wording": "node scripts/predeploy.js --wording-only",
+    "test:version": "node scripts/predeploy.js --version-only",
+    "test:e2e": "node scripts/run-tests.js",
+    "test:sitecheck": "node scripts/run-tests.js",
+    "predeploy": "node scripts/predeploy.js",
+    "release-check": "node scripts/release-check.js",
+    "install:browsers": "npx playwright install chromium",
+    "test:all": "node scripts/run-all-tests.js",
+    "daily-check": "node scripts/daily-check.js",
+    "daily": "node scripts/daily-check.js",
+    "ci-report": "node scripts/ci-report.js",
+    "test:ci": "node scripts/run-tests.js && node scripts/ci-report.js",
+    "package:ready": "node scripts/package-ready.js",
+    "package:not-ready": "node scripts/package-not-ready.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "http-server": "^14.1.1"
+  },
+  "notes": {
+    "netlify_cli": "Not installed. End-to-end tests (test:sitecheck) require deployed site at BASE_URL.",
+    "local_test": "npm run predeploy runs static analysis only. Does not require network.",
+    "e2e_test": "npm run test:sitecheck runs Playwright against BASE_URL (default: siteverdict2.netlify.app)",
+    "predeploy": "npm run predeploy passes before push. Run test:sitecheck after Netlify deploy."
+  }
+}

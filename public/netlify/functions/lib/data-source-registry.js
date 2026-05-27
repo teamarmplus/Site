@@ -264,7 +264,103 @@ const REGISTRY = [
  * Returns array because a jurisdiction may have multiple sources.
  */
 function getSources(jurisdiction) {
-  if (!jurisdiction) return [];
+  if (!jurisdiction) return [
+  // ── SA ────────────────────────────────────────────────────────
+  {
+    id:           'sa_dpti_planning',
+    label:        'SA Planning Portal (DPTI GeoHub)',
+    jurisdiction: 'SA',
+    source_type:  'official_open_data',
+    base_url:     'https://dpti.geohub.sa.gov.au/server/rest/services',
+    key_env_var:  null,
+    fields:       ['lga','infrastructure'],
+    confidence:   'Low',
+    notes:        'SA DPTI GeoHub has transport/infrastructure layers but not direct SA P&D Code zones. '
+                + 'SA P&D Code mapping requires SA Spatial Hub (account). '
+                + 'Integration: stub only until SA Spatial Hub account confirmed.',
+    live:         false,
+  },
+  {
+    id:           'sa_spatial_hub',
+    label:        'SA Spatial Hub (Planning zones)',
+    jurisdiction: 'SA',
+    source_type:  'official_api',
+    base_url:     'https://sailis.lssa.com.au',
+    key_env_var:  'SA_SPATIAL_HUB_KEY',
+    fields:       ['zone','overlay','parcel_area','lga'],
+    confidence:   'High',
+    notes:        'SA Spatial Hub provides P&D Code zones via ArcGIS REST. '
+                + 'Free account required at sailis.lssa.com.au. '
+                + 'FOUNDER ACTION: Register at https://sailis.lssa.com.au/SAILIS_Help/en/#t=Content%2FRegistration.htm '
+                + 'set SA_SPATIAL_HUB_KEY in Netlify UI.',
+    live:         false, // awaiting founder registration
+  },
+
+  // ── WA ────────────────────────────────────────────────────────
+  {
+    id:           'wa_slip_cadastre',
+    label:        'WA SLIP Cadastre (Landgate)',
+    jurisdiction: 'WA',
+    source_type:  'official_api',
+    base_url:     'https://catalogue.data.wa.gov.au',
+    key_env_var:  'WA_SLIP_API_KEY',
+    fields:       ['parcel_area','lot_number','council','title_number'],
+    confidence:   'High',
+    notes:        'WA SLIP (Shared Location Information Platform) provides cadastre and planning data. '
+                + 'Free registration required at slip.landgate.wa.gov.au. '
+                + 'FOUNDER ACTION: Register at https://slip.landgate.wa.gov.au/Pages/default.aspx '
+                + 'set WA_SLIP_API_KEY in Netlify UI. '
+                + 'WA Planning zones also require account on WAPC MRS maps (separate). '
+                + 'Interim: stub only.',
+    live:         false, // awaiting founder registration
+  },
+
+  // ── NT ────────────────────────────────────────────────────────
+  {
+    id:           'nt_ntlis',
+    label:        'NT Land Information System (NTLIS)',
+    jurisdiction: 'NT',
+    source_type:  'official_open_data',
+    base_url:     'https://www.ntlis.nt.gov.au',
+    key_env_var:  null,
+    fields:       ['parcel','lot_number','title_number'],
+    confidence:   'Low',
+    notes:        'NT NTLIS provides basic land info. NT Planning zones are under NT Planning Commission. '
+                + 'No free point-query API confirmed. Integration: stub only. '
+                + 'FOUNDER ACTION: Check https://planning.nt.gov.au for zoning data API when ready.',
+    live:         false,
+  },
+
+  // ── QLD (live API confirmed) ───────────────────────────────────
+  {
+    id:           'qld_qspatial_cadastre',
+    label:        'QLD QSpatial LandParcelPropertyFramework',
+    jurisdiction: 'QLD',
+    source_type:  'official_open_data',
+    base_url:     'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer',
+    key_env_var:  null,
+    fields:       ['lot_number','plan_number','parcel_area','lga'],
+    confidence:   'Medium',
+    notes:        'QLD QSpatial Land Parcel Property Framework. Live ArcGIS REST API confirmed. '
+                + 'No planning zone layer available at state level — zones held by 77 LGAs separately. '
+                + 'Rate limits: public, no key required.',
+    live:         true,
+  },
+  {
+    id:           'qld_qspatial_state_planning',
+    label:        'QLD State Planning Instruments',
+    jurisdiction: 'QLD',
+    source_type:  'official_open_data',
+    base_url:     'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/StatePlanning/MapServer',
+    key_env_var:  null,
+    fields:       ['state_planning_zone','priority_development_area'],
+    confidence:   'Medium',
+    notes:        'QLD State Planning instruments (SPP, SEQRP, PDAs). Does not cover LGA-level zones. '
+                + 'Live ArcGIS REST API confirmed.',
+    live:         true,
+  },
+
+];
   return REGISTRY.filter(s => s.jurisdiction === (jurisdiction || '').toUpperCase());
 }
 
