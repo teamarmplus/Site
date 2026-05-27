@@ -1,47 +1,12 @@
-name: SiteVerdict Claude Agent - Manual
-
-on:
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  pull-requests: write
-  issues: write
-  id-token: write
-
-concurrency:
-  group: siteverdict-claude-agent
-  cancel-in-progress: true
-
-jobs:
-  claude-agent:
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Run release check first
-        run: |
-          npm ci
-          npx playwright install --with-deps chromium
-          npm run release-check
-
-      - name: Run Claude agent
-        uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          show_full_output: true
-          prompt: |
-            name: SiteVerdict Claude Agent - Overnight
+name: SiteVerdict Claude Agent - Overnight
 
 on:
   workflow_dispatch:
   schedule:
-    # Sydney time AEST: roughly 10:07pm, 10:37pm ... through 10:37am
-    # If cost is too high, change this back to hourly.
-    - cron: "7,37 12-23,0 * * *"
+    # Sydney AEST overnight: 10:07pm/10:37pm through 9:37am, plus 10:07am check.
+    # If cost is too high, change back to hourly.
+    - cron: "7,37 12-23 * * *"
+    - cron: "7 0 * * *"
 
 permissions:
   contents: write
