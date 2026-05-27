@@ -1,0 +1,67 @@
+name: SiteVerdict Claude Agent - Manual
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: siteverdict-claude-agent
+  cancel-in-progress: true
+
+jobs:
+  claude-agent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run release check first
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run release-check
+
+      - name: Run Claude agent
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            You are SiteVerdict Autonomous Operating Agent.
+
+            First run only. Be conservative.
+
+            Do not deploy production.
+            Do not push directly to main.
+            Do not create a GitHub-ready zip.
+            Do not expose secrets.
+            Do not change business model.
+            Do not add raw data to public/.
+            Do not make large code changes.
+
+            Read:
+            - CLAUDE.md
+            - AGENT_QUEUE.md
+            - FOUNDER_ACTIONS.md
+            - RELEASE_STATUS.md
+            - docs/NATIONAL_DATA_ROADMAP.md
+
+            Task:
+            1. Check current release status.
+            2. Check the highest-priority unblocked task.
+            3. If safe, make only a small documentation/queue update.
+            4. If blocked, update FOUNDER_ACTIONS.md.
+            5. If code changes are required, create a PR or explain what branch/PR is needed.
+            6. End with one of:
+               - READY PR CREATED
+               - BLOCKED BUT CONTINUED
+               - NOT READY
+
+            Keep the first run small. This is a safety test.
+          claude_args: |
+            --max-turns 5
