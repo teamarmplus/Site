@@ -17,31 +17,33 @@ SiteVerdict must be:
 - Professionally caveated — not a planning certificate, not legal/financial advice
 - Never misleading — especially about state data availability
 
-## Paid Agent Run Rule
+## Paid Claude Agent Work Rule
 
-Every paid Claude Agent run must complete one small, specific, testable task tied to a real current SiteVerdict problem.
+Every paid Claude Agent run must complete **one small, specific, testable task** tied to a real current SiteVerdict problem.
 
-A valid task must include:
-- the exact problem
-- why it matters
-- allowed files
-- acceptance test
-- done condition
-- rollback/blocker rule
+The agent must not spend a paid run only analysing, rewriting strategy, or expanding the queue unless `AGENT_QUEUE.md` or `RELEASE_STATUS.md` is missing or broken.
 
-The agent must not spend a run only analysing, rewriting strategy, or expanding the queue unless AGENT_QUEUE.md or RELEASE_STATUS.md is missing/broken.
+### Task requirements
 
-Each run must end with exactly one of:
-- SMALL FIX COMPLETE
-- TESTED DOC/POLICY UPDATE COMPLETE
-- BLOCKED BUT CONTINUED
-- NOT READY
+Each task must clearly include:
 
-The agent must prefer real immediate problems:
+* the exact problem
+* why it matters
+* allowed files
+* acceptance test
+* done condition
+* rollback or blocker rule
+
+Each task should normally touch no more than **1–3 files**.
+
+### Priority order
+
+The agent must prefer immediate real problems in this order:
+
 1. release-check failure
 2. deploy-check failure
 3. Site Check hang
-4. non-NSW wrong NSW wording
+4. non-NSW address showing NSW wording
 5. fake address not handled clearly
 6. provider/state status unclear
 7. protected public route exposure
@@ -49,17 +51,58 @@ The agent must prefer real immediate problems:
 9. user-facing wording that overclaims
 10. missing professional verification warning
 
-Each task should normally touch no more than 1–3 files.
+### Work rules
 
-Every code change must run the relevant test and update DAILY_LOG.md with:
-- task picked
-- files changed
-- test run
-- result
-- blocker if any
-- next task recommendation
+The agent must:
 
----
+1. Pick one small real current problem from `AGENT_QUEUE.md`.
+2. Confirm why it matters.
+3. Change only the minimum required files.
+4. Run the relevant test.
+5. Update `DAILY_LOG.md`.
+6. Stop.
+
+The agent must not:
+
+* make broad refactors
+* touch many files
+* change the business model
+* expose secrets
+* add raw data to `public/`
+* intentionally deploy production
+* make untested ready claims
+* create GitHub-ready zip files after failed tests
+
+### Testing and reporting
+
+Every code change must run the relevant test.
+
+The agent must report:
+
+* task picked
+* files changed
+* test command run
+* pass/fail result
+* blocker if any
+* whether founder approval is required
+* next recommended task
+
+If the task is blocked, the agent must:
+
+1. Write the blocker in `FOUNDER_ACTIONS.md`.
+2. Move to the next safe task where possible.
+3. End with `BLOCKED BUT CONTINUED`.
+
+### Required ending
+
+Each run must end with exactly one of:
+
+* `SMALL FIX COMPLETE`
+* `TESTED DOC/POLICY UPDATE COMPLETE`
+* `BLOCKED BUT CONTINUED`
+* `NO SAFE TASK FOUND`
+* `NOT READY`
+
 
 ## Hard rules — never violate
 
