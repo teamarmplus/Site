@@ -3,9 +3,8 @@ name: SiteVerdict Claude Agent - Overnight
 on:
   workflow_dispatch:
   schedule:
-    # Sydney AEST overnight: about 10:07pm / 10:37pm through 9:37am, plus 10:07am.
-    - cron: "7,37 12-23 * * *"
-    - cron: "7 0 * * *"
+    # 24/7 every 30 minutes.
+    - cron: "7,37 * * * *"
 
 permissions:
   contents: write
