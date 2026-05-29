@@ -115,10 +115,127 @@ async function queryQLDPostGIS(lat, lon) {
 }
 
 // ── Main provider ─────────────────────────────────────────────────────
+
+// ── Live QSpatial ArcGIS REST (no account required) ──────────────
+// QSpatial LPPF: https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer
+// Layer 0: Addresses   — locality, street, LGA
+// Layer 1: Land Parcels — lot, plan, area
+// NOTE: Layer 0 addresses require a 200m buffer for point intersect to work
+const QSPATIAL_LPPF = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer';
+
+function buildQSpatialURL(layerId, lat, lon, outFields, bufferM) {
+  const geom = encodeURIComponent(JSON.stringify({ x: lon, y: lat, spatialReference: { wkid: 4326 } }));
+  const buf  = bufferM ? `&distance=${bufferM}&units=esriSRUnit_Meter` : '';
+  return `${QSPATIAL_LPPF}/${layerId}/query`
+    + `?geometry=${geom}&geometryType=esriGeometryPoint&inSR=4326`
+    + buf
+    + `&spatialRel=esriSpatialRelIntersects`
+    + `&outFields=${outFields.join(',')}`
+    + `&returnGeometry=false&f=json`;
+}
+
+async function fetchWithTimeout(url, ms) {
+  const ctrl  = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  try {
+    const res = await fetch(url, {
+      signal: ctrl.signal,
+      headers: { 'User-Agent': 'SiteVerdict-National/1.0' },
+    });
+    return res;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function queryQSpatialAddresses(lat, lon) {
+  try {
+    const url = buildQSpatialURL(0, lat, lon, ['LOCALITY_NAME','LGA_NAME','STREET_NAME'], 200);
+    const res = await fetchWithTimeout(url, 9000);
+    if (!res.ok) return null;
+    const d = await res.json();
+    const feats = (d.features || []);
+    if (!feats.length) return null;
+    return feats[0].attributes;
+  } catch { return null; }
+}
+
+async function queryQSpatialParcels(lat, lon) {
+  try {
+    const url = buildQSpatialURL(1, lat, lon, ['LOT','PLAN','AREA_M2','LGA_NAME'], 200);
+    const res = await fetchWithTimeout(url, 9000);
+    if (!res.ok) return null;
+    const d = await res.json();
+    const feats = (d.features || []);
+    if (!feats.length) return null;
+    return feats[0].attributes;
+  } catch { return null; }
+}
+
 async function run(geocodeResult) {
   const hasPostGIS = !!(process.env.PGCONNSTRING_QLD || process.env.PGCONNSTRING);
 
   // ── STUB: no PostGIS yet ──────────────────────────────────────────
+  // ── Attempt live QSpatial API (no account required) ──────────────
+  if (!hasPostGIS && geocodeResult && geocodeResult.found === true) {
+    const lat = geocodeResult.lat;
+    const lon = geocodeResult.lon;
+    const [addrData, parcelData] = await Promise.allSettled([
+      queryQSpatialAddresses(lat, lon),
+      queryQSpatialParcels(lat, lon),
+    ]);
+    const addr   = addrData.status   === 'fulfilled' ? addrData.value   : null;
+    const parcel = parcelData.status === 'fulfilled' ? parcelData.value : null;
+    const lgaName    = (addr   && addr.LGA_NAME)    || (parcel && parcel.LGA_NAME)  || null;
+    const locality   = (addr   && addr.LOCALITY_NAME) || null;
+    const lotPlan    = (parcel && parcel.LOT && parcel.PLAN) ? `Lot ${parcel.LOT} ${parcel.PLAN}` : null;
+    const areaM2     = parcel ? parcel.AREA_M2 : null;
+
+    if (lgaName || locality || lotPlan) {
+      const checkedFields = ['address', 'geocode_confidence'];
+      if (lgaName)  checkedFields.push('council');
+      if (locality) checkedFields.push('locality');
+      if (lotPlan)  checkedFields.push('lot_plan');
+      if (areaM2)   checkedFields.push('parcel_area');
+      return {
+        provider_name:      'Queensland (QSpatial Live — LGA + Cadastre)',
+        jurisdiction:       'QLD',
+        source_type:        'official_open_data',
+        confidence:         'Medium',
+        screening_label:    'Basic National Screening',
+        checked_fields:     checkedFields,
+        unavailable_fields: ['zone', 'overlays', 'min_lot_size', 'heritage', 'flood', 'bushfire'],
+        result: {
+          address_found:         true,
+          matched_address:       geocodeResult.matchedAddr || null,
+          geocode_confidence:    geocodeResult.confidence  || 'Unknown',
+          jurisdiction_detected: 'QLD',
+          council:               lgaName,
+          locality,
+          lot_plan:              lotPlan,
+          parcel_area_m2:        areaM2 ? Math.round(areaM2) : null,
+          planning_data: {
+            zone:        null,
+            zone_note:   'Queensland planning zones are not yet connected in this beta Site Check. Zones are held by 77 individual councils separately — no single state layer exists.',
+            overlays:    null,
+          },
+        },
+        warnings: [
+          'Queensland planning zones, overlays, heritage and flood controls are not yet connected in this beta Site Check.',
+          'Verify all planning controls with ' + (lgaName || 'the relevant council') + ' or at planning.qld.gov.au.',
+          'Parcel and LGA data from QSpatial LPPF — indicative only, verify against current title.',
+          'Based on available official, public, and verifiable data. Planning-risk context only.',
+          'Professional verification required before purchase, finance, or development decisions.',
+        ],
+        attribution: 'Queensland cadastre data from QSCF (QSpatial) © State of Queensland. CC BY 4.0. Indicative only.',
+        attribution_url: 'https://spatial-gis.information.qld.gov.au',
+        raw_summary: { lga: lgaName, locality, lot_plan: lotPlan, area_m2: areaM2 },
+        not_integrated: false,
+      };
+    }
+    // Live API returned no data — fall through to stub
+  }
+
   if (!hasPostGIS) {
     return {
       provider_name:   'Queensland (QSCF Cadastre — PostGIS pending)',

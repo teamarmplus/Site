@@ -61,7 +61,15 @@ async function runSiteCheck(page, address, landSize = null) {
   if (landSize) {
     const blockInput = page.locator('#block');
     if (await blockInput.count() > 0) {
-      await blockInput.fill(String(landSize));
+      // Open <details> if block input is inside one (collapsed by default in redesigned form)
+      const detailsEl = page.locator('details:has(#block)');
+      if (await detailsEl.count() > 0 && !(await detailsEl.getAttribute('open'))) {
+        await detailsEl.locator('summary').click();
+        await page.waitForTimeout(200);
+      }
+      if (await blockInput.isVisible()) {
+        await blockInput.fill(String(landSize));
+      }
     }
   }
 
@@ -296,12 +304,85 @@ test.describe('SiteVerdict Site Check — release safety', () => {
     const vj   = JSON.parse(body);
     // Package number must be a positive integer ≥ 80 (never a stale old number)
     const pkg  = parseInt(String(vj.package_number), 10);
+    // ≥ 86 = minimum acceptable: this test passes for 87, 88, 89... but fails for any stale ≤ 85
     expect(pkg, `package_number must be ≥ 86, got ${vj.package_number}`).toBeGreaterThanOrEqual(86);
     expect(vj.build_name, 'build_name must contain package number').toContain(String(pkg));
     // sv-check.js must be large enough to contain all safety guards
     const svSize = vj.sitecheck_js_size || 0;
-    expect(svSize, `sitecheck_js_size must be ≥ 200000, got ${svSize}`)
-      .toBeGreaterThanOrEqual(200000);
+    // ≥ 85000: threshold updated when AI UI layer deleted (pkg 96)
+    expect(svSize, `sitecheck_js_size must be ≥ 85000, got ${svSize}`)
+      .toBeGreaterThanOrEqual(85000);
+  });
+
+
+  // ── PRODUCT ACCEPTANCE TESTS ─────────────────────────────────────
+  // Verify the Site Check result: one CTA, correct flow, no old sections.
+  // Uses existing runSiteCheck helper (returns {resultHtml, timedOut, rendered, ...}).
+  // If these fail, do not ship.
+
+  test('NSW result: correct 3-engine flow and one CTA only', async ({ page }) => {
+    const r = await runSiteCheck(page, '148 Canley Vale Road, Canley Heights NSW 2166', 650);
+    expect(r.timedOut, 'NSW check must not time out').toBe(false);
+    expect(r.rendered, 'NSW check must render a result card').toBe(true);
+
+    const html = r.resultHtml;
+
+    // Required flow labels
+    for (const label of ['What we found', 'What this may mean', 'What is still missing', 'Find Out What My Land Can Do']) {
+      expect(html, `NSW result must contain "${label}"`).toContain(label);
+    }
+
+    // One-button rule: CTA text must appear exactly once
+    const ctaCount = (html.match(/Find Out What My Land Can Do/g) || []).length;
+    expect(ctaCount, `NSW result must show "Find Out What My Land Can Do" exactly once, got ${ctaCount}`).toBe(1);
+
+    // No competing Professional Pathway CTA in result
+    expect(html, 'NSW result must not show a "Professional Pathway →" button').not.toContain('Professional Pathway →');
+  });
+
+  test('Non-NSW result: one CTA only (QLD)', async ({ page }) => {
+    const r = await runSiteCheck(page, '1 Queen Street Brisbane QLD 4000');
+    expect(r.timedOut, 'QLD check must not time out').toBe(false);
+
+    const html = r.resultHtml;
+
+    // CTA must appear exactly once
+    const ctaCount = (html.match(/Find Out What My Land Can Do/g) || []).length;
+    expect(ctaCount, `QLD result must show "Find Out What My Land Can Do" exactly once, got ${ctaCount}`).toBe(1);
+
+    // No competing Professional Pathway CTA
+    expect(html, 'QLD result must not show a "Professional Pathway →" button').not.toContain('Professional Pathway →');
+  });
+
+  test('Site Check result does NOT show old report sections', async ({ page }) => {
+    const r = await runSiteCheck(page, '148 Canley Vale Road, Canley Heights NSW 2166', 650);
+    expect(r.timedOut, 'NSW check must not time out').toBe(false);
+    const html = r.resultHtml;
+
+    const FORBIDDEN_SECTIONS = [
+      // Old report sections
+      'Overlay analysis', 'Risk register', 'Development pathway',
+      'Comparable DAs', 'Infrastructure proximity',
+      'Finance readiness', 'Finance and lending context',
+      'Development scorecard', 'Get Full Report', 'Hot List',
+      'Low Signal', 'Strong Signal',
+      // AI result mutations — must not appear even when AI API is available
+      'AI development intelligence', 'AI intelligence score',
+      'Next actions', 'AI risk rating',
+      'Requires Investigation', 'AI-sequenced',
+    ];
+    for (const s of FORBIDDEN_SECTIONS) {
+      expect(html, `Result must NOT contain old section "${s}"`).not.toContain(s);
+    }
+
+    const FORBIDDEN_WORDING = [
+      'can subdivide', 'sell as-is', 'guaranteed approval',
+      'guaranteed subdivision', 'guaranteed value increase',
+      'exact land value', 'Higher-value development',
+    ];
+    for (const w of FORBIDDEN_WORDING) {
+      expect(html, `Result must NOT contain "${w}"`).not.toContain(w);
+    }
   });
 
 });

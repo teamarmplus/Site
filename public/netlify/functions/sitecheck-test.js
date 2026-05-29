@@ -16,7 +16,7 @@
  *  9  Homepage wording        → NSW-only phrases absent, national wording present
  * 10  VIC address             → found:true (not rejected)
  * 11  QLD address             → found:true (not rejected)
- * 12  Package number check    → package_number = 86  */
+ * 12  Package number check    → uses PACKAGE_NUMBER constant  */
 
 'use strict';
 
@@ -26,8 +26,8 @@ const CORS = {
   'Content-Type':                 'application/json',
 };
 
-const BUILD_MARKER   = 'sitecheck-release-check-87';
-const PACKAGE_NUMBER = '87';
+const BUILD_MARKER   = 'sitecheck-release-check-96';
+const PACKAGE_NUMBER = '96';
 
 function isLotAddr(s)   { return /^(lot|proposed\s+lot)\s+\d+/i.test((s||'').trim()); }
 function isRangeAddr(s) { return /^\d+\s*-\s*\d+\s+/i.test((s||'').trim()); }

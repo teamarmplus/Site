@@ -85,14 +85,16 @@ async function fetchWithTimeout(url, opts, ms) {
 }
 
 // Build ArcGIS REST point query URL
-function arcgisPointQuery(base, layerId, lat, lon, outFields) {
+function arcgisPointQuery(base, layerId, lat, lon, outFields, bufferM) {
   const geometry = encodeURIComponent(JSON.stringify({
     x: lon, y: lat, spatialReference: { wkid: 4326 }
   }));
+  const buf = bufferM ? `&distance=${bufferM}&units=esriSRUnit_Meter` : '';
   return `${base}/${layerId}/query`
     + `?geometry=${geometry}`
     + `&geometryType=esriGeometryPoint`
     + `&inSR=4326`
+    + buf
     + `&spatialRel=esriSpatialRelIntersects`
     + `&outFields=${outFields.join(',')}`
     + `&returnGeometry=false`
@@ -111,30 +113,33 @@ async function queryArcGIS(url) {
 
 // ── ACT Territory Plan zones ─────────────────────────────────────
 async function queryACTZones(lat, lon) {
-  const base = 'https://data.actmapi.act.gov.au/arcgis/rest/services'
-    + '/ACT_PLANNING/ACT_Territory_Plan_Land_Use_Zone_layer/MapServer';
-  const url = arcgisPointQuery(base, 0, lat, lon, ['LAND_USE_ZONE_CODE_ID']);
+  const base = 'https://services1.arcgis.com/E5n4f1VY84i0xSjy/arcgis/rest/services'
+    + '/ACTGOV_TP_LAND_USE_ZONE/FeatureServer';
+  // Layer 1 = Territory Plan Land Use Zones; 100m buffer for reliable intersect
+  const url = arcgisPointQuery(base, 1, lat, lon,
+    ['LAND_USE_ZONE_CODE_ID','LAND_USE_POLICY_DESC','DIVISION_NAME','DISTRICT_NAME'], 100);
   return queryArcGIS(url);
 }
 
 // ── ACT Territory Plan overlays ──────────────────────────────────
 // Layer 1 = overlay polygon layer; returns ZONE_OVERLAY_CODE_ID, DIVISION_NAME
 async function queryACTOverlays(lat, lon) {
-  const base = 'https://data.actmapi.act.gov.au/arcgis/rest/services'
-    + '/ACT_PLANNING/ACT_Territory_Plan_Overlay_Zone_layer/MapServer';
-  const url = arcgisPointQuery(base, 1, lat, lon,
-    ['ZONE_OVERLAY_CODE_ID', 'DIVISION_NAME']);
+  const base = 'https://services1.arcgis.com/E5n4f1VY84i0xSjy/arcgis/rest/services'
+    + '/ACTGOV_TP_OVERLAY_ZONE_POLY/FeatureServer';
+  // 100m buffer; returns overlay polygon data if present
+  const url = arcgisPointQuery(base, 0, lat, lon,
+    ['LAND_USE_ZONE_CODE_ID','ZONE_OVERLAY_CODE_ID','DIVISION_NAME'], 100);
   return queryArcGIS(url);
 }
 
 // ── ACT Cadastre blocks ──────────────────────────────────────────
 // Returns block and district info from registered urban blocks layer
 async function queryACTCadastre(lat, lon) {
-  const base = 'https://data.actmapi.act.gov.au/arcgis/rest/services'
-    + '/data_extract/Land_Administration/MapServer';
-  // Layer 0 = ACT Blocks (registered)
+  const base = 'https://services1.arcgis.com/E5n4f1VY84i0xSjy/arcgis/rest/services'
+    + '/ACTGOV_DIVISIONS/FeatureServer';
+  // Layer 0 = ACT Divisions; returns DIVISION, DISTRICT fields
   const url = arcgisPointQuery(base, 0, lat, lon,
-    ['DISTRICT_NAME', 'BLOCK_IDENTIFIER', 'CURRENT_LIFECYCLE_STAGE']);
+    ['DIVISION','DISTRICT'], 100);
   return queryArcGIS(url);
 }
 
@@ -143,7 +148,7 @@ async function run(geocodeResult) {
   // Geocode failed
   if (!geocodeResult || geocodeResult.found !== true) {
     return {
-      provider_name:      'ACT Territory Plan (ACTmapi)',
+      provider_name:      'ACT Territory Plan (ACTGOV ArcGIS Online)',
       jurisdiction:       'ACT',
       source_type:        'official_open_data',
       confidence:         'Low',
@@ -189,7 +194,10 @@ async function run(geocodeResult) {
   const overlayName = overlayData ? overlayData.DIVISION_NAME : null;
 
   // Cadastre
-  const district  = cadastreData ? cadastreData.DISTRICT_NAME : null;
+  const district  = (cadastreData && (cadastreData.DISTRICT || cadastreData.DISTRICT_NAME))
+                    || (zoneData && zoneData.DISTRICT_NAME) || null;
+  const division  = (cadastreData && (cadastreData.DIVISION || cadastreData.DIVISION_NAME))
+                    || (zoneData && zoneData.DIVISION_NAME) || null;
   const blockId   = cadastreData ? (cadastreData.BLOCK_IDENTIFIER || null) : null;
 
   // Build checked/unavailable fields
@@ -213,7 +221,7 @@ async function run(geocodeResult) {
   if (geocodeResult.confidence === 'Verified' && zoneCode) confidence = 'Medium';
 
   return {
-    provider_name:      'ACT Territory Plan (ACTmapi)',
+    provider_name:      'ACT Territory Plan (ACTGOV ArcGIS Online)',
     jurisdiction:       'ACT',
     source_type:        'official_open_data',
     confidence,

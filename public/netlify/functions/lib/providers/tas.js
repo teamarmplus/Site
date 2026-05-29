@@ -127,14 +127,16 @@ async function fetchWithTimeout(url, opts, ms) {
   }
 }
 
-function arcgisPointQuery(baseUrl, layerId, lat, lon, outFields) {
+function arcgisPointQuery(baseUrl, layerId, lat, lon, outFields, bufferMetres) {
   const geom = encodeURIComponent(
     JSON.stringify({ x: lon, y: lat, spatialReference: { wkid: 4326 } })
   );
+  const buf = bufferMetres ? `&distance=${bufferMetres}&units=esriSRUnit_Meter` : '';
   return `${baseUrl}/${layerId}/query`
     + `?geometry=${geom}`
     + `&geometryType=esriGeometryPoint`
     + `&inSR=4326`
+    + buf
     + `&spatialRel=esriSpatialRelIntersects`
     + `&outFields=${outFields.join(',')}`
     + `&returnGeometry=false`
@@ -157,7 +159,7 @@ async function queryArcGIS(url) {
 // Key field: ZONE_NO (integer), display: LPS (planning scheme ref)
 async function queryTASZones(lat, lon) {
   const base = 'https://services.thelist.tas.gov.au/arcgis/rest/services/Public/PlanningOnline/MapServer';
-  const url  = arcgisPointQuery(base, 13, lat, lon, ['ZONE_NO', 'LPS']);
+  const url  = arcgisPointQuery(base, 13, lat, lon, ['ZONE_NO', 'ZONE', 'ZONE_ABB', 'LPS'], 50);
   return queryArcGIS(url);
 }
 
@@ -222,7 +224,8 @@ async function run(geocodeResult) {
 
   // Zone
   const zoneNo    = zoneData ? zoneData.ZONE_NO : null;
-  const zoneLabel = zoneNo   ? (TPS_ZONES[Number(zoneNo)] || `Zone ${zoneNo}`) : null;
+  const zoneLabel = zoneData ? (zoneData.ZONE || TPS_ZONES[Number(zoneNo)] || (zoneNo ? `Zone ${zoneNo}` : null)) : null;
+  const zoneAbb   = zoneData ? zoneData.ZONE_ABB : null;
   const lpsRef    = zoneData ? zoneData.LPS : null;
 
   // Cadastre — use COMP_AREA first, fall back to MEAS_AREA
@@ -286,6 +289,7 @@ async function run(geocodeResult) {
       planning_data: {
         zone_no:      zoneNo,
         zone_label:   zoneLabel,
+        zone_abb:     zoneAbb,
         lps_ref:      lpsRef,
         parcel_area:  parcelArea ? Math.round(parcelArea) : null,
         pid:          pid,

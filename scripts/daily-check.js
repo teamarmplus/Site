@@ -193,7 +193,7 @@ async function checkLive() {
   try {
     const vj = await (await fetch(`${BASE_URL}/version.json?_=${Date.now()}`, cache)).json();
     const pkg = parseInt(vj.package_number || '0', 10);
-    if (pkg >= 86) {
+    if (pkg >= 86) {  // minimum acceptable deployed package (update when older packages are retired)
       ok(`Live package_number = ${pkg}`, vj.build_name || '');
     } else {
       fail(`Live package_number = ${pkg} (expected ≥ 86)`, 'Deploy may be stale');

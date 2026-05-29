@@ -1,68 +1,87 @@
 # FOUNDER ACTIONS REQUIRED
 
 Actions that require T's personal/business login, registration, or payment decision.
-AI cannot complete these — they require your identity.
+AI cannot complete these — they require your identity or a business decision.
 
-**Current status: 2 actions pending**
+**Updated: 2026-05-27 based on live API probes**
 
 ---
 
-## Action 1 — SA Planning Zones (South Australia)
+## Action 1 — SA Planning Zones (HIGHEST VALUE — new market)
 
-**Priority:** Medium  
-**What it unlocks:** Real SA planning zone (P&D Code) for any SA address in Site Check  
-**Cost:** Free (government service)  
-**Time needed:** ~10 minutes
+**Priority:** High  
+**Time:** ~10 minutes  
+**Cost:** Free  
+**What it unlocks:** Real SA P&D Code planning zones, policy areas, and overlays for any SA address
 
-### What to do
+### Steps
 
 1. Go to: https://sailis.lssa.com.au
-2. Click "Register" or "Create account"
-3. Register as a business account (ABN: 42 663 950 070)
-4. Request access to: **SA Spatial Hub API** (or equivalent P&D Code layer)
-5. Copy the API key you receive
-6. In Netlify UI → Site settings → Environment variables → Add:
+2. Click "Register" → Create business account (ABN: 42 663 950 070)
+3. Request access to: **SA Spatial Hub** or P&D Code GeoJSON API
+4. Get API key
+5. Netlify UI → Site settings → Environment variables → Add:
    - **Key:** `SA_SPATIAL_HUB_KEY`
-   - **Value:** (paste your key)
-7. Add the same key to GitHub repo → Settings → Secrets → Actions → New secret:
+   - **Value:** your API key
+6. GitHub → Settings → Secrets → Actions → New secret:
    - **Name:** `SA_SPATIAL_HUB_KEY`
-   - **Value:** (paste your key)
 
-### What SiteVerdict does after this
-
-- SA provider (`providers/sa.js`) activates automatically when key is present
-- SA Site Check returns: planning zone, overlay, parcel area, LGA
-- Source shown as: "SA Planning and Design Code (SA Spatial Hub)"
+**After this:** SA Site Check will return zone, policy area, overlays from PlanSA.
 
 ---
 
-## Action 2 — WA Cadastre and Planning (Western Australia)
+## Action 2 — WA Cadastre and Planning
 
 **Priority:** Medium  
-**What it unlocks:** WA cadastre parcel data and planning zone context  
-**Cost:** Free (government service)  
-**Time needed:** ~15 minutes
+**Time:** ~15 minutes  
+**Cost:** Free  
+**What it unlocks:** WA cadastre (lot/plan/area), LGA, and planning zones for WA addresses
 
-### What to do
+### Steps
 
 1. Go to: https://slip.landgate.wa.gov.au/Pages/default.aspx
-2. Click "Register"
-3. Create a free account
-4. Navigate to "SLIP" (Shared Location Information Platform)
-5. Request access to: **Cadastre** and **Planning** layers
-6. Copy the API key or subscription token you receive
-7. In Netlify UI → Site settings → Environment variables → Add:
+2. Click "Register" → Create free account
+3. Request access to: **Cadastre** and **Planning** layers
+4. Get API key / subscription token
+5. Netlify UI → Environment variables → Add:
    - **Key:** `WA_SLIP_API_KEY`
-   - **Value:** (paste your key)
-8. Add to GitHub repo → Settings → Secrets:
+   - **Value:** your token
+6. GitHub → Secrets → Add:
    - **Name:** `WA_SLIP_API_KEY`
-   - **Value:** (paste your key)
 
-### What SiteVerdict does after this
+**After this:** WA Site Check will return parcel data and planning context.
 
-- WA fallback (`providers/fallback.js`) upgrades to real WA data
-- WA Site Check returns: parcel area, lot number, LGA, council
-- Source shown as: "WA SLIP (Landgate)"
+---
+
+## Action 3 — PostGIS database for VIC (and future QLD/SA) (DIRECTOR DECISION)
+
+**Priority:** High (VIC is second-largest state market)  
+**Time:** ~30 minutes  
+**Cost:** ~$7-25/month (Supabase free tier available)  
+**What it unlocks:** Full Vicmap Planning zones + overlays for all Victorian addresses. Same DB can later hold QLD council schemes and SA P&D Code.
+
+**Options:**
+
+| Option | Cost | Setup |
+|---|---|---|
+| Supabase free tier (PostgreSQL + PostGIS) | Free to start | https://supabase.com |
+| Neon serverless PostgreSQL | Free tier | https://neon.tech |
+| Railway PostgreSQL | $5/month | https://railway.app |
+| Self-hosted on VPS | $5-10/month | Your choice |
+
+### Steps
+
+1. Create a PostgreSQL + PostGIS database (any above option)
+2. Get the connection string: `postgresql://user:pass@host:5432/dbname`
+3. Netlify UI → Environment variables → Add:
+   - **Key:** `SITEVERDICT_POSTGIS_URL`
+   - **Value:** your connection string
+4. GitHub → Secrets → Add:
+   - **Name:** `SITEVERDICT_POSTGIS_URL`
+5. Tell AI: "PostGIS is set up at [host]. Load the VIC data."
+   → AI will run `scripts/import-vicmap-planning.sh` to load the GDB
+
+**After this:** VIC Site Check returns real zone + overlay data. QLD and SA can be added to same DB later.
 
 ---
 
@@ -70,22 +89,19 @@ AI cannot complete these — they require your identity.
 
 | State | Why no action needed |
 |---|---|
-| NSW | Live ArcGIS REST — no key required |
-| ACT | Live ACTmapi — no key required |
-| TAS | Live theLIST — no key required |
-| VIC | Vicmap GDB received — PostGIS integration in progress (AI handles) |
-| QLD | QSpatial live API — no key required |
-| NT | NTLIS — limited public access; AI will research further |
+| NSW | Fully connected — no key required |
+| TAS | Fully connected — public API, no key required |
+| QLD | Partially connected — LGA/locality/lot live as of pkg 88 |
+| ACT | Research ongoing — no account needed for ACT ArcGIS Online |
 
 ---
 
-## How to confirm actions are done
+## After you complete actions
 
-After setting env vars in Netlify:
-1. Redeploy the site (or push any commit)
-2. Open `/deploy-check.html`
-3. SA and WA geocode checks should show `found: true` with real source data
+1. Deploy the latest package to Netlify (or push to GitHub → PR → auto-deploy)
+2. Open `/deploy-check.html` on the live site
+3. New state data will appear automatically when env vars are set
 
 ---
 
-*This file is maintained by the AI agent. Last updated: see git log.*
+*This file is maintained by AI. Last updated by agent run: 2026-05-27*

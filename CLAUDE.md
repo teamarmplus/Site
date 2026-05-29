@@ -17,92 +17,7 @@ SiteVerdict must be:
 - Professionally caveated — not a planning certificate, not legal/financial advice
 - Never misleading — especially about state data availability
 
-## Paid Claude Agent Work Rule
-
-Every paid Claude Agent run must complete **one small, specific, testable task** tied to a real current SiteVerdict problem.
-
-The agent must not spend a paid run only analysing, rewriting strategy, or expanding the queue unless `AGENT_QUEUE.md` or `RELEASE_STATUS.md` is missing or broken.
-
-### Task requirements
-
-Each task must clearly include:
-
-* the exact problem
-* why it matters
-* allowed files
-* acceptance test
-* done condition
-* rollback or blocker rule
-
-Each task should normally touch no more than **1–3 files**.
-
-### Priority order
-
-The agent must prefer immediate real problems in this order:
-
-1. release-check failure
-2. deploy-check failure
-3. Site Check hang
-4. non-NSW address showing NSW wording
-5. fake address not handled clearly
-6. provider/state status unclear
-7. protected public route exposure
-8. package/version mismatch
-9. user-facing wording that overclaims
-10. missing professional verification warning
-
-### Work rules
-
-The agent must:
-
-1. Pick one small real current problem from `AGENT_QUEUE.md`.
-2. Confirm why it matters.
-3. Change only the minimum required files.
-4. Run the relevant test.
-5. Update `DAILY_LOG.md`.
-6. Stop.
-
-The agent must not:
-
-* make broad refactors
-* touch many files
-* change the business model
-* expose secrets
-* add raw data to `public/`
-* intentionally deploy production
-* make untested ready claims
-* create GitHub-ready zip files after failed tests
-
-### Testing and reporting
-
-Every code change must run the relevant test.
-
-The agent must report:
-
-* task picked
-* files changed
-* test command run
-* pass/fail result
-* blocker if any
-* whether founder approval is required
-* next recommended task
-
-If the task is blocked, the agent must:
-
-1. Write the blocker in `FOUNDER_ACTIONS.md`.
-2. Move to the next safe task where possible.
-3. End with `BLOCKED BUT CONTINUED`.
-
-### Required ending
-
-Each run must end with exactly one of:
-
-* `SMALL FIX COMPLETE`
-* `TESTED DOC/POLICY UPDATE COMPLETE`
-* `BLOCKED BUT CONTINUED`
-* `NO SAFE TASK FOUND`
-* `NOT READY`
-
+---
 
 ## Hard rules — never violate
 
@@ -123,28 +38,6 @@ Each run must end with exactly one of:
 10. **Protected routes must stay blocked:** `/tools`, `/data`, `/docs`, and their subdirs.
 
 ---
-## How to Work With Claude
-
-Claude must not treat broad requests as permission to make broad changes.
-
-Every task must have:
-- one clear goal
-- exact scope
-- do-not-change rules
-- acceptance criteria
-- required tests
-- output contract
-- blocker rule
-
-Claude must prefer small, testable improvements over large changes.
-
-Claude must not mark work ready unless the required tests pass.
-
-Claude must update DAILY_LOG.md after each agent run.
-
-Claude must never expose secrets, deploy production, create ready zips after failed tests, add raw data to public/, or make claims that SiteVerdict cannot verify.
-
-If blocked by founder action, API access, licence terms, payment, or account registration, Claude must update FOUNDER_ACTIONS.md and move to the next safe task.
 
 ## National Site Check acceptance criteria
 
@@ -234,6 +127,75 @@ Creates: siteverdict-NOT-READY-diagnostics-N.zip (NO deploy)
 | SA | P&D Code GeoJSON | PostGIS pending; no fake zone |
 | WA | SLIP pending account | Not yet connected; honest |
 | NT | NTLIS limited | Not yet connected; honest |
+
+---
+
+## External Data Provider Communication Rule
+
+When SiteVerdict contacts a council, state agency, data owner, or API provider — by email, web form, or any written channel — every message must follow these rules.
+
+### What to disclose (truthful, minimal)
+
+- We are building a free public property information tool for Australia
+- We display official and open data to help people understand property context before decisions
+- We attribute every data source correctly per the applicable licence
+- We are a small Australian business (ABN: 42 663 950 070)
+- We are requesting access to / confirming licence terms for a specific named dataset
+
+### What not to disclose unprompted
+
+- Internal revenue model or pricing strategy
+- Names of other data providers or API keys we hold
+- Technical architecture details (PostGIS, Netlify, provider file structure)
+- Future product roadmap beyond the immediate request
+- That the system uses AI to assist with report drafting
+
+### AI-assisted, not AI-final
+
+If asked about how data is used in reports: *"Our system uses AI to assist with drafting property context summaries. All results carry a professional verification disclaimer and are not presented as planning certificates."*
+
+Never say: "AI generates the reports" or "fully automated" — these overstate and misrepresent.
+
+### Licence-first rule
+
+Before integrating any new data source, confirm in writing (email or documented web page):
+
+1. Licence name and version (e.g. CC BY 4.0, OGL, custom)
+2. Whether commercial use is permitted
+3. Whether automated point queries are permitted
+4. Required attribution text
+5. Any rate limits or fair-use obligations
+
+Do not integrate data until at least items 1, 2, and 3 are confirmed. Document the answer in `data/state-source-registry.json` before the provider file is written.
+
+### No raw data resale
+
+SiteVerdict does not sell, redistribute, or sublicence raw datasets. We display derived property-context summaries with attribution. This must be stated if a data owner asks about our distribution model.
+
+### Professional verification always required
+
+Every result shown to end users must carry: *"Not a planning certificate. Professional verification required before any property, finance, or development decision."*
+
+This applies regardless of data quality or source authority.
+
+### Template for outreach emails
+
+Use this structure when writing to a data provider:
+
+> Subject: Data licence clarification — SiteVerdict (ABN 42 663 950 070)
+>
+> We are building SiteVerdict, a free public property information tool for Australia. We display official open data to help people understand property context before purchase, development, or finance decisions. Every source is attributed per its licence terms.
+>
+> We would like to confirm the licence terms for: [dataset name and URL]
+>
+> Specifically:
+> 1. Is commercial use permitted?
+> 2. Are automated point queries permitted?
+> 3. What attribution text is required?
+>
+> We do not redistribute raw data. Results carry a professional verification disclaimer.
+>
+> Thank you — [Founder name], SiteVerdict
 
 ---
 

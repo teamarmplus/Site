@@ -79,19 +79,11 @@
 .sr-l{font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 
 /* ── EXECUTIVE VERDICT ───────────────────────────────── */
-.verdict-section{padding:16px 18px;border-bottom:1px solid var(--border);background:var(--bg3)}
-.vs-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-.vs-left{flex:1}
-.vs-label{font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted2);margin-bottom:4px}
-.vs-verdict-text{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:4px}
-.vs-summary{font-size:.76rem;color:var(--muted);line-height:1.8;max-width:520px}
-.vs-right{text-align:right;flex-shrink:0}
-.vs-score-num{font-size:2.2rem;font-weight:600;font-family:var(--font-mono);line-height:1}
-.vs-score-lbl{font-size:.54rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2);margin-top:2px}
-.verdict-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.vkpi{background:var(--bg2);border-radius:var(--r);padding:9px 10px;border:1px solid var(--border);text-align:center}
-.vkpi-v{font-size:.82rem;font-weight:600;font-family:var(--font-mono);margin-bottom:2px;line-height:1.1}
-.vkpi-l{font-size:.52rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted2)}
+.signal-card{padding:18px 20px;border-bottom:1px solid var(--border);background:var(--bg3)}
+.signal-section{margin-bottom:14px}
+.signal-section:last-of-type{margin-bottom:0}
+.signal-heading{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);margin-bottom:5px}
+.signal-body{font-size:.78rem;color:var(--muted);line-height:1.7}
 
 /* ── INSTITUTIONAL SCORECARD ─────────────────────────── */
 .scorecard-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -248,3 +240,8 @@
   .rsec{padding-left:14px;padding-right:14px}
   .rcard .rsec{padding:12px 14px}
 }
+
+/* ── MAP PREVIEW (Leaflet) ────────────────────────────────────── */
+#map-card { animation: fadeIn .3s ease; }
+#sv-map { background: var(--bg3); }
+.leaflet-container { font-family: inherit; background: var(--bg3); }

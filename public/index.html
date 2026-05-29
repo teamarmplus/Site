@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<!-- SiteVerdict package 87 build_time 2026-05-26T23:45:58Z build_name sitecheck-release-check-87 -->
+<!-- SiteVerdict package 96 build_time 2026-05-29T10:49:32Z build_name sitecheck-release-check-96 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="siteverdict-build" content="sitecheck-expanded-report-2026-05-22">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SiteVerdict — Development Intelligence for NSW Property</title>
-<meta name="description" content="AI-powered development intelligence for any NSW address. Zone, overlays, DA timeline and feasibility — from 16+ live data sources. Free.">
-<meta property="og:title" content="SiteVerdict — Development Intelligence">
-<meta property="og:description" content="Free Site Check for any Australian property. Zone, heritage, flood, DA timeline and development feasibility — NSW has the deepest live planning layers first.ibility analysis.">
+<title>SiteVerdict — Free Property Site Check for Australia</title>
+<meta name="description" content="Check any Australian property address before you buy, sell, develop or finance. Zone, overlays and planning context — free.">
+<meta property="og:title" content="SiteVerdict — Free Property Site Check">
+<meta property="og:description" content="Free Site Check for any Australian property. Check any Australian property address. See what we found, what it may mean, and what is still missing before you make a big property decision.ibility analysis.">
 <meta property="og:url" content="https://siteverdict.com.au">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +24,7 @@
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "SiteVerdict",
-  "description": "AI-powered development intelligence platform for NSW property. 16+ live data checks per address.",
+  "description": "Free property Site Check for Australia. See what we found, what it may mean, and what is still missing.",
   "url": "https://siteverdict.com.au",
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Web",
@@ -32,86 +32,94 @@
   "provider": { "@type": "Organization", "name": "SiteVerdict", "url": "https://siteverdict.com.au" }
 }
 </script>
+  <!-- Leaflet map (free, no API key — © OpenStreetMap contributors) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style id="homepage-qa-fix">
+/* Layout-only fix for the sticky header covering map/result. No markup/wording/logic change.
+   nav is position:sticky;top:0 (~58px tall desktop, ~58px mobile).
+   1) scroll-padding-top on the scroll root makes EVERY scroll-to (programmatic or anchor)
+      stop below the sticky bar — not just scrollIntoView.
+   2) scroll-margin-top on the targets is the matching belt-and-braces lever.
+   3) a little breathing space above map/result so the title area is never tucked under the bar. */
+html { scroll-padding-top: 84px; }
+#map-card, #result, .result-wrap { scroll-margin-top: 84px; }
+.result-wrap { padding-top: 8px; }
+
+/* Sticky nav must fully hide content scrolling beneath it. The shared style uses a
+   translucent blurred background, which lets result text ghost through and look broken.
+   Make it solid (opaque) — layout/style only, no markup/wording/logic change. */
+nav { background: var(--bg) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+
+/* Desktop hero spacing: a calmer, balanced gap below the sticky nav so the hero
+   doesn't feel cramped against the bar. Spacing only — no structure/wording change. */
+@media (min-width: 561px) {
+  .hero { padding-top: 64px; padding-bottom: 24px; }
+}
+
+@media (max-width: 560px) {
+  /* Mobile: give a touch more clearance so the result/map title sits clearly below the bar */
+  html { scroll-padding-top: 76px; }
+  #map-card, #result, .result-wrap { scroll-margin-top: 76px; }
+  #map-card { margin-top: 8px; }
+}
+</style>
 </head>
 <body>
 
 <nav>
   <a href='/'><div class="logo"><span class="logo-mark"></span>SiteVerdict</div></a>
   <div class="nl">
-    <a href='/' class="active">Site Check</a>
-    <a href='/sell-lease.html'>Sell / Lease</a>
-    <a href='/hot-list'>&#128293; Hot list</a>
-    <a href='/services'>Development Works</a>
-    <a href='/finance'>Finance</a>
-    <a href='/full-report.html'>Full report</a>
+    <a href='/' class='active'>Free Site Check</a>
+    <a href='/what-this-may-mean.html'>What This May Mean</a>
+    <a href='/full-report.html'>Find Out What My Land Can Do</a>
+    <a href='/services'>Professional Pathway</a>
+    <a href='/terms.html'>Terms</a>
   </div>
-  <button class="nav-cta" onclick="chatPro()">Chat with us</button>
+  <a href='/' class="nav-cta">Check My Land</a>
 </nav>
 
 <div class="hero">
-  <div class="hero-platform-badge">&#9679; AI Development Intelligence Platform</div>
-  <h1>The verdict on<br><em>any Australian property</em></h1>
-  <div class="hero-sub">Zone controls, heritage, flood, DA approval timelines and development feasibility — from 16+ live government data sources. Free. NSW has deeper planning layers first. Other states return basic address and site context while planning layers are connected.</div>
+  
+  <h1>Check your land<br><em>for free</em></h1>
+  <div class="hero-sub">See what we found, what it may mean, and what is still missing before you make a big property decision.</div>
   <div class="trust-row">
-    <div class="trust-item"><span class="ti-dot"></span>16+ live data sources</div>
+    <div class="trust-item"><span class="ti-dot"></span>Free &mdash; no account needed</div>
     <span class="trust-div"></span>
-    <div class="trust-item"><span class="ti-dot"></span>34 NSW councils</div>
+    <div class="trust-item"><span class="ti-dot"></span>Australian addresses</div>
     <span class="trust-div"></span>
-    <div class="trust-item"><span class="ti-dot"></span>319 real DA records</div>
-    <span class="trust-div"></span>
-    <div class="trust-item"><span class="ti-dot a"></span>Investors &middot; Developers &middot; Planners</div>
+    <div class="trust-item"><span class="ti-dot a"></span>Australia-wide parcel check &middot; planning depth varies by state</div>
   </div>
 </div>
 
 <!-- Example insight card — shows what intelligence output looks like -->
-<div class="example-wrap">
-  <div class="example-card">
-    <div class="ec-eyebrow">Example data signal</div>
-    <div class="ec-body">
-      <div>
-        <div class="ec-addr">14 Redfern Street, Redfern NSW 2016</div>
-        <div class="ec-sub">CITY OF SYDNEY &nbsp;&middot;&nbsp; R1 Zone &nbsp;&middot;&nbsp; Block: 920m&#178;</div>
-        <div class="ec-chips">
-          <span class="ec-chip g">&#10003; Overlays clear</span>
-          <span class="ec-chip g">&#10003; 2 lots LEP</span>
-          <span class="ec-chip a">&#9888; 119d DA median</span>
-        </div>
-      </div>
-      <div class="ec-score">
-        <div class="ec-score-n" style="font-size:1.1rem;letter-spacing:-.02em">High</div>
-        <div class="ec-score-l">Data<br>confidence</div>
-      </div>
-    </div>
-    <div class="ec-footer">
-      <span class="ec-live"><span class="ec-live-dot"></span>Live</span>
-      <span>16+ live data checks from government, open-source and paid planning sources</span>
-      <span style="margin-left:auto;color:var(--muted2)">Example only &mdash; enter your address below</span>
-    </div>
-  </div>
-</div>
-
 <div class="form-card">
-  <div style="margin-bottom:14px">
+  <div style="margin-bottom:16px">
     <label class="lbl">Property address</label>
-    <input class="fi" id="addr" type="text" placeholder="26 Smith Street Penrith NSW 2750" autocomplete="off" onkeydown="if(event.key==='Enter')runCheck()">
-    <div class="hint">Australian addresses &middot; NSW has the deepest live planning layers first &middot; Include suburb and postcode for best results</div>
+    <input class="fi" id="addr" type="text"
+      placeholder="Enter address, suburb and postcode"
+      autocomplete="off"
+      onkeydown="if(event.key==='Enter')runCheck()">
+    <div class="hint">Include suburb and postcode for best results &middot; Australia-wide parcel check &middot; planning depth varies by state</div>
   </div>
-  <div class="two" style="margin-bottom:8px">
-    <div>
-      <label class="lbl">
-        Land size / block size (m&#178;)
-      </label>
-      <input class="fi" id="block" type="number" placeholder="Optional — enter advertised, title or contract size" min="100">
+  <details style="margin-bottom:12px">
+    <summary style="cursor:pointer;user-select:none;color:var(--muted2);font-size:.68rem;padding:4px 0">Optional: add known land size and frontage for a more complete result</summary>
+    <div class="two" style="margin-top:10px">
+      <div>
+        <label class="lbl">Land size (m&#178;)</label>
+        <input class="fi" id="block" type="number" placeholder="e.g. 600" min="100">
+        <div class="hint">From rates notice, title or listing</div>
+      </div>
+      <div>
+        <label class="lbl">Street frontage (m)</label>
+        <input class="fi" id="front" type="number" placeholder="e.g. 15" min="1">
+        <div class="hint">Width at street</div>
+      </div>
     </div>
-    <div class="hint" style="margin-top:3px;font-size:.63rem">Optional — enter advertised, contract, title or known land size. If blank, SiteVerdict returns a limited location/planning facts check.</div>
-    <div class="hint" style="margin-top:6px;font-size:.6rem;color:var(--muted2)">&#127758; Australia-wide: NSW has deeper planning layers first. For other states, basic address and site context is shown until state planning layers are connected. No NSW-specific zoning, min lot or DA timelines are shown for non-NSW addresses.</div>
-    <div>
-      <label class="lbl">Street frontage (m)</label>
-      <input class="fi" id="front" type="number" placeholder="15" min="1">
-      <div class="hint">Width at street. Check your rates notice.</div>
-    </div>
-  </div>
-  <button class="run-btn" id="run-btn" onclick="runCheck()">Run intelligence check &#8594;</button>
+  </details>
+  <button class="run-btn" id="run-btn" onclick="runCheck()">Check My Land &#8594;</button>
 </div>
 
 <div class="st-bar"><div id="status"></div></div>
@@ -143,6 +151,8 @@
       </div>
     </div>
   </div>
+  <!-- Map first: the user sees their actual land (proof the engine found the property), then the plain-English result below -->
+  <div id="map-card" style="display:none;margin-bottom:14px"></div>
   <div id="result"></div>
 </div>
 
@@ -151,7 +161,7 @@
   <div class="modal" style="position:relative">
     <button class="modal-close" onclick="closeRegModal()" aria-label="Close">&times;</button>
     <div class="modal-title">Register to continue</div>
-    <div class="modal-sub" id="reg-reason">Register free to unlock your full report. No spam. No subscription.</div>
+    <div class="modal-sub" id="reg-reason">Register free to see the fuller picture. No spam. No subscription.</div>
     <form name="siteverdict-registration" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="handleRegSubmit(event)">
       <input type="hidden" name="form-name" value="siteverdict-registration">
       <p style="display:none"><label>Don&apos;t fill this out: <input name="bot-field"></label></p>
@@ -196,11 +206,11 @@
 </div>
 
 <footer>
-  <div>SiteVerdict &middot; ABN 42 663 950 070 &middot; Development intelligence for Australian property &middot; NSW deepest first</div>
+  <div>SiteVerdict &middot; ABN 42 663 950 070</div>
   <div>
-    <a href="https://wa.me/61402623628" style="color:inherit">Chat with us</a> &middot;
-    <a href='/hot-list' style="color:inherit">Hot list</a> &middot;
-    <a href='/services' style="color:inherit">Services</a> &middot;
+    <a href="/what-this-may-mean.html" style="color:inherit">What This May Mean</a> &middot;
+    <a href="/full-report.html" style="color:inherit">Find Out What My Land Can Do</a> &middot;
+    <a href='/services' style="color:inherit">Professional Pathway</a> &middot;
     <a href='/terms' style="color:inherit">Terms</a> &middot;
     <button onclick="window.print()" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:.6rem;font-family:inherit">&#128438; Print report</button>
   </div>

@@ -11,10 +11,19 @@
 /*.pem              /404.html  404!
 /register-trader.html  /404.html  404!
 
+# ── Old pages folded into Professional Pathway (forced — beats static files) ──
+/hot-list           /services  301!
+/hot-list/*         /services  301!
+/hot-list.html      /services  301!
+/finance            /services  301!
+/finance/*          /services  301!
+/finance.html       /services  301!
+/sell-lease         /services  301!
+/sell-lease/*       /services  301!
+/sell-lease.html    /services  301!
+
 # ── Clean URLs ─────────────────────────────────────────────────────
-/hot-list           /hot-list.html      200
-/services           /services.html      200
-/finance            /finance.html       200
-/terms              /terms.html         200
-/full-report        /full-report.html   200
-/sell-lease         /sell-lease.html    200
+/services           /services.html              200
+/terms              /terms.html                 200
+/full-report        /full-report.html           200
+/what-this-may-mean /what-this-may-mean.html    200

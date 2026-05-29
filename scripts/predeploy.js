@@ -30,7 +30,7 @@ const ONLY_VER   = args.includes('--version-only');
 const ALL        = !ONLY_SYN && !ONLY_WORD && !ONLY_VER;
 
 // ── Expected package number — update this each release ────────────
-const EXPECTED_PKG = '87';
+const EXPECTED_PKG = '96';
 
 let passed = 0, failed = 0;
 const failures = [];
@@ -121,8 +121,8 @@ if (ALL || ONLY_VER) {
       fail(`package_number must be ${EXPECTED_PKG}`, `got "${pkg}" — update version.json`);
 
     const svs = vj.sitecheck_js_size || 0;
-    if (svs >= 200000) ok(`sitecheck_js_size = ${svs}b (\u2265 200000)`);
-    else fail('sitecheck_js_size too small', `${svs}b`);
+    if (svs >= 85000) ok(`sitecheck_js_size = ${svs}b (\u2265 85000)`);
+    else fail('sitecheck_js_size too small', `${svs}b, expected \u2265 85000 — may indicate stripped guards`);
 
     if (vj.build_name && String(vj.build_name).includes(EXPECTED_PKG))
       ok(`build_name = ${vj.build_name}`);
@@ -144,6 +144,18 @@ if (ALL || ONLY_VER) {
       ok(`sitecheck-test.js expects package ${EXPECTED_PKG}`);
     else
       fail('sitecheck-test.js has wrong package number', `expected PACKAGE_NUMBER = '${EXPECTED_PKG}'`);
+
+    // ── HARD CHECK: deploy-check.html must expect EXACT current package ──
+    // This catches the bug where version.json is bumped but deploy-check.html is forgotten.
+    const dchContent = fs.readFileSync(path.join(PUBLIC, 'deploy-check.html'), 'utf8');
+    const dchPkgMatch = dchContent.match(/String\(v\.package_number\)==='(\d+)'/);
+    const dchPkg = dchPkgMatch ? dchPkgMatch[1] : null;
+    if (dchPkg === EXPECTED_PKG)
+      ok(`deploy-check.html expects exact package ${EXPECTED_PKG}`);
+    else
+      fail('deploy-check.html package mismatch',
+        `deploy-check expects ${dchPkg || 'NOT FOUND'}, should be ${EXPECTED_PKG}. ` +
+        `This causes false pass/fail on the live deploy check page.`);
 
   } catch(e) { fail('version.json', e.message); }
 }
@@ -173,6 +185,77 @@ if (ALL) {
   for (const [label, needle] of GUARDS) {
     if (svContent.includes(needle)) ok(label);
     else fail(label, `"${needle}" not found in sv-check.js`);
+  }
+
+  // ── PRODUCT OUTPUT WORDING CHECKS ─────────────────────────────────
+  // Fail if old report-style section titles are still in the rendered output.
+  // This catches the bug where new sections were added ON TOP of old sections.
+  // Check _renderResultInner specifically — this is what writes to resultEl.innerHTML
+  // Extract just the _renderResultInner function body
+  const rriStart = svContent.indexOf('function _renderResultInner(');
+  const rriEnd   = svContent.indexOf('\nfunction ', rriStart + 100);
+  const rriBody  = rriStart !== -1 && rriEnd !== -1
+    ? svContent.slice(rriStart, rriEnd) : svContent;
+
+  const FORBIDDEN_RSEC = ['Overlay analysis', 'Risk register', 'Development pathway'];
+  for (const section of FORBIDDEN_RSEC) {
+    const pattern    = `rsec-title">${section}`;
+    const altPattern = `rsec-title\\">${section}`;
+    if (rriBody.includes(pattern) || rriBody.includes(altPattern)) {
+      fail(`Old result section "${section}" still in _renderResultInner H assembly`,
+        'This section must be removed — it renders directly to the user');
+    } else {
+      ok(`Old section "${section}" absent from _renderResultInner`);
+    }
+  }
+
+  // New flow labels must be present in buildVerdictSection (as section heading strings or comments)
+  const REQUIRED_LABELS = ['What we found', 'What this may mean', 'What is still missing'];
+  for (const label of REQUIRED_LABELS) {
+    if (svContent.includes(label)) {
+      ok(`New flow label present: "${label}"`);
+    } else {
+      fail(`New flow label missing: "${label}"`);
+    }
+  }
+
+  // Dead display functions must not be defined (proven unreachable and deleted)
+  const DEAD_FNS = [
+    'buildPersonaNextSteps', 'buildFinancialAssumptions', 'svCalcFin',
+    'buildHBUSection', 'buildCouncilBehaviour', 'buildShareableSummary',
+    'buildVerificationChecklist', 'buildRiskNotes', 'buildMissingInfoSection',
+    'buildEvidenceLedger', 'buildSiteContextSection',
+    'buildProVerification', 'buildConstraintChecklist',
+  ];
+  for (const fn of DEAD_FNS) {
+    if (svContent.includes(`function ${fn}(`)) {
+      fail(`Dead display function "${fn}" still defined — should have been deleted`, 'Remove it from sv-check.js');
+    } else {
+      ok(`Dead display function "${fn}" confirmed deleted`);
+    }
+  }
+
+  // AI UI functions must not be defined (render old sections when AI API is available)
+  const AI_UI_FNS = [
+    'runAIInterpretation', 'renderAIVerdict', 'renderAIRisks',
+    'renderAINextActions', 'showAILoading', 'hideAILoading',
+  ];
+  for (const fn of AI_UI_FNS) {
+    if (svContent.includes(`function ${fn}(`)) {
+      fail(`AI UI function "${fn}" still defined — can render old sections when API is available`, 'Remove or fully rewrite into approved 3-engine flow');
+    } else {
+      ok(`AI UI function "${fn}" confirmed deleted`);
+    }
+  }
+
+  // runAIInterpretation must not be called from renderResult
+  const aiRRStart = svContent.indexOf('function renderResult(');
+  const aiRREnd   = svContent.indexOf('\nfunction ', aiRRStart + 50);
+  const aiRRBody  = aiRRStart !== -1 && aiRREnd !== -1 ? svContent.slice(aiRRStart, aiRREnd) : '';
+  if (aiRRBody.includes('runAIInterpretation(')) {
+    fail('runAIInterpretation() is still called from renderResult', 'Remove the call — AI layer must not mutate public result');
+  } else {
+    ok('runAIInterpretation() not called from renderResult');
   }
 }
 

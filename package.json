@@ -1,7 +1,7 @@
 {
   "name": "siteverdict",
-  "version": "0.87.0",
-  "description": "SiteVerdict \u2014 national Site Check CI release system (package 87)",
+  "version": "0.96.0",
+  "description": "SiteVerdict \u2014 national Site Check CI release system (package 92)",
   "private": true,
   "engines": {
     "node": ">=18.0.0"
