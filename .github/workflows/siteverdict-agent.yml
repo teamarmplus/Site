@@ -1,99 +1,147 @@
-name: SiteVerdict Claude Agent - Overnight
+Overnight Claude Agent job — Package 97 live guard
 
-on:
-  workflow_dispatch:
-  schedule:
-    # 24/7 every 30 minutes.
-    - cron: "7,37 * * * *"
+Do not change code.
 
-permissions:
-  contents: write
-  pull-requests: write
-  issues: write
-  id-token: write
+Do not edit files.
 
-concurrency:
-  group: siteverdict-claude-agent
-  cancel-in-progress: true
+Do not push to GitHub.
 
-jobs:
-  claude-agent:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+Do not deploy.
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+Do not add features.
 
-      - name: Run release check first
-        run: |
-          npm ci
-          npx playwright install --with-deps chromium
-          npm run release-check
+Do not build Package 98 tonight.
 
-      - name: Run Claude agent
-        uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          show_full_output: true
-          prompt: |
-            You are SiteVerdict Overnight Agent.
+Your job tonight is only to check and report.
 
-            Mission: improve SiteVerdict safely, one small step per run.
+Live site:
+https://siteverdict2.netlify.app
 
-            Core values:
-            usefulness, truth, transparency, non-harm, professional verification, no false certainty.
+Check 1 — Version
 
-            Absolute rules:
-            - No production deploy.
-            - No zip files.
-            - No secrets.
-            - No raw data in public/.
-            - No large refactor.
-            - No business model change.
-            - No fake data.
-            - No guaranteed approval/profit/investment/lending wording.
-            - Non-NSW addresses must not show NSW planning overlay wording.
+Open:
+https://siteverdict2.netlify.app/version.json
 
-            Read only these first:
-            - RELEASE_STATUS.md
-            - AGENT_QUEUE.md
-            - FOUNDER_ACTIONS.md
-            - DAILY_LOG.md
+Confirm live site shows:
 
-            If RELEASE_STATUS.md or AGENT_QUEUE.md is missing, create/update only the missing operating files and stop.
+* package_number 97
+* build_name sitecheck-release-check-97
 
-            Work rule:
-            1. Pick the first unblocked P0 or P1 task.
-            2. If blocked by founder/API/registration/payment, write it in FOUNDER_ACTIONS.md, then pick the next safe task.
-            3. Do one small useful change only.
-            4. Maximum 2 files changed.
-            5. If code is changed, run npm run release-check again.
-            6. If tests fail, revert your change or write NOT_READY_REPORT.md.
-            7. Update DAILY_LOG.md every run.
+Check 2 — Deploy check
 
-            Prefer tasks:
-            - keep release-check green
-            - improve automatic tests
-            - improve provider/state health checks
-            - improve National Site Check clarity
-            - improve safe wording
-            - improve AGENT_QUEUE.md / RELEASE_STATUS.md quality
+Open:
+https://siteverdict2.netlify.app/deploy-check.html
 
-            Protected public routes must remain blocked:
-            - /tools
-            - /tools/*
-            - /data
-            - /data/*
-            - /docs
-            - /docs/*
+Report whether it loads and whether it confirms the current package.
 
-            End with exactly one:
-            - SMALL UPDATE COMPLETE
-            - BLOCKED BUT CONTINUED
-            - NO SAFE TASK
-            - NOT READY
+Check 3 — Homepage
 
-            Keep final output under 200 words.
-          claude_args: |
-            --max-turns 20
+Open:
+https://siteverdict2.netlify.app
+
+Confirm:
+
+* homepage loads
+* base map appears before search
+* address box is easy to find
+* Check My Land button is easy to see
+
+Check 4 — NSW Site Check
+
+Test this address:
+
+148 Canley Vale Road, Canley Heights NSW 2166
+
+Confirm:
+
+* search works
+* map appears above result
+* parcel/boundary appears if available
+* fact strip appears
+* result appears below map
+* CTA is unchanged
+* disclaimer is visible
+* no console error blocks the result
+* only one Leaflet map is created
+* no duplicate map initialization error
+
+Check 5 — QLD preview
+
+Test this address:
+
+1 Queen Street, Brisbane QLD 4000
+
+Confirm:
+
+* QLD preview works
+* map appears
+* it does not claim full planning controls
+* it clearly says planning controls are not fully connected for this state
+* it does not imply approval
+* it does not imply profit
+* it does not imply certainty
+
+Check 6 — Mobile check
+
+Check mobile view.
+
+Confirm:
+
+* address box is easy to find
+* base map appears
+* button is easy to tap
+* sticky header does not cover map
+* sticky header does not cover fact strip
+* sticky header does not cover result header
+* sticky header does not cover stats row
+* sticky header does not cover CTA
+
+Check 7 — 80-year-old homeowner review
+
+Pretend the user is an 80-year-old homeowner.
+
+Answer clearly:
+
+* Is Site Check simple enough?
+* Is there too much text?
+* Does it feel like a map app?
+* What is confusing?
+* What is the smallest safe Package 98 improvement?
+
+Return report only in this format:
+
+1. Live package:
+2. What passed:
+3. What failed:
+4. NSW result:
+5. QLD result:
+6. Mobile result:
+7. 80-year-old homeowner review:
+8. Smallest safe Package 98 improvement:
+9. Code changed? yes/no
+
+Important rules:
+
+Code changed must be NO.
+
+Do not build Package 98 tonight.
+
+Do not add TAS, VIC, WA, SA, ACT, or NT.
+
+Do not redesign other pages.
+
+Do not change scoring.
+
+Do not change backend/API logic.
+
+Do not change result wording.
+
+Do not change CTA.
+
+Do not remove disclaimers.
+
+Do not claim exact dimensions.
+
+Do not push.
+
+Do not deploy.
