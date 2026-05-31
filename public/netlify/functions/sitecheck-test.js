@@ -26,8 +26,8 @@ const CORS = {
   'Content-Type':                 'application/json',
 };
 
-const BUILD_MARKER   = 'sitecheck-release-check-96';
-const PACKAGE_NUMBER = '96';
+const BUILD_MARKER   = 'sitecheck-release-check-97';
+const PACKAGE_NUMBER = '97';
 
 function isLotAddr(s)   { return /^(lot|proposed\s+lot)\s+\d+/i.test((s||'').trim()); }
 function isRangeAddr(s) { return /^\d+\s*-\s*\d+\s+/i.test((s||'').trim()); }

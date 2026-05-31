@@ -30,7 +30,7 @@ const ONLY_VER   = args.includes('--version-only');
 const ALL        = !ONLY_SYN && !ONLY_WORD && !ONLY_VER;
 
 // ── Expected package number — update this each release ────────────
-const EXPECTED_PKG = '96';
+const EXPECTED_PKG = '97';
 
 let passed = 0, failed = 0;
 const failures = [];

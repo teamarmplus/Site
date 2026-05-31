@@ -38,123 +38,17 @@ SiteVerdict must be:
 10. **Protected routes must stay blocked:** `/tools`, `/data`, `/docs`, and their subdirs.
 
 ---
-# Claude Instructions for SiteVerdict
 
-## Current priority
+## National Site Check acceptance criteria
 
-Focus only on Site Check.
+A Site Check is complete only when every Australian address ends in one of:
+1. NSW deep report (zone, overlays, parcel data, DA timeline)
+2. Connected state report (ACT/TAS with live provider data)
+3. Limited state report (VIC/QLD/SA/WA/NT with honest status + missing-data warning)
+4. Clear address-not-matched message
+5. Clear timeout/error card (SITE_CHECK_TIMEOUT after 20s)
 
-The other pages are not the priority right now. Do not redesign services pages, terms pages, professional pathway pages, or general marketing pages unless T explicitly asks.
-
-## Product direction
-
-SiteVerdict must become a simple map-first land checking app.
-
-NSW first.
-
-The goal is to become more useful than Landchecker by combining:
-
-* map-first land view
-* parcel boundary
-* approximate land facts
-* planning controls
-* risk signals
-* plain-English explanation
-* honest professional next step
-
-## Current live baseline
-
-Package 96 is the current live baseline.
-
-Protect Package 96 unless T explicitly approves a new package.
-
-Package 96 includes:
-
-* map-first result
-* Leaflet SRI fixed and version pinned
-* NSW Site Check working
-* QLD preview safe
-* wording: “Australia-wide parcel check · planning depth varies by state”
-* disclaimer: “Approximate boundary and dimensions only — not a survey. Confirm by title plan or licensed surveyor.”
-
-## Package 97 direction
-
-Package 97 should focus only on Site Check.
-
-Package 97 goal:
-
-Make NSW Site Check feel like a map app, not a website.
-
-Preferred order:
-
-1. Base map visible on arrival
-2. Address search over or near the map
-3. One clear “Check My Land” button
-4. Fewer words before action
-5. Optional land size/frontage moved below main action
-6. Parcel boundary shown clearly after search
-7. Land facts near map:
-
-   * land size
-   * lot/plan
-   * LGA
-   * planning zone
-   * frontage only if safely available
-8. Approximate dimensions only if safe
-9. Plain-English result below map
-
-## Hard rules
-
-Do not change scoring unless T explicitly approves.
-
-Do not change backend/API logic unless T explicitly approves.
-
-Do not change result wording unless T explicitly approves.
-
-Do not add TAS, VIC, WA, SA, NT, or ACT unless T explicitly approves.
-
-Do not overclaim exact dimensions.
-
-Do not imply development approval.
-
-Do not imply profit.
-
-Do not imply certainty.
-
-Do not remove disclaimers.
-
-Do not commit secrets, API keys, raw spatial datasets, or private credentials.
-
-## Required disclaimer
-
-Use this wording whenever boundary or dimensions are shown:
-
-“Approximate boundary and dimensions only — not a survey. Confirm by title plan or licensed surveyor.”
-
-## Agent role
-
-Claude Agent should be a guard and planner first.
-
-Claude Agent should not change code unless T explicitly approves.
-
-Every agent run should return:
-
-1. What passed
-2. What failed
-3. Live site status
-4. Site Check weakness
-5. Recommended next step
-6. Whether code was changed: yes/no
-
-## Founder principle
-
-Build slowly, honestly, and usefully.
-
-SiteVerdict should help people avoid wasting money and confusion.
-
-Trust is more important than hype.
-
-
+**Never:** empty result, stuck "Checking...", or NSW overlay data shown for non-NSW address.
 
 ### Forbidden non-NSW rendered text
 - NSW Planning Portal

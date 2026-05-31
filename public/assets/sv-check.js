@@ -696,6 +696,7 @@ function _showNonNSWResult(addr, state, geo, landSizeInput, frontage, addrType){
   var mAddr  = (geo && geo.matchedAddr) || addr;
   var src    = (geo && geo.source)      || 'Geocode';
   var council= (geo && geo.council)     || '';
+  try { window._svCouncil = council; } catch(e){}
   var geoConf= conf;
 
   // State-specific status messages
@@ -906,17 +907,20 @@ function esc(v, maxLen){
 
 // ── SOURCE BADGE HELPER ───────────────────────────────
 
-function _renderMap(lat, lon, state, matchedAddr) {
+// Build the map card shell + ONE Leaflet map. Called once on load (base map) and
+// reused on every check. Returns the map instance or null. Display-only.
+function _ensureBaseMap() {
   var mapCard = document.getElementById('map-card');
-  if (!mapCard) return;
-  if (typeof L === 'undefined') return;  // Leaflet not loaded
+  if (!mapCard) return null;
+  if (typeof L === 'undefined') return null;
 
-  // Show the map card
+  // Already built — reuse the cached instance
+  if (window._svMap) return window._svMap;
+
   mapCard.style.display = 'block';
   mapCard.style.maxWidth = '620px';
   mapCard.style.margin = '0 auto 12px';
 
-  // Create map container
   mapCard.innerHTML = [
     '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden">',
       '<div style="padding:10px 16px 6px;font-size:.62rem;font-weight:700;text-transform:uppercase;',
@@ -924,7 +928,15 @@ function _renderMap(lat, lon, state, matchedAddr) {
         '<span>Map preview</span>',
         '<span style="font-weight:400;color:var(--muted)">&#183; Location approximate &#183; Not a survey</span>',
       '</div>',
-      '<div id="sv-map" style="height:220px;width:100%"></div>',
+      '<div id="sv-map" style="height:220px;width:100%;position:relative">',
+        '<div id="sv-map-empty" style="position:absolute;inset:0;z-index:400;display:flex;',
+          'align-items:center;justify-content:center;text-align:center;padding:0 18px;',
+          'background:var(--bg2);color:var(--muted);font-size:.9rem;pointer-events:none">',
+          'Enter your address to see your land',
+        '</div>',
+      '</div>',
+      '<div id="sv-fact-strip" style="display:none;padding:8px 16px;border-top:1px solid var(--border);',
+        'font-size:.78rem;color:var(--muted);line-height:1.6"></div>',
       '<div id="sv-map-note" style="padding:6px 16px 10px;font-size:.63rem;color:var(--muted2)">',
         '&#169; <a href="https://www.openstreetmap.org/copyright" target="_blank" ',
         'style="color:var(--muted2)">OpenStreetMap contributors</a>',
@@ -934,35 +946,82 @@ function _renderMap(lat, lon, state, matchedAddr) {
 
   try {
     var map = L.map('sv-map', {
-      center: [lat, lon],
-      zoom: 17,
+      center: [-33.5, 151.0],   // NSW-centred base view before any search
+      zoom: 5,
       zoomControl: true,
       attributionControl: false,
     });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+    window._svMap = map;
+    window._svOverlayLayers = [];   // pin + parcel layers, cleared each check
+    return map;
+  } catch(e) {
+    return null;
+  }
+}
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-    }).addTo(map);
+function _renderMap(lat, lon, state, matchedAddr) {
+  var mapCard = document.getElementById('map-card');
+  if (!mapCard) return;
+  if (typeof L === 'undefined') return;  // Leaflet not loaded
 
-    // Custom pin
-    var pin = L.circleMarker([lat, lon], {
-      radius: 7,
-      fillColor: '#c8a84b',
-      color: '#ffffff',
-      weight: 2,
-      opacity: 1,
-      fillOpacity: 1,
-    }).addTo(map);
+  mapCard.style.display = 'block';
 
-    // NSW: fetch parcel outline from SIX Maps (CC BY 4.0, no key)
+  try {
+    var map = _ensureBaseMap();
+
+    if (map) {
+      // REUSE path: clear previous pin/parcel layers, hide empty-state, pan in
+      var empty = document.getElementById('sv-map-empty');
+      if (empty) empty.style.display = 'none';
+      if (window._svOverlayLayers) {
+        window._svOverlayLayers.forEach(function(l){ try { map.removeLayer(l); } catch(e){} });
+      }
+      window._svOverlayLayers = [];
+      // Reset the map note + fact strip for this check
+      var note0 = document.getElementById('sv-map-note');
+      if (note0) note0.innerHTML = '&#169; <a href="https://www.openstreetmap.org/copyright" target="_blank" style="color:var(--muted2)">OpenStreetMap contributors</a>';
+      var fs0 = document.getElementById('sv-fact-strip');
+      if (fs0) { fs0.style.display = 'none'; fs0.innerHTML = ''; }
+
+      map.setView([lat, lon], 17);
+      setTimeout(function(){ try { map.invalidateSize(); } catch(e){} }, 60);
+
+      var pin = L.circleMarker([lat, lon], {
+        radius: 7, fillColor: '#c8a84b', color: '#ffffff',
+        weight: 2, opacity: 1, fillOpacity: 1,
+      }).addTo(map);
+      window._svOverlayLayers.push(pin);
+    } else {
+      // FALLBACK path (base map unavailable): original create-on-demand behaviour
+      mapCard.style.maxWidth = '620px';
+      mapCard.style.margin = '0 auto 12px';
+      mapCard.innerHTML = [
+        '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden">',
+          '<div style="padding:10px 16px 6px;font-size:.62rem;font-weight:700;text-transform:uppercase;',
+            'letter-spacing:.08em;color:var(--muted2);display:flex;align-items:center;gap:8px">',
+            '<span>Map preview</span>',
+            '<span style="font-weight:400;color:var(--muted)">&#183; Location approximate &#183; Not a survey</span>',
+          '</div>',
+          '<div id="sv-map" style="height:220px;width:100%"></div>',
+          '<div id="sv-fact-strip" style="display:none;padding:8px 16px;border-top:1px solid var(--border);font-size:.78rem;color:var(--muted);line-height:1.6"></div>',
+          '<div id="sv-map-note" style="padding:6px 16px 10px;font-size:.63rem;color:var(--muted2)">',
+            '&#169; <a href="https://www.openstreetmap.org/copyright" target="_blank" style="color:var(--muted2)">OpenStreetMap contributors</a>',
+          '</div>',
+        '</div>',
+      ].join('');
+      map = L.map('sv-map', { center: [lat, lon], zoom: 17, zoomControl: true, attributionControl: false });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+      L.circleMarker([lat, lon], { radius: 7, fillColor: '#c8a84b', color: '#ffffff', weight: 2, opacity: 1, fillOpacity: 1 }).addTo(map);
+    }
+
+    // Parcel outline (unchanged adapters) — NSW / QLD / other
     if (state === 'NSW' || (state !== 'ACT' && state !== 'TAS' && state !== 'QLD' &&
         state !== 'VIC' && state !== 'SA' && state !== 'WA' && state !== 'NT')) {
       _fetchParcelOutline(lat, lon, map);
     } else if (state === 'QLD') {
-      // QLD: fetch parcel outline from DCDB (CC BY 4.0, no key) — second state adapter
       _fetchParcelOutlineQLD(lat, lon, map);
     } else {
-      // Other states: parcel outline not yet connected — show pin + note only
       var note = document.getElementById('sv-map-note');
       if (note) {
         note.innerHTML += ' &#183; Parcel outline not yet available for this state &#183; Location pin only';
@@ -984,7 +1043,7 @@ function _fetchParcelOutline(lat, lon, map) {
     + '&distance=50'
     + '&units=esriSRUnit_Meter'
     + '&spatialRel=esriSpatialRelIntersects'
-    + '&outFields=cadid,lotidstring,planlabel,areatotalm2,lganame'
+    + '&outFields=*'
     + '&returnGeometry=true'
     + '&outSR=4326'
     + '&f=json';
@@ -1006,26 +1065,54 @@ function _fetchParcelOutline(lat, lon, map) {
       // Draw parcel outline
       if (geom && geom.rings && geom.rings.length) {
         var latlngs = geom.rings[0].map(function(pt) { return [pt[1], pt[0]]; });
-        L.polygon(latlngs, {
+        var parcelPoly = L.polygon(latlngs, {
           color: '#c8a84b',
           weight: 2,
           fillColor: '#c8a84b',
           fillOpacity: 0.08,
         }).addTo(map);
+        if (window._svOverlayLayers) window._svOverlayLayers.push(parcelPoly);
 
         // Fit map to parcel bounds
-        var poly = L.polygon(latlngs);
-        map.fitBounds(poly.getBounds(), { padding: [20, 20] });
+        map.fitBounds(parcelPoly.getBounds(), { padding: [20, 20] });
       }
 
-      // Update note with parcel info
+      // Fact strip — display mirror of fields already fetched (no scoring, no compute)
+      var fs = document.getElementById('sv-fact-strip');
+      // Build a clean Lot/Plan from parts (avoid raw lotidstring like "100//DP1033915")
+      var lotPlan = '';
+      if (attrs.lotnumber && attrs.planlabel) lotPlan = 'Lot ' + attrs.lotnumber + ' \u00b7 ' + attrs.planlabel;
+      else if (attrs.planlabel) lotPlan = attrs.planlabel;
+      else if (attrs.lotnumber) lotPlan = 'Lot ' + attrs.lotnumber;
+      // Land size: areatotalm2 first, then planlotarea fallback (omit cleanly if neither)
+      var landArea = (attrs.areatotalm2 != null && attrs.areatotalm2 !== '') ? attrs.areatotalm2
+        : ((attrs.planlotarea != null && attrs.planlotarea !== '') ? attrs.planlotarea : null);
+      // Council: parcel lganame first, then existing result council value
+      var council = (attrs.lganame && String(attrs.lganame).trim()) ? String(attrs.lganame).trim() : (window._svCouncil || '');
+      if (fs && (lotPlan || landArea || council || window._svZoneName)) {
+        var chips = [];
+        if (landArea) chips.push('<b>Land size</b> ~' + Math.round(landArea) + ' m&#178;');
+        if (lotPlan)  chips.push('<b>Lot/Plan</b> ' + lotPlan);
+        if (council)  chips.push('<b>Council</b> ' + council);
+        if (window._svZoneName) chips.push('<b>Planning zone</b> ' + window._svZoneName);
+        if (chips.length) {
+          fs.innerHTML = chips.join(' &nbsp;&#183;&nbsp; ')
+            + '<div style="margin-top:6px;color:var(--muted2);font-size:.72rem">'
+            + 'Approximate boundary and dimensions only — not a survey. Confirm by title plan or licensed surveyor.</div>';
+          fs.style.display = 'block';
+        }
+      }
+
+      // Update note with parcel info (clean Lot/Plan from parts)
       var note = document.getElementById('sv-map-note');
-      if (note && attrs.lotidstring) {
-        var areaStr = attrs.areatotalm2 ? ' &#183; ~' + Math.round(attrs.areatotalm2) + 'm&#178;' : '';
-        note.innerHTML = 'Parcel: ' + attrs.lotidstring
-          + (attrs.planlabel ? ' / ' + attrs.planlabel : '')
+      if (note && (attrs.lotnumber || attrs.planlabel)) {
+        var noteLotPlan = (attrs.lotnumber && attrs.planlabel) ? ('Lot ' + attrs.lotnumber + ' \u00b7 ' + attrs.planlabel)
+          : (attrs.planlabel || ('Lot ' + attrs.lotnumber));
+        var noteArea = (attrs.areatotalm2 != null && attrs.areatotalm2 !== '') ? attrs.areatotalm2
+          : ((attrs.planlotarea != null && attrs.planlotarea !== '') ? attrs.planlotarea : null);
+        var areaStr = noteArea ? ' &#183; ~' + Math.round(noteArea) + 'm&#178;' : '';
+        note.innerHTML = noteLotPlan
           + areaStr
-          + (attrs.lganame ? ' &#183; ' + attrs.lganame : '')
           + ' &#183; Source: NSW SIX Maps (CC BY 4.0)'
           + ' &#183; <a href="https://www.openstreetmap.org/copyright" target="_blank" '
           + 'style="color:var(--muted2)">&#169; OpenStreetMap</a>';
@@ -1067,14 +1154,14 @@ function _fetchParcelOutlineQLD(lat, lon, map) {
       // Draw parcel outline
       if (geom && geom.rings && geom.rings.length) {
         var latlngs = geom.rings[0].map(function(pt) { return [pt[1], pt[0]]; });
-        L.polygon(latlngs, {
+        var qPoly = L.polygon(latlngs, {
           color: '#c8a84b',
           weight: 2,
           fillColor: '#c8a84b',
           fillOpacity: 0.08,
         }).addTo(map);
-        var poly = L.polygon(latlngs);
-        map.fitBounds(poly.getBounds(), { padding: [20, 20] });
+        if (window._svOverlayLayers) window._svOverlayLayers.push(qPoly);
+        map.fitBounds(qPoly.getBounds(), { padding: [20, 20] });
       }
 
       // Update note with parcel info — clear, two-line. Cannot imply planning certainty.
@@ -1339,6 +1426,15 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
   // Zone label
   var zoneLabels={'R1':'Low density res','R2':'Low density res','R3':'Medium density res','R4':'High density res','R5':'Large lot res','RU1':'Primary production','RU2':'Rural landscape','E4':'Environmental living'};
   var zLabel=(zone&&zoneLabels[zone])||zoneName||(zone?zone+' zone':'Zone unknown');
+  // Capture zone for the map fact strip (display mirror only — no scoring/logic change)
+  try { window._svZoneName = (zone ? zLabel + ' (' + zone + ')' : zLabel); } catch(e){}
+  // Capture LGA/council for the map fact strip (display mirror only — value the result already uses)
+  try {
+    if (lga) {
+      var _lgaClean = String(lga).replace(/\b(\w)(\w*)/g, function(_,a,b){return a+b.toLowerCase();});
+      window._svCouncil = /council|city|shire|municipal/i.test(_lgaClean) ? _lgaClean : (_lgaClean + ' Council');
+    }
+  } catch(e){}
 
   // Stats row values
   var daMedian = cm&&cm.data ? cm.data.days+'d median' : 'No data';
@@ -1606,3 +1702,19 @@ function prepareForAI(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
 
 
 function toggleReg(){var e=document.getElementById("reg-box");e&&e.classList.toggle("show")}function saveResult(){var e=document.getElementById("rn").value.trim(),t=document.getElementById("re").value.trim(),a=document.getElementById("rp").value.trim();if(e&&t&&a){var r=document.getElementById("reg-box");r&&(r.innerHTML='<div style="font-size:.8rem;color:var(--green);padding:4px 0">✓ Saved. We will send you updates for this address.</div>')}else alert("Please fill in all three fields.")}function goReport(){var el=document.getElementById("result");if(el&&el.querySelector(".rcard")){el.scrollIntoView({behavior:"smooth",block:"start"});}else{runCheck();}}function goSample(){window.location.href="/services";}document.addEventListener("keydown",function(e){"Enter"===e.key&&"INPUT"===document.activeElement.tagName&&runCheck()});
+// Package 97: show a calm base map on arrival (map-app feel). Display-only.
+// Reuses _ensureBaseMap; _renderMap reuses the same instance after a check.
+(function _svInitBaseMap(){
+  function tryInit(attempts){
+    if (typeof L !== 'undefined' && document.getElementById('map-card')) {
+      try { _ensureBaseMap(); } catch(e) {}
+      return;
+    }
+    if (attempts > 0) setTimeout(function(){ tryInit(attempts-1); }, 200);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){ tryInit(15); });
+  } else {
+    tryInit(15);
+  }
+})();

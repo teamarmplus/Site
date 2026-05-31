@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- SiteVerdict package 96 build_time 2026-05-29T10:49:32Z build_name sitecheck-release-check-96 -->
+<!-- SiteVerdict package 97 build_time 2026-05-31T09:45:49Z build_name sitecheck-release-check-97 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -51,7 +51,10 @@ html { scroll-padding-top: 84px; }
 /* Sticky nav must fully hide content scrolling beneath it. The shared style uses a
    translucent blurred background, which lets result text ghost through and look broken.
    Make it solid (opaque) — layout/style only, no markup/wording/logic change. */
-nav { background: var(--bg) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+nav { background: var(--bg) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; z-index: 400 !important; }
+/* Result/card use transform for fade-in, which creates a stacking context that can
+   paint over the sticky nav on some mobile engines. Keep them below the nav. */
+.result-wrap, #result, #result .rcard, #map-card { position: relative; z-index: 1; }
 
 /* Desktop hero spacing: a calmer, balanced gap below the sticky nav so the hero
    doesn't feel cramped against the bar. Spacing only — no structure/wording change. */
@@ -83,28 +86,24 @@ nav { background: var(--bg) !important; backdrop-filter: none !important; -webki
 
 <div class="hero">
   
-  <h1>Check your land<br><em>for free</em></h1>
-  <div class="hero-sub">See what we found, what it may mean, and what is still missing before you make a big property decision.</div>
+  <h1>Check your land</h1>
+  <div class="hero-sub">Enter your address. See your land on the map, then a plain-English result.</div>
   <div class="trust-row">
-    <div class="trust-item"><span class="ti-dot"></span>Free &mdash; no account needed</div>
-    <span class="trust-div"></span>
-    <div class="trust-item"><span class="ti-dot"></span>Australian addresses</div>
-    <span class="trust-div"></span>
-    <div class="trust-item"><span class="ti-dot a"></span>Australia-wide parcel check &middot; planning depth varies by state</div>
+    <div class="trust-item"><span class="ti-dot a"></span>Free &middot; Australia-wide parcel check &middot; planning depth varies by state</div>
   </div>
 </div>
 
-<!-- Example insight card — shows what intelligence output looks like -->
+<!-- Site Check — address is the one clear action -->
 <div class="form-card">
-  <div style="margin-bottom:16px">
+  <div style="margin-bottom:14px">
     <label class="lbl">Property address</label>
     <input class="fi" id="addr" type="text"
       placeholder="Enter address, suburb and postcode"
       autocomplete="off"
       onkeydown="if(event.key==='Enter')runCheck()">
-    <div class="hint">Include suburb and postcode for best results &middot; Australia-wide parcel check &middot; planning depth varies by state</div>
   </div>
-  <details style="margin-bottom:12px">
+  <button class="run-btn" id="run-btn" onclick="runCheck()">Check My Land &#8594;</button>
+  <details style="margin-top:12px">
     <summary style="cursor:pointer;user-select:none;color:var(--muted2);font-size:.68rem;padding:4px 0">Optional: add known land size and frontage for a more complete result</summary>
     <div class="two" style="margin-top:10px">
       <div>
@@ -119,11 +118,12 @@ nav { background: var(--bg) !important; backdrop-filter: none !important; -webki
       </div>
     </div>
   </details>
-  <button class="run-btn" id="run-btn" onclick="runCheck()">Check My Land &#8594;</button>
 </div>
 
-<div class="st-bar"><div id="status"></div></div>
+<!-- Base map visible on arrival (map-app feel). Map sits above the result. -->
 <div class="result-wrap">
+  <div id="map-card" style="margin-bottom:14px"></div>
+  <div class="st-bar"><div id="status"></div></div>
   <!-- Loading skeleton (shown while check runs) -->
   <div id="result-skeleton" style="display:none">
     <div class="sk-card">
@@ -151,8 +151,7 @@ nav { background: var(--bg) !important; backdrop-filter: none !important; -webki
       </div>
     </div>
   </div>
-  <!-- Map first: the user sees their actual land (proof the engine found the property), then the plain-English result below -->
-  <div id="map-card" style="display:none;margin-bottom:14px"></div>
+  <!-- Map first: user sees their land, then the plain-English result below -->
   <div id="result"></div>
 </div>
 

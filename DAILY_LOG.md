@@ -20,6 +20,79 @@
 
 
 
+
+
+
+---
+
+## Package 97 blocker fixes — 2026-05-31
+
+Result: PACKAGE READY. Static 100/100, Browser 16 passed/1 skip/0 fail. sv-check.js -> 3f1eabb8.
+
+Blocker 1 — sticky header covered result (FIXED): #result/.rcard transform created a stacking context painting over the sticky nav on mobile. Fix (index.html CSS only): nav z-index 400 + opaque; .result-wrap/#result/.rcard/#map-card position:relative;z-index:1. Verified scrolled mobile: header + stats fully visible, no cut-through.
+
+Blocker 2 — fact strip missing land size + council (FIXED): council now captured from renderResult lga param (display mirror) -> shows "Fairfield Council". Land size (planlotarea) often null on SIX layer 9 -> omitted cleanly, shown when present.
+
+Blocker 3 — messy Lot/Plan (FIXED): built from parts "Lot N - PLAN" e.g. "Lot 30 - DP728" instead of doubled lotidstring.
+
+Guardrails: scoring/backend/result-wording/CTA unchanged; result byte-identical; fake-address gate intact; one Leaflet map (no dup, no console errors); no edge labels; no TAS/VIC/WA; disclaimer present; QLD mock removed from zip.
+
+---
+
+## Package 97 — 2026-05-31 (Site Check map-app, NSW-first)
+
+**Result:** ✓ PACKAGE READY. Static 100/100 · Browser 16 passed, 1 skipped, 0 failed.
+**Zip:** siteverdict-package-97.zip (65 files) · sv-check.js 8a4739ec · all markers=97 (incl package.json 0.97.0)
+
+### Built (per approved spec + build order)
+1. Base map on arrival: _ensureBaseMap() builds shell + ONE Leaflet map on load, NSW-centred, "Enter your address to see your land" overlay. (desktop+mobile confirmed: 6 tiles, 1 container)
+2. Search above the map; one Check My Land button.
+3. _renderMap refactored to REUSE window._svMap (clear overlay layers, pan, pin) with create-fallback if base map absent. Confirmed: exactly 1 .leaflet-container after NSW and QLD checks — NO duplicate-map error.
+4. Parcel boundary kept (NSW + QLD), layers tracked in window._svOverlayLayers and cleared each check.
+5. Fewer words above action (short headline + 1 trust line).
+6. Optional land size/frontage moved BELOW the button.
+7. NSW fact strip (#sv-fact-strip): display-mirror of fetched fields — Land size (planlotarea), Lot/Plan (lotidstring/planlabel), Council (geocode council), Planning zone (captured zLabel). Omits missing fields, never guesses. Disclaimer line included.
+8. Plain-English result unchanged below map: RESULT BYTE-IDENTICAL to pkg96 baseline; CTA count=1.
+
+### Pre-existing bug found & fixed (within map-display layer)
+NSW _fetchParcelOutline requested outFields=areatotalm2,lganame which DO NOT EXIST on SIX layer 9 → ArcGIS returned 0 features → parcel note/area silently never worked. Fixed to real fields: lotidstring, lotnumber, planlabel, planlotarea. LGA now sourced from geocode council (window._svCouncil). This restored the parcel note AND enabled the fact strip.
+
+### Guardrails verified
+- Result wording/CTA: byte-identical (captured + compared).
+- Scoring/backend/API: untouched.
+- Fake-address gate: intact (test passes).
+- One Leaflet map only, no "already initialized" error (console errors: none).
+- No edge dimension labels. No TAS/VIC/WA. No exact-dimension claims. Disclaimer present.
+- QLD test mock used only for local verification, removed from shipped zip.
+
+### Honest notes
+- External NSW SIX endpoint is intermittently slow from sandbox; parcel/fact-strip populate only when it responds (best-effort, fails safe to pin+map). Verified working when endpoint responds.
+- This is package 97; live site still 87 until founder deploys 96/97.
+
+---
+
+## Deploy Prep — 2026-05-29 (lock map-first national preview with QLD parcel check)
+
+**Result:** ✓ PACKAGE READY FOR DEPLOY (push is founder action)
+**Zip:** siteverdict-package-96-DEPLOY.zip (66 files incl DEPLOY_INSTRUCTIONS.md)
+**Commit message:** Lock map-first national preview with QLD parcel check
+
+### Pre-commit checks — all PASS
+1. Full gate: ✓ run
+2. Static: ✓ 100/100
+3. Browser: ✓ 16 passed, 1 skipped, 0 failed
+4. Fake-address gate: ✓ intact
+5. Result wording + CTA: ✓ unchanged (What we found / may mean / still missing / Find Out What My Land Can Do)
+6. No unapproved TAS/VIC/WA code: ✓ confirmed absent (functions + endpoints)
+- Map-first: ✓ #map-card before #result
+- Leaflet SRI: ✓ @1.9.4 + correct pinned hash
+- National wording: ✓ present
+- Disclaimer: ✓ present
+- sv-check.js hash: 162b3225 (verified inside zip)
+
+### Deploy boundary (honest)
+Actual GitHub push + Netlify build require founder account access — cannot be done from sandbox. DEPLOY_INSTRUCTIONS.md in the zip has exact commit/push commands + post-deploy verification (curl version.json must show pkg 96, not 87). Live verification + live screenshots can only happen AFTER founder pushes.
+
 ---
 
 ## Overnight Job — 2026-05-29 (protection checks + VIC/WA/TAS investigation; NO code changes)
