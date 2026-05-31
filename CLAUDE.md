@@ -1,216 +1,213 @@
-# SiteVerdict — CLAUDE.md
+# CLAUDE.md — SiteVerdict Operating Rules
 
-Project rules for AI autonomous operation. Read this before every task.
+## Current live baseline
 
----
+Package 97 is the current live baseline.
 
-## Purpose
+Package 97 means:
 
-SiteVerdict is a national Australian property intelligence tool.
+* Site Check is map-first.
+* Base map appears on arrival.
+* NSW Site Check works.
+* Map appears above result.
+* NSW parcel/fact strip appears where data is available.
+* QLD preview is safe and does not overclaim planning.
+* Result wording, scoring, CTA, and backend logic are unchanged from Package 96.
 
-People use Site Check before they buy, sell, invest, develop, subdivide, finance, renovate, or engage any property professional.
-
-SiteVerdict must be:
-- Useful first — real data that helps real decisions
-- Honest always — no hype, no false certainty, no overclaiming
-- Adaptive — improve every day based on data and test results
-- Professionally caveated — not a planning certificate, not legal/financial advice
-- Never misleading — especially about state data availability
-
----
-
-## Hard rules — never violate
-
-1. **No direct production push.** Always PR → release-check → founder approval.
-2. **No zip without passing release-check.** `npm run package:ready` only runs after `release-check` passes.
-3. **No raw spatial datasets in public/.** GDB, SHP, GPKG, GeoJSON never go in public/.
-4. **No secrets or API keys in any file.** Use `process.env.X` references only. Never hardcode.
-5. **No NSW overlay cards for non-NSW addresses.** State gate must prevent this.
-6. **No "Checking..." forever.** Every address must end in a result or error card within 25s.
-7. **No stale version markers.** All of these must match every release:
-   - `public/version.json` package_number
-   - `package.json` version
-   - `sitecheck-test.js` PACKAGE_NUMBER
-   - `predeploy.js` EXPECTED_PKG
-   - `public/index.html` build marker comment
-8. **No rebuild unless requested.** Smallest safe change that fixes the issue.
-9. **Professional verification required** in every Site Check result.
-10. **Protected routes must stay blocked:** `/tools`, `/data`, `/docs`, and their subdirs.
+Protect Package 97 unless T explicitly approves a new package.
 
 ---
 
-## National Site Check acceptance criteria
+## Main priority
 
-A Site Check is complete only when every Australian address ends in one of:
-1. NSW deep report (zone, overlays, parcel data, DA timeline)
-2. Connected state report (ACT/TAS with live provider data)
-3. Limited state report (VIC/QLD/SA/WA/NT with honest status + missing-data warning)
-4. Clear address-not-matched message
-5. Clear timeout/error card (SITE_CHECK_TIMEOUT after 20s)
+Focus on Site Check first.
 
-**Never:** empty result, stuck "Checking...", or NSW overlay data shown for non-NSW address.
+Site Check is the product.
 
-### Forbidden non-NSW rendered text
-- NSW Planning Portal
-- NSW EPI Flood
-- NSW RFS Bush Fire
-- Section 10.7
-- LEP minimum lot size
-- NSW Planning Portal Layer
-- NSW council overlay
+Do not spend time redesigning other pages unless T explicitly asks.
+
+Other pages can stay basic for now.
 
 ---
 
-## Package identity rule
+## Product direction
 
-Every package must have all these markers set to the SAME number:
+SiteVerdict must become a simple, trusted land-checking app.
 
-```
-public/version.json  → package_number: "N"
-package.json         → version: "0.N.0"
-sitecheck-test.js    → PACKAGE_NUMBER = 'N'
-predeploy.js         → EXPECTED_PKG = 'N'
-public/index.html    → <!-- SiteVerdict package N build_time ... -->
-```
+NSW first.
 
-If any marker does not match → `release-check` must FAIL.
+The goal is to become more useful than Landchecker by combining:
 
----
+1. map-first land view
+2. parcel boundary
+3. land facts
+4. planning controls
+5. risk signals
+6. plain-English explanation
+7. honest professional next step
 
-## Release workflow
+Landchecker shows land.
 
-```
-AI makes change on branch
-       ↓
-npm run release-check    ← must pass (static + browser)
-       ↓
-npm run package:ready    ← only runs if release-check passed
-       ↓
-Creates: siteverdict-github-ready.zip + RELEASE_PROOF.md
-       ↓
-PR created (or founder deploys)
-       ↓
-Founder approves → Netlify deploy
-```
-
-If `release-check` fails:
-```
-npm run package:not-ready
-       ↓
-Creates: siteverdict-NOT-READY-diagnostics-N.zip (NO deploy)
-         NOT_READY_REPORT.md
-         TEST_FAILURES.md
-         FOUNDER_ACTIONS.md (if founder action needed)
-```
+SiteVerdict must show land and explain what it means.
 
 ---
 
-## AI autonomous limits
+## User standard
 
-- Max 3 repair attempts per session before escalating to founder
-- Never push directly to main
-- Never deploy to production without founder approval
-- Never invent data — only use official/public/verifiable sources
-- If blocked on account/API key → document in FOUNDER_ACTIONS.md, continue other work
+Assume the user may be an 80-year-old homeowner.
 
----
+The experience must be:
 
-## State data honesty
+* easy to understand in 10 seconds
+* map-first
+* one clear address box
+* one clear button
+* no long explanation before action
+* readable on mobile
+* honest and calm
+* not technical unless needed
 
-| State | Current status | What to show |
-|---|---|---|
-| NSW | Deep live API | Zone, overlays, parcel, heritage, flood, bushfire, DA |
-| ACT | Live ACTmapi | ACT zones + cadastre; indicator only; no NSW cards |
-| TAS | Live theLIST | TPS zones + cadastre; CC BY 3.0 AU; no NSW cards |
-| VIC | Vicmap GDB received | PostGIS pending; honest status; no fake zone |
-| QLD | QSCF received | PostGIS pending; no state zone layer (77 councils); honest |
-| SA | P&D Code GeoJSON | PostGIS pending; no fake zone |
-| WA | SLIP pending account | Not yet connected; honest |
-| NT | NTLIS limited | Not yet connected; honest |
+If an older homeowner would feel confused, the design is not good enough.
 
 ---
 
-## External Data Provider Communication Rule
+## Package 98 direction
 
-When SiteVerdict contacts a council, state agency, data owner, or API provider — by email, web form, or any written channel — every message must follow these rules.
+Package 98 should improve Site Check only.
 
-### What to disclose (truthful, minimal)
+Possible Package 98 goals:
 
-- We are building a free public property information tool for Australia
-- We display official and open data to help people understand property context before decisions
-- We attribute every data source correctly per the applicable licence
-- We are a small Australian business (ABN: 42 663 950 070)
-- We are requesting access to / confirming licence terms for a specific named dataset
+1. Make the first screen even simpler.
+2. Make the map larger and easier to understand.
+3. Make the address search more obvious.
+4. Make NSW parcel boundary clearer.
+5. Make land facts easier to read.
+6. Improve mobile usability.
+7. Prepare safe approximate frontage/dimension investigation.
 
-### What not to disclose unprompted
-
-- Internal revenue model or pricing strategy
-- Names of other data providers or API keys we hold
-- Technical architecture details (PostGIS, Netlify, provider file structure)
-- Future product roadmap beyond the immediate request
-- That the system uses AI to assist with report drafting
-
-### AI-assisted, not AI-final
-
-If asked about how data is used in reports: *"Our system uses AI to assist with drafting property context summaries. All results carry a professional verification disclaimer and are not presented as planning certificates."*
-
-Never say: "AI generates the reports" or "fully automated" — these overstate and misrepresent.
-
-### Licence-first rule
-
-Before integrating any new data source, confirm in writing (email or documented web page):
-
-1. Licence name and version (e.g. CC BY 4.0, OGL, custom)
-2. Whether commercial use is permitted
-3. Whether automated point queries are permitted
-4. Required attribution text
-5. Any rate limits or fair-use obligations
-
-Do not integrate data until at least items 1, 2, and 3 are confirmed. Document the answer in `data/state-source-registry.json` before the provider file is written.
-
-### No raw data resale
-
-SiteVerdict does not sell, redistribute, or sublicence raw datasets. We display derived property-context summaries with attribution. This must be stated if a data owner asks about our distribution model.
-
-### Professional verification always required
-
-Every result shown to end users must carry: *"Not a planning certificate. Professional verification required before any property, finance, or development decision."*
-
-This applies regardless of data quality or source authority.
-
-### Template for outreach emails
-
-Use this structure when writing to a data provider:
-
-> Subject: Data licence clarification — SiteVerdict (ABN 42 663 950 070)
->
-> We are building SiteVerdict, a free public property information tool for Australia. We display official open data to help people understand property context before purchase, development, or finance decisions. Every source is attributed per its licence terms.
->
-> We would like to confirm the licence terms for: [dataset name and URL]
->
-> Specifically:
-> 1. Is commercial use permitted?
-> 2. Are automated point queries permitted?
-> 3. What attribution text is required?
->
-> We do not redistribute raw data. Results carry a professional verification disclaimer.
->
-> Thank you — [Founder name], SiteVerdict
+Package 98 must not start unless T approves.
 
 ---
 
-## When to ask the founder
+## Hard rules
 
-Only ask for:
-- Account registrations that require personal/business login
-- API keys that require payment or formal agreement
-- Direction decisions (new features, new state priorities)
-- Ethics or safety judgments
-- Partnership or commercial decisions
+Do not change scoring unless T explicitly approves.
 
-Never ask for:
-- Manual test runs
-- Manual bug discovery
-- Repetitive checking work
-- Version number updates
-- Wording fixes AI can make safely
+Do not change backend/API logic unless T explicitly approves.
+
+Do not change result wording unless T explicitly approves.
+
+Do not change the CTA unless T explicitly approves.
+
+Do not add TAS, VIC, WA, SA, ACT, or NT unless T explicitly approves.
+
+Do not redesign other pages unless T explicitly approves.
+
+Do not claim exact dimensions.
+
+Do not imply development approval.
+
+Do not imply profit.
+
+Do not imply certainty.
+
+Do not remove disclaimers.
+
+Do not commit secrets, API keys, private credentials, or raw spatial datasets.
+
+Do not push to main unless T explicitly approves.
+
+Do not deploy unless T explicitly approves.
+
+---
+
+## Required disclaimer
+
+Use this whenever boundary, area, frontage, or dimensions are shown:
+
+“Approximate boundary and dimensions only — not a survey. Confirm by title plan or licensed surveyor.”
+
+---
+
+## Claude Agent role
+
+Claude Agent is a guard, tester, and reviewer first.
+
+Claude Agent should not change code unless T clearly says the task is approved to build.
+
+Claude Agent should not push to GitHub.
+
+Claude Agent should not deploy.
+
+Claude Agent should not create new features by itself.
+
+Claude Agent should protect the live site and report clearly.
+
+---
+
+## Claude Max role
+
+Claude Max is the builder.
+
+Claude Max can build only after T approves the exact change.
+
+Claude Max must test before presenting a package.
+
+Claude Max must not show T weak work as final.
+
+If something is still obviously weak, Claude Max should say so and propose the smallest safe improvement.
+
+---
+
+## Testing standard
+
+Every serious package must check:
+
+1. version.json package number
+2. homepage loads
+3. Site Check works
+4. NSW map/result works
+5. QLD preview remains safe
+6. mobile layout is clean
+7. fake-address gate works
+8. no duplicate Leaflet map error
+9. no console error blocks result
+10. result wording and CTA remain unchanged unless approved
+11. disclaimer remains visible
+12. deploy-check page works
+
+---
+
+## Agent report format
+
+Every Claude Agent report must use this format:
+
+1. Live package:
+2. What passed:
+3. What failed:
+4. NSW result:
+5. QLD result:
+6. Mobile result:
+7. 80-year-old homeowner review:
+8. Smallest safe next improvement:
+9. Code changed? yes/no
+
+If code changed without approval, that is a failure.
+
+---
+
+## Founder principle
+
+Build slowly.
+
+Be honest.
+
+Be useful.
+
+Help people avoid wasting money.
+
+Trust is more important than hype.
+
+Do not decorate SiteVerdict.
+
+Make the engine visible, simple, trusted, and useful.
