@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- SiteVerdict package 98 build_time 2026-05-31T12:13:20Z build_name sitecheck-release-check-98 -->
+<!-- SiteVerdict package 99 build_time 2026-06-01T01:16:05Z build_name sitecheck-release-check-99 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -103,21 +103,6 @@ nav { background: var(--bg) !important; backdrop-filter: none !important; -webki
       onkeydown="if(event.key==='Enter')runCheck()">
   </div>
   <button class="run-btn" id="run-btn" onclick="runCheck()">Check My Land &#8594;</button>
-  <details style="margin-top:12px">
-    <summary style="cursor:pointer;user-select:none;color:var(--muted2);font-size:.68rem;padding:4px 0">Optional: add known land size and frontage for a more complete result</summary>
-    <div class="two" style="margin-top:10px">
-      <div>
-        <label class="lbl">Land size (m&#178;)</label>
-        <input class="fi" id="block" type="number" placeholder="e.g. 600" min="100">
-        <div class="hint">From rates notice, title or listing</div>
-      </div>
-      <div>
-        <label class="lbl">Street frontage (m)</label>
-        <input class="fi" id="front" type="number" placeholder="e.g. 15" min="1">
-        <div class="hint">Width at street</div>
-      </div>
-    </div>
-  </details>
 </div>
 
 <!-- Base map visible on arrival (map-app feel). Map sits above the result. -->
@@ -153,6 +138,23 @@ nav { background: var(--bg) !important; backdrop-filter: none !important; -webki
   </div>
   <!-- Map first: user sees their land, then the plain-English result below -->
   <div id="result"></div>
+  <!-- Package 99A: optional user-entered values, BELOW the result (detect first, ask only if missing) -->
+  <div id="user-input-card" style="display:none;max-width:620px;margin:14px auto 0;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 16px">
+    <div style="font-size:.82rem;color:var(--text);font-weight:600;margin-bottom:4px">Add your own land details (optional)</div>
+    <div style="font-size:.72rem;color:var(--muted2);margin-bottom:10px">If you know these from your rates notice, title or plan, add them. These will be shown as <b>User entered</b>.</div>
+    <div class="two">
+      <div>
+        <label class="lbl">Land size (m&#178;)</label>
+        <input class="fi" id="block" type="number" placeholder="e.g. 600" min="100">
+        <div class="hint">From rates notice, title or listing</div>
+      </div>
+      <div>
+        <label class="lbl">Street frontage (m)</label>
+        <input class="fi" id="front" type="number" placeholder="e.g. 15" min="1">
+        <div class="hint">Width at street</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- REGISTRATION MODAL (Netlify Forms) -->

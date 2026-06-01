@@ -26,6 +26,15 @@
 
 
 
+
+---
+
+## Package 98 sticky-header fix — 2026-06-01
+
+Blocker: mobile sticky nav covered NSW result header/stats. Root cause (measured): after the auto-scroll, the async parcel map + fact strip (display:none->block) shifted page height, leaving the result card top at +34px under the 60px nav. Not a stacking bug (nav already z-400 opaque).
+Fix (layout/scroll only): after the existing scrollIntoView, re-apply scroll once (1800ms) after async map/fact-strip settle. Result card now lands at top=160px, nav bottom 60px -> COVERED: false. Header, OVERALL, full stats row (R2/ZONE, MIN LOT, DA MEDIAN, LAND SIZE) all visible.
+Gate: static 100/100, browser 16 pass/1 skip/0 fail, fake-gate intact, one Leaflet map, QLD safe. No scoring/result-wording/CTA/backend changes. sv-check.js f23972e3. Live still 97 until founder deploys 98.
+
 ---
 
 ## Package 98 — Site Check map quality (agentic loop, 2 loops) — 2026-05-31

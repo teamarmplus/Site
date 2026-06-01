@@ -38,7 +38,7 @@ iframe{display:none;}
 <div class="card">
 <div class="card-title">1. Build identity</div>
 <div class="chk"><div class="dot run" id="d-ver"></div><div class="label">version.json loaded<div class="detail" id="det-ver">…</div></div></div>
-<div class="chk"><div class="dot run" id="d-pkg"></div><div class="label">package_number is current (= 98)<div class="detail" id="det-pkg">…</div></div></div>
+<div class="chk"><div class="dot run" id="d-pkg"></div><div class="label">package_number is current (= 99)<div class="detail" id="det-pkg">…</div></div></div>
 <div class="chk"><div class="dot run" id="d-svs"></div><div class="label">sitecheck_js_size = 90 000 b<div class="detail" id="det-svs">…</div></div></div>
 <div class="chk"><div class="dot run" id="d-marker"></div><div class="label">index.html contains build marker comment<div class="detail" id="det-marker">…</div></div></div>
 </div>
@@ -107,7 +107,7 @@ async function checkBuild(){
   try{
     var v=await(await fetch('/version.json?_='+Date.now(),{cache:'no-store'})).json();
     dot('ver','pass','build_name:'+v.build_name);R.ver=true;
-    var pkOk=(String(v.package_number)==='98');
+    var pkOk=(String(v.package_number)==='99');
     dot('pkg',pkOk?'pass':'fail','package_number: '+v.package_number);R.pkg=pkOk;
     var svOk=(v.sitecheck_js_size||0)>=200000;
     dot('svs',svOk?'pass':'fail',v.sitecheck_js_size+'b');R.svs=svOk;

@@ -805,6 +805,8 @@ function _showNonNSWResult(addr, state, geo, landSizeInput, frontage, addrType){
   ].join('');
 
   resultEl.classList.add('show');
+  // Package 99A: reveal optional user-entered inputs below the result (detect first, ask after)
+  try { var _uic=document.getElementById('user-input-card'); if(_uic) _uic.style.display='block'; } catch(e){}
   setSt('');
 
   // Map preview: pin only for non-NSW until parcel outline is connected per state
@@ -909,6 +911,45 @@ function esc(v, maxLen){
 
 // Build the map card shell + ONE Leaflet map. Called once on load (base map) and
 // reused on every check. Returns the map instance or null. Display-only.
+// Package 99A: compute approximate parcel area from polygon rings + confidence.
+// Display-only. Does NOT feed scoring or the result's own land-size logic.
+// Returns { area, confidence } where confidence is 'detected' | 'estimated' | 'none'.
+function _svParcelArea(rings, fieldArea) {
+  if (!rings || !rings.length) return { area: null, confidence: 'none' };
+  // Multi-ring (strata / multi-part) → not safe to state a single land size
+  if (rings.length > 1) return { area: null, confidence: 'none' };
+  var ring = rings[0];
+  if (!ring || ring.length < 4) return { area: null, confidence: 'none' };
+  var verts = ring.length - 1; // closing vertex repeats first
+  // Local-metre approximation (equirectangular) — fine for small suburban lots only
+  var lat0 = 0, i;
+  for (i = 0; i < ring.length; i++) lat0 += ring[i][1];
+  lat0 /= ring.length;
+  var mlon = 111320 * Math.cos(lat0 * Math.PI / 180), mlat = 110540;
+  var A = 0;
+  for (i = 0; i < ring.length - 1; i++) {
+    var x1 = ring[i][0] * mlon,   y1 = ring[i][1] * mlat;
+    var x2 = ring[i+1][0] * mlon, y2 = ring[i+1][1] * mlat;
+    A += x1 * y2 - x2 * y1;
+  }
+  var area = Math.abs(A) / 2;
+  var fa = (fieldArea != null && fieldArea !== '') ? parseFloat(fieldArea) : null;
+  // Confidence rules (per roadmap):
+  // detected = simple ring, <=12 verts, 50–20,000 m2, and (if field present) within ~10%
+  var simple = verts <= 12 && area >= 50 && area <= 20000;
+  if (simple) {
+    if (fa && fa > 0) {
+      var diff = Math.abs(area - fa) / fa;
+      if (diff <= 0.10) return { area: Math.round(area), confidence: 'detected' };
+      return { area: Math.round(area), confidence: 'estimated' }; // disagree >10%
+    }
+    return { area: Math.round(area), confidence: 'detected' };
+  }
+  // single ring but outside bounds (large/rural or tiny) → estimated, not authoritative
+  if (verts <= 20 && area > 0) return { area: Math.round(area), confidence: 'estimated' };
+  return { area: null, confidence: 'none' };
+}
+
 function _ensureBaseMap() {
   var mapCard = document.getElementById('map-card');
   if (!mapCard) return null;
@@ -1084,14 +1125,24 @@ function _fetchParcelOutline(lat, lon, map) {
       if (attrs.lotnumber && attrs.planlabel) lotPlan = 'Lot ' + attrs.lotnumber + ' \u00b7 ' + attrs.planlabel;
       else if (attrs.planlabel) lotPlan = attrs.planlabel;
       else if (attrs.lotnumber) lotPlan = 'Lot ' + attrs.lotnumber;
-      // Land size: areatotalm2 first, then planlotarea fallback (omit cleanly if neither)
-      var landArea = (attrs.areatotalm2 != null && attrs.areatotalm2 !== '') ? attrs.areatotalm2
-        : ((attrs.planlotarea != null && attrs.planlotarea !== '') ? attrs.planlotarea : null);
+      // Land size (Package 99A): compute from polygon, label confidence.
+      // planlotarea used only as cross-check/fallback. Never fabricate.
+      var areaResult = _svParcelArea(geom && geom.rings, attrs.planlotarea);
+      var landArea = areaResult.area;
+      var landConf = areaResult.confidence;  // 'detected' | 'estimated' | 'none'
+      // Fallback: if polygon gave nothing but the field has a value, show it as estimated
+      if (landArea == null && attrs.planlotarea != null && attrs.planlotarea !== '') {
+        var pf = parseFloat(attrs.planlotarea);
+        if (pf > 0) { landArea = Math.round(pf); landConf = 'estimated'; }
+      }
+      var landLabel = landConf === 'detected' ? 'Detected from parcel'
+        : (landConf === 'estimated' ? 'Estimated from map' : '');
       // Council: parcel lganame first, then existing result council value
       var council = (attrs.lganame && String(attrs.lganame).trim()) ? String(attrs.lganame).trim() : (window._svCouncil || '');
       if (fs && (lotPlan || landArea || council || window._svZoneName)) {
         var chips = [];
-        if (landArea) chips.push('<b>Land size</b> ~' + Math.round(landArea) + ' m&#178;');
+        if (landArea) chips.push('<b>Land size</b> ~' + landArea + ' m&#178; <span style="color:var(--muted2);font-size:.82em">(' + landLabel + ')</span>');
+        else chips.push('<b>Land size</b> <span style="color:var(--muted2)">Not confirmed</span>');
         if (lotPlan)  chips.push('<b>Lot/Plan</b> ' + lotPlan);
         if (council)  chips.push('<b>Council</b> ' + council);
         if (window._svZoneName) chips.push('<b>Planning zone</b> ' + window._svZoneName);
@@ -1544,6 +1595,8 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
 
   resultEl.innerHTML=H;
   resultEl.classList.add('show');
+  // Package 99A: reveal optional user-entered inputs below the result (detect first, ask after)
+  try { var _uic=document.getElementById('user-input-card'); if(_uic) _uic.style.display='block'; } catch(e){}
   resultEl.scrollIntoView({behavior:'smooth',block:'start'});
   // Layout fix: the parcel map + fact strip load async and shift page height after the
   // initial scroll, which can leave the result header tucked under the sticky nav.
