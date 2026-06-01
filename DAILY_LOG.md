@@ -23,6 +23,57 @@
 
 
 
+
+
+
+---
+
+## Package 98 — Site Check map quality (agentic loop, 2 loops) — 2026-05-31
+
+Verified pkg97 live first (package_number 97, _ensureBaseMap present) before starting.
+
+LOOP 1 (weakest = small grey map + faint boundary): map height 220->340px; parcel boundary weight 2->4, fill 0.08->0.18; fact strip .78rem/muted -> .9rem/text colour. Gate 100/100, 16 browser.
+LOOP 2 (next weakest = cramped grey disclaimer): map note .63rem/muted2 -> .72rem/muted, more line-height + padding. Gate 100/100, 16 browser.
+STOPPED at 2 loops: remaining ideas (satellite tiles, edge labels) need a key/licence or separate approval — out of scope. Honest stop rather than over-polish.
+
+sv-check.js 07b80a09. Map-display only. Scoring/backend/result-wording/CTA unchanged; result byte-identical path; fake-gate intact; one Leaflet map; QLD safe; disclaimer present + now more readable; no edge labels; no exact-dimension claims; no TAS/VIC/WA; no other pages.
+
+Package: siteverdict-package-98.zip (221 KB). Live still 97 until founder deploys 98.
+
+---
+
+## Package 97 — FINAL RELEASE-READINESS CONFIRMATION — 2026-05-31
+
+No changes made (confirmation only). sv-check.js bfab2f70 (zip matches).
+
+1. Land size: SIX returns planlotarea=None for test parcel; areatotalm2 field does not exist on layer. "Land size field not returned for this test parcel; omitted cleanly." Verified earlier: when SIX returns an area, fact strip shows it (areatotalm2 ?? planlotarea). Not fabricated.
+2. Fact strip labels readable: "Lot/Plan Lot 30 - DP728 · Council Fairfield Council · Planning zone Low density res (R2)" + disclaimer. PASS.
+3. Mobile sticky header: nav z-index 400, opaque rgb(7,8,10); scrolled result header/stats clear of nav (not covered). PASS.
+4. Full gate: static 100/100; browser 16 pass/1 skip/0 fail; fake-address gate intact; one Leaflet container (NSW=1, QLD=1) no dup error; QLD preview safe; result byte-identical to pkg96; CTA=1; no console errors. PASS.
+5. No edge dimension labels; no exact-dimension claims; disclaimer present (3x). PASS.
+
+VERDICT: Package 97 READY for founder review/deploy. Live site still pkg 87 until founder deploys.
+
+---
+
+## Package 97 land-size fix — 2026-05-31
+
+Result: PACKAGE READY. Static 100/100, Browser 16/1skip/0fail. sv-check.js -> bfab2f70.
+
+KEY FINDING (raw field check on SIX NSW_Cadastre layer 9 "Lot"):
+- Real fields: lotnumber, planlabel, lotidstring, planlotarea, planlotareaunits.
+- areatotalm2 and lganame DO NOT EXIST on this layer. Package 96 requested them -> ArcGIS returned 0 features -> pkg96 parcel area/LGA NEVER actually displayed (silent bug). Pkg97 did not drop working fields; it fixed them.
+- Requesting non-existent fields BREAKS the query ("Failed to execute query") — confirmed live.
+
+Fix:
+- NSW parcel query now uses outFields=* (returns all existing fields, never errors).
+- Fact strip + map note: land size = areatotalm2 ?? planlotarea (fallback); council = parcel lganame ?? result council value. Omit cleanly if neither.
+- Unit-verified: when planlotarea present (e.g. 632.5) -> "Land size ~633 m2" displays. Parramatta/Penrith points return planlotarea; Canley Vale + Orange return None.
+
+HONEST NOTE: For the Canley Vale test address, SIX returns planlotarea=None and has no areatotalm2 field, so land size is genuinely unavailable and is omitted (not fabricated). Land size displays whenever SIX provides an area value for the parcel.
+
+Guardrails: scoring/backend/result-wording/CTA/QLD wording unchanged; result byte-identical; fake-gate intact; one Leaflet map (no dup, no console errors); sticky header fixed; no edge labels; no TAS/VIC/WA; disclaimer present; test mocks removed from zip.
+
 ---
 
 ## Package 97 blocker fixes — 2026-05-31

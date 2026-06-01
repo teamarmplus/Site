@@ -928,7 +928,7 @@ function _ensureBaseMap() {
         '<span>Map preview</span>',
         '<span style="font-weight:400;color:var(--muted)">&#183; Location approximate &#183; Not a survey</span>',
       '</div>',
-      '<div id="sv-map" style="height:220px;width:100%;position:relative">',
+      '<div id="sv-map" style="height:340px;width:100%;position:relative">',
         '<div id="sv-map-empty" style="position:absolute;inset:0;z-index:400;display:flex;',
           'align-items:center;justify-content:center;text-align:center;padding:0 18px;',
           'background:var(--bg2);color:var(--muted);font-size:.9rem;pointer-events:none">',
@@ -936,8 +936,8 @@ function _ensureBaseMap() {
         '</div>',
       '</div>',
       '<div id="sv-fact-strip" style="display:none;padding:8px 16px;border-top:1px solid var(--border);',
-        'font-size:.78rem;color:var(--muted);line-height:1.6"></div>',
-      '<div id="sv-map-note" style="padding:6px 16px 10px;font-size:.63rem;color:var(--muted2)">',
+        'font-size:.9rem;color:var(--text);line-height:1.7;padding:11px 16px"></div>',
+      '<div id="sv-map-note" style="padding:8px 16px 12px;font-size:.72rem;line-height:1.6;color:var(--muted)">',
         '&#169; <a href="https://www.openstreetmap.org/copyright" target="_blank" ',
         'style="color:var(--muted2)">OpenStreetMap contributors</a>',
       '</div>',
@@ -1003,9 +1003,9 @@ function _renderMap(lat, lon, state, matchedAddr) {
             '<span>Map preview</span>',
             '<span style="font-weight:400;color:var(--muted)">&#183; Location approximate &#183; Not a survey</span>',
           '</div>',
-          '<div id="sv-map" style="height:220px;width:100%"></div>',
-          '<div id="sv-fact-strip" style="display:none;padding:8px 16px;border-top:1px solid var(--border);font-size:.78rem;color:var(--muted);line-height:1.6"></div>',
-          '<div id="sv-map-note" style="padding:6px 16px 10px;font-size:.63rem;color:var(--muted2)">',
+          '<div id="sv-map" style="height:340px;width:100%"></div>',
+          '<div id="sv-fact-strip" style="display:none;padding:8px 16px;border-top:1px solid var(--border);font-size:.9rem;color:var(--text);line-height:1.7"></div>',
+          '<div id="sv-map-note" style="padding:8px 16px 12px;font-size:.72rem;line-height:1.6;color:var(--muted)">',
             '&#169; <a href="https://www.openstreetmap.org/copyright" target="_blank" style="color:var(--muted2)">OpenStreetMap contributors</a>',
           '</div>',
         '</div>',
@@ -1067,9 +1067,9 @@ function _fetchParcelOutline(lat, lon, map) {
         var latlngs = geom.rings[0].map(function(pt) { return [pt[1], pt[0]]; });
         var parcelPoly = L.polygon(latlngs, {
           color: '#c8a84b',
-          weight: 2,
+          weight: 4,
           fillColor: '#c8a84b',
-          fillOpacity: 0.08,
+          fillOpacity: 0.18,
         }).addTo(map);
         if (window._svOverlayLayers) window._svOverlayLayers.push(parcelPoly);
 
@@ -1156,9 +1156,9 @@ function _fetchParcelOutlineQLD(lat, lon, map) {
         var latlngs = geom.rings[0].map(function(pt) { return [pt[1], pt[0]]; });
         var qPoly = L.polygon(latlngs, {
           color: '#c8a84b',
-          weight: 2,
+          weight: 4,
           fillColor: '#c8a84b',
-          fillOpacity: 0.08,
+          fillOpacity: 0.18,
         }).addTo(map);
         if (window._svOverlayLayers) window._svOverlayLayers.push(qPoly);
         map.fitBounds(qPoly.getBounds(), { padding: [20, 20] });
@@ -1545,6 +1545,10 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
   resultEl.innerHTML=H;
   resultEl.classList.add('show');
   resultEl.scrollIntoView({behavior:'smooth',block:'start'});
+  // Layout fix: the parcel map + fact strip load async and shift page height after the
+  // initial scroll, which can leave the result header tucked under the sticky nav.
+  // Re-apply the scroll once content has settled so the header/stats are never covered.
+  setTimeout(function(){ try { resultEl.scrollIntoView({behavior:'smooth',block:'start'}); } catch(e){} }, 1800);
 
   // Render map preview (display only — does not affect Site Check data)
   try {

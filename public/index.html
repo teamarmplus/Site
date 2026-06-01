@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- SiteVerdict package 97 build_time 2026-05-31T09:45:49Z build_name sitecheck-release-check-97 -->
+<!-- SiteVerdict package 98 build_time 2026-05-31T12:13:20Z build_name sitecheck-release-check-98 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -45,7 +45,7 @@
    2) scroll-margin-top on the targets is the matching belt-and-braces lever.
    3) a little breathing space above map/result so the title area is never tucked under the bar. */
 html { scroll-padding-top: 84px; }
-#map-card, #result, .result-wrap { scroll-margin-top: 84px; }
+#map-card, #result, .result-wrap, #result .rcard { scroll-margin-top: 90px; }
 .result-wrap { padding-top: 8px; }
 
 /* Sticky nav must fully hide content scrolling beneath it. The shared style uses a
@@ -65,7 +65,7 @@ nav { background: var(--bg) !important; backdrop-filter: none !important; -webki
 @media (max-width: 560px) {
   /* Mobile: give a touch more clearance so the result/map title sits clearly below the bar */
   html { scroll-padding-top: 76px; }
-  #map-card, #result, .result-wrap { scroll-margin-top: 76px; }
+  #map-card, #result, .result-wrap, #result .rcard { scroll-margin-top: 84px; }
   #map-card { margin-top: 8px; }
 }
 </style>
