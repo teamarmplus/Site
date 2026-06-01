@@ -1,3 +1,28 @@
+Please diagnose the failed SiteVerdict Release Check run.
+
+Do not change product code.
+Do not change Site Check.
+Do not change Package 97.
+Do not build Package 98.
+
+Problem:
+The Claude Agent workflow is disabled, which is correct.
+But the SiteVerdict Release Check failed on the commit “Update CLAUDE.md”.
+
+Please inspect the failed release-check log and report:
+
+1. Exact error
+2. Whether live Package 97 is affected
+3. Whether this is only a CLAUDE.md / documentation issue
+4. Smallest safe fix
+5. Whether we can leave it until later or should fix now
+
+Rules:
+
+* Do not redesign anything
+* Do not change scoring/backend/result wording
+* Do not deploy new package
+* Only fix release-check/CLAUDE.md if needed
 # CLAUDE.md — SiteVerdict Operating Rules
 
 ## Current live baseline
