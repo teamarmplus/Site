@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<!-- SiteVerdict Package 99C — Professional Review -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SiteVerdict — Professional Review</title>
+<meta name="description" content="Request a professional review of your property. We review your details and get back to you within 24–48 hours on business working days.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/sv-tokens.css">
+<link rel="stylesheet" href="/assets/sv-base.css">
+<link rel="stylesheet" href="/assets/sv-components.css">
+<link rel="stylesheet" href="/assets/sv-layout.css">
+<link rel="stylesheet" href="/assets/sv-print.css">
+</head>
+<body>
+
+<nav>
+  <a href='/'><div class="logo"><span class="logo-mark"></span>SiteVerdict</div></a>
+  <div class="nl">
+    <a href='/'>Free Site Check</a>
+    <a href='/professional-review.html' class='active'>Professional Review</a>
+    <a href='/terms'>Terms</a>
+  </div>
+  <a href='/' class="nav-cta">Check My Land</a>
+</nav>
+
+<div class="hero" style="max-width:640px;margin:0 auto;padding:32px 20px 0">
+  <h1>Professional Review</h1>
+  <div class="hero-sub">Send us your property details. A person will review them and get back to you with the right next step. You do not need plans or documents to ask.</div>
+</div>
+
+<div class="form-card" style="max-width:640px;margin:18px auto 0">
+  <!-- Netlify Forms: name + file upload enabled -->
+  <form name="siteverdict-professional-review" method="POST" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data" action="/professional-review-thanks.html">
+    <input type="hidden" name="form-name" value="siteverdict-professional-review">
+    <p style="display:none"><label>Don&apos;t fill this out: <input name="bot-field"></label></p>
+
+    <div style="margin-bottom:12px">
+      <label class="form-label">Name</label>
+      <input class="form-input" type="text" name="name" required placeholder="Your name">
+    </div>
+    <div class="two" style="margin-bottom:12px">
+      <div>
+        <label class="form-label">Phone</label>
+        <input class="form-input" type="tel" name="phone" placeholder="0400 000 000">
+      </div>
+      <div>
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" name="email" required placeholder="your@email.com">
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label class="form-label">Property address</label>
+      <input class="form-input" type="text" name="property_address" id="pr-addr" placeholder="Address you are checking">
+    </div>
+    <div style="margin-bottom:12px">
+      <label class="form-label">What are you trying to do?</label>
+      <select class="form-input" name="purpose">
+        <option value="not_sure">Not sure</option>
+        <option value="buy">Buy</option>
+        <option value="sell">Sell</option>
+        <option value="build">Build</option>
+        <option value="develop">Develop</option>
+        <option value="oc_handover">OC / handover</option>
+        <option value="external_works">External works</option>
+      </select>
+    </div>
+    <div style="margin-bottom:12px">
+      <label class="form-label">Notes</label>
+      <textarea class="form-input" name="notes" rows="4" placeholder="Anything you want us to know about the property or your plans"></textarea>
+    </div>
+    <div style="margin-bottom:14px">
+      <label class="form-label">Upload files (optional)</label>
+      <input class="form-input" type="file" name="upload" multiple
+        accept=".pdf,.jpg,.jpeg,.png,.heic,.doc,.docx">
+      <div class="hint">Optional: plan, title, survey, listing, photos, drawings or council documents. You can send these later if you don&apos;t have them now.</div>
+    </div>
+
+    <button type="submit" class="btn btn-gold btn-full" style="padding:13px 18px;font-size:.84rem">Request Professional Review &#8594;</button>
+
+    <div style="margin-top:12px;font-size:.74rem;color:var(--muted);line-height:1.6;text-align:center">
+      We&apos;ll review your details and get back to you within 24&#8211;48 hours on business working days.
+    </div>
+    <div style="margin-top:10px;font-size:.64rem;color:var(--muted);line-height:1.6;text-align:center">
+      Preliminary information only. Professional verification required before decisions or spending money.
+      Not a planning certificate, valuation, legal, financial or survey advice.
+    </div>
+  </form>
+</div>
+
+<div style="height:40px"></div>
+
+<script>
+  // Pre-fill address from ?addr= passed by Site Check
+  (function(){
+    try{
+      var p=new URLSearchParams(window.location.search).get('addr');
+      var f=document.getElementById('pr-addr');
+      if(p && f && !f.value){ f.value=p; }
+    }catch(e){}
+  })();
+</script>
+</body>
+</html>

@@ -1,28 +1,30 @@
 <!DOCTYPE html>
+<!-- SiteVerdict package 99 build_time 2026-06-01T01:16:05Z build_name sitecheck-release-check-99 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SiteVerdict — Development Intelligence for NSW Property</title>
-<meta name="description" content="AI-powered development intelligence for any NSW address. Zone, overlays, DA timeline and feasibility — from 16+ live data sources. Free.">
-<meta property="og:title" content="SiteVerdict — Development Intelligence">
-<meta property="og:description" content="16+ live data checks for any NSW property. Zone, heritage, flood, DA timeline, lot potential and institutional-grade feasibility analysis.">
+<meta name="siteverdict-build" content="sitecheck-expanded-report-2026-05-22">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SiteVerdict — Free Property Site Check for Australia</title>
+<meta name="description" content="Check any Australian property address before you buy, sell, develop or finance. Zone, overlays and planning context — free.">
+<meta property="og:title" content="SiteVerdict — Free Property Site Check">
+<meta property="og:description" content="Free Site Check for any Australian property. Check any Australian property address. See what we found, what it may mean, and what is still missing before you make a big property decision.ibility analysis.">
 <meta property="og:url" content="https://siteverdict.com.au">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="/assets/sv-check.js" as="script">
+<link rel="preload" href="/assets/sv-check.js?v=sitecheck-expanded-report-2026-05-22" as="script">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/sv-tokens.css">
-<link rel="stylesheet" href="/assets/sv-base.css">
-<link rel="stylesheet" href="/assets/sv-components.css">
-<link rel="stylesheet" href="/assets/sv-layout.css">
-<link rel="stylesheet" href="/assets/sv-print.css">
+<link rel="stylesheet" href="/assets/sv-tokens.css?v=sitecheck-expanded-report-2026-05-22">
+<link rel="stylesheet" href="/assets/sv-base.css?v=sitecheck-expanded-report-2026-05-22">
+<link rel="stylesheet" href="/assets/sv-components.css?v=sitecheck-expanded-report-2026-05-22">
+<link rel="stylesheet" href="/assets/sv-layout.css?v=sitecheck-expanded-report-2026-05-22">
+<link rel="stylesheet" href="/assets/sv-print.css?v=sitecheck-expanded-report-2026-05-22">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "SiteVerdict",
-  "description": "AI-powered development intelligence platform for NSW property. 16+ live data checks per address.",
+  "description": "Free property Site Check for Australia. See what we found, what it may mean, and what is still missing.",
   "url": "https://siteverdict.com.au",
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Web",
@@ -30,89 +32,76 @@
   "provider": { "@type": "Organization", "name": "SiteVerdict", "url": "https://siteverdict.com.au" }
 }
 </script>
+  <!-- Leaflet map (free, no API key — © OpenStreetMap contributors) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style id="homepage-qa-fix">
+/* 99C: nav is static (non-sticky), so it can never cover content.
+   Only modest spacing remains; large scroll offsets for a sticky bar are no longer needed. */
+#map-card, #result, .result-wrap, #result .rcard { scroll-margin-top: 12px; }
+.result-wrap { padding-top: 8px; }
+.result-wrap, #result, #result .rcard, #map-card { position: relative; z-index: 1; }
+@media (min-width: 561px) {
+  .hero { padding-top: 24px; padding-bottom: 24px; }
+}
+@media (max-width: 560px) {
+  #map-card { margin-top: 8px; }
+}
+</style>
 </head>
 <body>
 
 <nav>
-  <a href="index.html"><div class="logo"><span class="logo-mark"></span>SiteVerdict</div></a>
+  <a href='/'><div class="logo"><span class="logo-mark"></span>SiteVerdict</div></a>
   <div class="nl">
-    <a href="index.html" class="active">Site Check</a>
-    <a href="hot-list.html">&#128293; Hot list</a>
-    <a href="services.html">Services</a>
-    <a href="finance.html">Finance</a>
-    <a href="full-report.html">Full report</a>
+    <a href='/' class='active'>Site Check</a>
+    <a href='/professional-review.html'>Professional Review</a>
+    <a href='/terms'>Terms</a>
   </div>
-  <button class="nav-cta" onclick="chatPro()">Chat with us</button>
+  <a href='/' class="nav-cta">Check My Land</a>
 </nav>
 
 <div class="hero">
-  <div class="hero-platform-badge">&#9679; AI Development Intelligence Platform</div>
-  <h1>The verdict on<br><em>any NSW property</em></h1>
-  <div class="hero-sub">Zone controls, heritage, flood, DA approval timelines and development feasibility — from 16+ live government data sources. Free. For any NSW address.</div>
+  
+  <h1>Check your land</h1>
+  <div class="hero-sub">Enter your address. See your land on the map, then a plain-English result.</div>
   <div class="trust-row">
-    <div class="trust-item"><span class="ti-dot"></span>16+ live data sources</div>
-    <span class="trust-div"></span>
-    <div class="trust-item"><span class="ti-dot"></span>34 NSW councils</div>
-    <span class="trust-div"></span>
-    <div class="trust-item"><span class="ti-dot"></span>319 real DA records</div>
-    <span class="trust-div"></span>
-    <div class="trust-item"><span class="ti-dot a"></span>Investors &middot; Developers &middot; Planners</div>
+    <div class="trust-item"><span class="ti-dot a"></span>Free &middot; Australia-wide parcel check &middot; planning depth varies by state</div>
   </div>
 </div>
 
-<!-- Example insight card — shows what intelligence output looks like -->
-<div class="example-wrap">
-  <div class="example-card">
-    <div class="ec-eyebrow">Example intelligence output</div>
-    <div class="ec-body">
-      <div>
-        <div class="ec-addr">14 Redfern Street, Redfern NSW 2016</div>
-        <div class="ec-sub">CITY OF SYDNEY &nbsp;&middot;&nbsp; R1 Zone &nbsp;&middot;&nbsp; Block: 920m&#178;</div>
-        <div class="ec-chips">
-          <span class="ec-chip g">&#10003; Overlays clear</span>
-          <span class="ec-chip g">&#10003; 2 lots LEP</span>
-          <span class="ec-chip a">&#9888; 119d DA median</span>
-        </div>
-      </div>
-      <div class="ec-score">
-        <div class="ec-score-n">71</div>
-        <div class="ec-score-l">Intelligence<br>score</div>
-      </div>
-    </div>
-    <div class="ec-footer">
-      <span class="ec-live"><span class="ec-live-dot"></span>Live</span>
-      <span>16+ live data checks from government, open-source and paid planning sources</span>
-      <span style="margin-left:auto;color:var(--muted2)">Example only &mdash; enter your address below</span>
-    </div>
-  </div>
-</div>
-
+<!-- Site Check — address + land size + frontage, then one clear action -->
 <div class="form-card">
   <div style="margin-bottom:14px">
     <label class="lbl">Property address</label>
-    <input class="fi" id="addr" type="text" placeholder="26 Smith Street Penrith NSW 2750" autocomplete="off" onkeydown="if(event.key==='Enter')runCheck()">
-    <div class="hint">NSW addresses only &middot; Include suburb and postcode for best results</div>
+    <input class="fi" id="addr" type="text"
+      placeholder="Enter address, suburb and postcode"
+      autocomplete="off"
+      onkeydown="if(event.key==='Enter')runCheck()">
   </div>
   <div class="two" style="margin-bottom:8px">
     <div>
-      <label class="lbl">
-        Block size (m&#178;)
-        <span id="block-lookup-status" style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--green);font-size:.58rem;margin-left:6px"></span>
-      </label>
-      <input class="fi" id="block" type="number" placeholder="Optional — or auto-detect" min="100">
-      <div class="hint"><button id="auto-lookup-btn" onclick="autoLookupBlock()">&#128269; Auto-detect from address</button></div>
+      <label class="lbl">Land size (m&#178;)</label>
+      <input class="fi" id="block" type="number" placeholder="e.g. 600" min="1"
+        onkeydown="if(event.key==='Enter')runCheck()">
     </div>
     <div>
-      <label class="lbl">Street frontage (m)</label>
-      <input class="fi" id="front" type="number" placeholder="15" min="1">
-      <div class="hint">Width at street. Check your rates notice.</div>
+      <label class="lbl">Frontage (m)</label>
+      <input class="fi" id="front" type="number" placeholder="e.g. 15" min="1"
+        onkeydown="if(event.key==='Enter')runCheck()">
     </div>
   </div>
-  <button class="run-btn" id="run-btn" onclick="runCheck()">Run intelligence check &#8594;</button>
+  <div class="hint" style="margin-bottom:12px">Use your contract, title, survey, rates notice, planning document, or listing.</div>
+  <button class="run-btn" id="run-btn" onclick="runCheck()">Check My Land &#8594;</button>
+  <div id="missing-fields-msg" style="display:none;margin-top:10px;font-size:.78rem;color:var(--muted)">Please add land size and frontage to continue.</div>
 </div>
 
-<div class="st-bar"><div id="status"></div></div>
+<!-- Base map visible on arrival (map-app feel). Map sits above the result. -->
 <div class="result-wrap">
+  <div id="map-card" style="margin-bottom:14px"></div>
+  <div class="st-bar"><div id="status"></div></div>
   <!-- Loading skeleton (shown while check runs) -->
   <div id="result-skeleton" style="display:none">
     <div class="sk-card">
@@ -140,103 +129,21 @@
       </div>
     </div>
   </div>
+  <!-- Map first: user sees their land, then the plain-English result below -->
   <div id="result"></div>
 </div>
 
-<!-- REGISTRATION MODAL (Netlify Forms) -->
-<div class="modal-overlay" id="reg-modal">
-  <div class="modal" style="position:relative">
-    <button class="modal-close" onclick="closeRegModal()" aria-label="Close">&times;</button>
-    <div class="modal-title">Register to continue</div>
-    <div class="modal-sub" id="reg-reason">Register free to unlock your full report. No spam. No subscription.</div>
-    <form name="siteverdict-registration" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="handleRegSubmit(event)">
-      <input type="hidden" name="form-name" value="siteverdict-registration">
-      <p style="display:none"><label>Don&apos;t fill this out: <input name="bot-field"></label></p>
-      <div class="form-group">
-        <label class="form-label">Full name *</label>
-        <input class="form-input" type="text" name="name" required placeholder="Your name">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email *</label>
-        <input class="form-input" type="email" name="email" required placeholder="your@email.com">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Phone</label>
-        <input class="form-input" type="tel" name="phone" placeholder="0400 000 000">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Property address (if applicable)</label>
-        <input class="form-input" type="text" name="property_address" id="reg-addr-field" placeholder="Address you are checking">
-      </div>
-      <div class="form-group">
-        <label class="form-label">I am a *</label>
-        <select class="form-select" name="investor_type" required>
-          <option value="">Select...</option>
-          <option value="homeowner">Homeowner exploring options</option>
-          <option value="investor">Property investor</option>
-          <option value="developer">Developer or builder</option>
-          <option value="professional">Town planner / surveyor / engineer</option>
-          <option value="buyer">Buyer doing due diligence</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-gold btn-full" style="margin-top:6px" id="reg-submit-btn">Register free &#8594;</button>
-      <div style="margin-top:10px;font-size:.62rem;color:var(--muted2);text-align:center">No spam. No subscription. We may contact you about your property query.</div>
-    </form>
-    <div id="reg-success" style="display:none;text-align:center;padding:20px 0">
-      <div style="font-size:1.8rem;margin-bottom:8px">&#10003;</div>
-      <div style="font-size:.88rem;font-weight:500;color:var(--green);margin-bottom:6px">Registered successfully</div>
-      <div style="font-size:.74rem;color:var(--muted);line-height:1.7">Your free report is unlocked. You can now run another full intelligence check.</div>
-      <button class="btn btn-outline btn-sm" onclick="closeRegModal()" style="margin-top:12px">Close</button>
-    </div>
-  </div>
-</div>
-
 <footer>
-  <div>SiteVerdict &middot; ABN 42 663 950 070 &middot; Development intelligence for NSW</div>
+  <div>SiteVerdict &middot; ABN 42 663 950 070</div>
   <div>
-    <a href="https://wa.me/61402623628" style="color:inherit">Chat with us</a> &middot;
-    <a href="hot-list.html" style="color:inherit">Hot list</a> &middot;
-    <a href="services.html" style="color:inherit">Services</a> &middot;
-    <a href="terms.html" style="color:inherit">Terms</a> &middot;
-    <button onclick="window.print()" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:.6rem;font-family:inherit">&#128438; Print report</button>
+    <a href='/' style='color:inherit'>Site Check</a> &middot;
+    <a href='/professional-review.html' style='color:inherit'>Professional Review</a> &middot;
+    <a href='/terms' style="color:inherit">Terms</a>
   </div>
 </footer>
 
-<script>
-// Registration submit handler
-function handleRegSubmit(e){
-  e.preventDefault();
-  var form = e.target;
+<script src="/assets/sv-check.js?v=sitecheck-expanded-report-2026-05-22"></script>
 
-  // Auto-fill address if empty
-  var addrField = document.getElementById('reg-addr-field');
-  if(addrField && !addrField.value){
-    var checkedAddr = document.getElementById('addr');
-    if(checkedAddr) addrField.value = checkedAddr.value;
-  }
-
-  // Disable submit button to prevent double-submit
-  var btn = document.getElementById('reg-submit-btn');
-  if(btn){btn.disabled=true;btn.textContent='Registering...';}
-
-  // Submit to Netlify
-  var data = new FormData(form);
-  fetch('/', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
-    body: new URLSearchParams(data).toString()
-  }).then(function(){
-    // Success: unlock reports, show success state
-    localStorage.setItem('sv_reports_used','0');
-    form.style.display='none';
-    var success = document.getElementById('reg-success');
-    if(success) success.style.display='block';
-  }).catch(function(){
-    // Fallback: still unlock on error (user registered intent)
-    localStorage.setItem('sv_reports_used','0');
-    closeRegModal();
-  });
-}
-</script>
-<script src="/assets/sv-check.js"></script>
+<div id="sv-build" style="display:none" data-build="sitecheck-expanded-report-2026-05-22">SiteVerdict build: sitecheck-expanded-report-2026-05-22</div>
 </body>
 </html>

@@ -1,7 +1,8 @@
 /* SiteVerdict — Layout v2.0 */
 
 /* ── NAV ─────────────────────────────────────────────── */
-nav{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:13px 5%;border-bottom:1px solid var(--border);background:rgba(7,8,10,.94);backdrop-filter:blur(24px)}
+/* 99C: nav is static (non-sticky) so the header never covers content. */
+nav{position:static;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:13px 5%;border-bottom:1px solid var(--border);background:rgba(7,8,10,.94)}
 .logo{font-family:var(--font-serif);font-size:1.05rem;display:flex;align-items:center;gap:9px}
 .logo-mark{width:8px;height:8px;border-radius:50%;background:var(--gold)}
 .nl{display:flex;gap:2px;font-size:.74rem}
@@ -67,3 +68,7 @@ footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-c
   .two{grid-template-columns:1fr}
   .rh{flex-direction:column}
 }
+
+.hero h1 { font-size:2.4rem; font-weight:700; line-height:1.2; margin-bottom:12px; }
+.hero h1 em { color:var(--gold); font-style:normal; }
+@media(max-width:640px){.hero h1{font-size:1.8rem}}
