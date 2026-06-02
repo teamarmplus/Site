@@ -3,7 +3,7 @@
   "build_name": "sitecheck-release-check-99C-r7",
   "package_number": "99C",
   "build_time": "2026-06-01T00:00:00Z",
-  "release_note": "Package 99C-r7: Free NSW Site Check \u2192 Professional Review. NSW-first wording, plain-English result sections, user-entered land size/frontage labels, Professional Review form with optional upload, 24\u201348 business-hours response wording, deploy files under public/.",
+  "release_note": "Package 99C-r7: Free NSW Site Check -> Professional Review. NSW wording, plain-English result sections, user-entered land size/frontage labels, Professional Review form with optional upload, 24-48 business-hours response wording, NSW-focused initial map, deploy files under public/.",
   "status": "draft-awaiting-private-gate",
   "features": {
     "publicFlowTwoStep": true,
@@ -25,11 +25,11 @@
     "scorecardHeaderResidueRemoved": true,
     "realFlowStateAVerified": true,
     "staticNavNoOverlay": true,
-    "nswFirstWording": true,
+    "nswWording": true,
     "noPublicAdvDisHeadings": true,
     "whatStillNeedsCheckingSection": true,
     "deployUnderPublicDir": true,
-    "nswFirstPositioning": true
+    "nswPositioning": true
   },
   "principle_version": "1.0"
 }

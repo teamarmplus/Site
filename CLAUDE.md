@@ -78,6 +78,27 @@ Live NSW data check on 148 Canley Vale Road: a generic geocoder returns a road-c
 - `SITEVERDICT_99B_BUILD_SPEC.md` — parcel accuracy + confidence (related).
 - `SITEVERDICT_ENGINE1_PACKET_SPEC.md` — Package 100 architecture (related).
 
+## Market pain first (core business principle)
+
+Market pain first. Useful product second. APIs are tools only. Revenue and trust decide what stays.
+
+**Always find the painkiller in the market.** Do not build "nice to have" tools first. Focus on problems people *must* solve, *must* check, or *must* pay someone to help with. A good product sits in a real, growing market, at a painful decision point, where mistakes cost money, time, stress, or opportunity.
+
+For SiteVerdict the industry is real estate, land, property, development, site risk, and service decision-making. The painkiller is helping people:
+- avoid buying the wrong property
+- avoid wasting money on the wrong site
+- avoid misunderstanding zoning or planning data
+- avoid delay before DA / CDC / build / OC / handover
+- know what still needs checking
+- know which professional or service may be needed
+- get practical help without being confused or taken advantage of
+
+**APIs are tools, not the business.** The core asset is the SiteVerdict operating machine: Site Check, Professional Review, internal analysis, validation, service triage, response workflow, and trust/data confidence — not any single API. SiteVerdict is data-source flexible: if a source is useful, use it; if a better source exists, replace it.
+
+DA Leads is one paid data source, not the strategy. It is only worth keeping if it measurably helps: (1) validation, (2) Professional Review, (3) cash-flow service leads, (4) better property intelligence, (5) faster internal analysis. If it does not prove useful within a clear test period, recommend cancelling or replacing it.
+
+**Evaluate every paid API against:** Does it solve a real bottleneck? Does it improve truth or trust? Does it help validation? Does it help Professional Review? Does it create cash-flow opportunities? Is the data accurate and legally usable? Is the cost justified by revenue or saved time? Could another source do better? The goal is not to collect APIs — it is to build a useful machine.
+
 ## Hard rules
 
 These are non-negotiable for every package:

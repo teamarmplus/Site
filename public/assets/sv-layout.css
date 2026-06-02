@@ -13,8 +13,8 @@ nav{position:static;z-index:200;display:flex;align-items:center;justify-content:
 @media(max-width:680px){.nl{display:none}}
 
 /* ── HERO ────────────────────────────────────────────── */
-.hero{max-width:640px;margin:0 auto;padding:52px 5% 28px;text-align:center}
-.hero-sub{font-size:.84rem;color:var(--muted);line-height:1.85;margin-bottom:20px;max-width:480px;margin-left:auto;margin-right:auto}
+.hero{max-width:640px;margin:0 auto;padding:64px 5% 32px;text-align:center}
+.hero-sub{font-size:.95rem;color:var(--muted);line-height:1.8;margin-bottom:24px;max-width:500px;margin-left:auto;margin-right:auto}
 .hero-platform-badge{display:inline-flex;align-items:center;gap:7px;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--goldl);border:1px solid var(--goldm);color:var(--gold);padding:4px 13px;border-radius:14px;margin-bottom:18px}
 .hero-tagline{font-size:.72rem;color:var(--muted2);margin-top:8px;margin-bottom:22px;letter-spacing:.02em}
 
@@ -69,6 +69,6 @@ footer{border-top:1px solid var(--border);padding:18px 5%;display:flex;justify-c
   .rh{flex-direction:column}
 }
 
-.hero h1 { font-size:2.4rem; font-weight:700; line-height:1.2; margin-bottom:12px; }
+.hero h1 { font-size:2.6rem; font-weight:700; line-height:1.18; margin-bottom:14px; letter-spacing:-0.01em; }
 .hero h1 em { color:var(--gold); font-style:normal; }
 @media(max-width:640px){.hero h1{font-size:1.8rem}}

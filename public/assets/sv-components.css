@@ -174,7 +174,7 @@
 
 /* ── TRUST INDICATORS ────────────────────────────────── */
 .trust-row{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:28px}
-.trust-item{display:flex;align-items:center;gap:6px;font-size:.68rem;color:var(--muted);white-space:nowrap}
+.trust-item{display:flex;align-items:center;gap:7px;font-size:.8rem;color:var(--muted);white-space:nowrap}
 .ti-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 4px var(--green)}
 .ti-dot.a{background:var(--gold);box-shadow:0 0 4px var(--gold)}
 .trust-div{width:1px;height:12px;background:var(--border2)}
