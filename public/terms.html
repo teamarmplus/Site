@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+<!-- SiteVerdict package 99C build_time 2026-06-01T00:00:00Z build_name sitecheck-release-check-99C-r7 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Terms &amp; Data Use — SiteVerdict</title>
-<meta name="description" content="SiteVerdict Terms of Use and Data Use Policy. Preliminary screening only. Not legal, planning, valuation, financial or investment advice.">
+<meta name="description" content="SiteVerdict Terms &amp; Data Use. NSW-first preliminary Site Check and Professional Review enquiry pathway. Preliminary information only — not legal, planning, valuation, financial, survey or engineering advice.">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#07080a;--bg2:#0f1118;--bg3:#161820;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.13);--text:#eeedf0;--muted:#6b6b78;--muted2:#3f3f48;--gold:#c8a84b;--r:10px;--r2:16px}
@@ -12,7 +13,8 @@
 body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
 a{color:var(--gold);text-decoration:none}
 a:hover{text-decoration:underline}
-nav{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:13px 5%;border-bottom:1px solid var(--border);background:rgba(7,8,10,.96);backdrop-filter:blur(20px)}
+/* Static (non-sticky) nav — must never cover content */
+nav{position:static;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:13px 5%;border-bottom:1px solid var(--border);background:rgba(7,8,10,.96)}
 .logo{font-family:"Instrument Serif",serif;font-size:1.05rem;display:flex;align-items:center;gap:9px}
 .logo-mark{width:7px;height:7px;border-radius:50%;background:var(--gold)}
 .nl{display:flex;font-size:.74rem;color:var(--muted);gap:2px}
@@ -22,14 +24,15 @@ nav{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-co
 .nav-cta{background:var(--gold);color:#07080a;border:none;padding:7px 14px;border-radius:8px;font-size:.74rem;font-weight:600;cursor:pointer;text-decoration:none}
 .wrap{max-width:720px;margin:0 auto;padding:48px 5% 80px}
 h1{font-family:"Instrument Serif",serif;font-size:1.8rem;font-weight:400;margin-bottom:6px}
-.eff{font-size:.74rem;color:var(--muted2);margin-bottom:40px}
-h2{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);margin:36px 0 12px}
+.eff{font-size:.74rem;color:var(--muted2);margin-bottom:36px}
+.lead{font-size:.9rem;color:var(--text);line-height:1.8;margin-bottom:8px}
+h2{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);margin:34px 0 12px}
 p{font-size:.86rem;color:var(--muted);line-height:1.8;margin-bottom:10px}
 ul{padding-left:0;list-style:none;margin-bottom:10px}
 ul li{font-size:.86rem;color:var(--muted);line-height:1.8;padding:3px 0 3px 16px;position:relative}
 ul li::before{content:"·";position:absolute;left:0;color:var(--muted2)}
 .alert{background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.18);border-radius:var(--r);padding:16px 20px;margin:16px 0}
-.alert p{font-size:.82rem}
+.alert p{font-size:.84rem;color:var(--text);margin:0}
 .alert strong{color:var(--gold)}
 footer{border-top:1px solid var(--border);padding:24px 5%;font-size:.72rem;color:var(--muted2);display:flex;gap:16px;flex-wrap:wrap}
 footer a{color:var(--muted2)}
@@ -40,89 +43,68 @@ footer a{color:var(--muted2)}
 <nav>
   <a href='/'><div class="logo"><span class="logo-mark"></span>SiteVerdict</div></a>
   <div class="nl">
-    <a href='/'>Free Site Check</a>
-    <a href='/what-this-may-mean.html'>What This May Mean</a>
-    <a href='/full-report.html'>Find Out What My Land Can Do</a>
-    <a href='/services'>Professional Pathway</a>
+    <a href='/'>Site Check</a>
+    <a href='/professional-review.html'>Professional Review</a>
     <a href='/terms.html' class='active'>Terms</a>
   </div>
   <a href='/' class="nav-cta">Check My Land</a>
 </nav>
 
 <div class="wrap">
-
   <h1>Terms &amp; Data Use</h1>
-  <p class="eff">Arm Plus Pty Ltd &middot; ABN 42 663 950 070 &middot; Effective May 2026</p>
+  <div class="eff">SiteVerdict &middot; Arm Plus Pty Ltd &middot; ABN 42 663 950 070 &middot; Effective 2026</div>
 
-  <h2>Who we are</h2>
-  <p>SiteVerdict is operated by Arm Plus Pty Ltd (ABN 42 663 950 070), based in Sydney, NSW, Australia.</p>
+  <p class="lead">SiteVerdict provides a NSW-first preliminary Site Check and Professional Review enquiry pathway. By using SiteVerdict you agree to these terms.</p>
 
   <h2>What SiteVerdict is</h2>
-
-  <div class="alert">
-    <p><strong>SiteVerdict is preliminary screening and decision-support only.</strong></p>
-    <p>It is not legal advice. It is not planning advice. It is not valuation advice. It is not financial advice. It is not investment advice. It is not engineering advice or certification. It does not guarantee approval, subdivision, value increase, or profit of any kind.</p>
-  </div>
-
-  <p>SiteVerdict queries official government APIs and open data sources and returns indicative planning and site context for Australian property addresses. Results show planning controls, overlays, and site indicators available at the time of query.</p>
-  <p>Results are preliminary screening only. They are not a formal planning certificate, title search, survey, valuation, or professional report. Data may be incomplete, outdated, or unavailable for some addresses or states.</p>
+  <p>SiteVerdict gives a NSW-first preliminary Site Check: it shows basic land and planning signals for an address in plain English, with confidence labels and a clear list of what still needs checking. Other states may request Professional Review while we expand, but automated data depth may be limited.</p>
 
   <h2>What SiteVerdict is not</h2>
+  <div class="alert"><p><strong>Preliminary information only.</strong> SiteVerdict is not legal advice, planning advice, financial advice, valuation advice, survey advice, or engineering advice.</p></div>
   <ul>
-    <li>Not legal advice</li>
-    <li>Not planning advice or a planning certificate</li>
-    <li>Not valuation advice or a formal valuation</li>
-    <li>Not financial advice</li>
-    <li>Not investment advice</li>
-    <li>Not engineering advice or certification</li>
-    <li>Not a guarantee of development approval</li>
-    <li>Not a guarantee of subdivision</li>
-    <li>Not a guarantee of value increase</li>
-    <li>Not a guarantee of profit</li>
-    <li>Not a guarantee of loan approval</li>
+    <li>No guarantee of development approval</li>
+    <li>No guarantee of subdivision</li>
+    <li>No guarantee of value increase</li>
+    <li>No guarantee of profit</li>
+    <li>No guarantee of loan approval</li>
   </ul>
+  <p>Results are a starting point for understanding, not a decision and not confirmation of what can be approved or built.</p>
 
-  <h2>Professional verification required</h2>
-  <p>Always engage a licensed town planner, surveyor, solicitor, civil engineer, and/or registered valuer before making any property, development, finance, or investment decision. SiteVerdict accepts no liability for decisions made on the basis of its tools, data, or results.</p>
+  <h2>Data and map limits</h2>
+  <p>Maps and locations are approximate and are not a survey. Boundaries, dimensions, land size and frontage shown or entered are indicative only and must be verified by title, survey, or a licensed professional. Land size and frontage you enter are your figures and are not independently verified. Data may be incomplete, outdated, or unavailable for some addresses or states.</p>
 
-  <h2>Data sources and accuracy</h2>
-  <p>SiteVerdict uses official government APIs, open data, and authorised sources. Data may be incomplete or unavailable for some addresses. Not all states have the same depth of planning data connected.</p>
-  <p>Where data is not confirmed, SiteVerdict says so clearly rather than guess or fill in missing information.</p>
+  <h2>Professional verification</h2>
+  <p>Always engage a licensed town planner, surveyor, solicitor, civil engineer, and/or registered valuer before making any property, development, finance, or investment decision. You must verify all information independently before making decisions or spending money. SiteVerdict accepts no liability for decisions made on the basis of its tools, data, or results.</p>
 
-  <h2>Data licences and government API terms</h2>
-  <p>SiteVerdict uses data from official government and open data sources under their applicable licence terms, including Creative Commons Attribution licences. Attribution is provided in results where required.</p>
-  <p>SiteVerdict does not resell or redistribute raw government or council data as standalone data products. If a data licence or API term does not allow a particular use, SiteVerdict does not use that data publicly until compliant permission or access is confirmed.</p>
-  <p>Data sources include: NSW Planning Portal (CC BY 4.0), NSW SIX Maps (CC BY 4.0), Queensland QSpatial (CC BY 4.0), Tasmania theLIST (CC BY 3.0 AU), ACT ACTGOV ArcGIS Online, and OpenStreetMap (© OpenStreetMap contributors, ODbL).</p>
-
-  <h2>Pre-screened property information</h2>
-  <p>Any pre-screened property information is indicative and preliminary only. Pre-screening is not a recommendation to buy, sell, or develop any property. Always verify independently before any decision.</p>
-
-  <h2>Service enquiries and Professional Pathway</h2>
-  <p>Service enquiries submitted through SiteVerdict may be handled directly by Arm Plus Pty Ltd, or matched with appropriately qualified professionals and trades where available. We will confirm who is quoting before any work proceeds. Where referral arrangements exist, they are disclosed transparently before any client commits to services.</p>
-  <p>SiteVerdict does not guarantee the availability of professionals or services for any location, property type, or request.</p>
+  <h2>Professional Review</h2>
+  <p>Service enquiries submitted through SiteVerdict may be handled directly by Arm Plus Pty Ltd, or matched with appropriately qualified professionals and trades where available. We confirm who is quoting before any work proceeds, and any referral arrangements are disclosed before you commit to services. We do not guarantee the availability of professionals or services for any location, property type, or request.</p>
 
   <h2>Privacy</h2>
-  <p>Addresses entered in the Site Check are used only to query connected data sources and return results. We do not sell or share personal address data with third parties for marketing purposes.</p>
-  <p>Registration data (name, email, phone) is used to respond to enquiries and, where you have opted in, to provide relevant updates. See our Privacy Policy for full details.</p>
+  <p>Addresses entered in the Site Check are used only to query connected data sources and return results. Details you submit through the Professional Review form (such as name, email, phone, and any uploads) are used only to respond to your enquiry. We do not sell personal data, and we do not share it for third-party marketing.</p>
 
-  <h2>Limitation of liability</h2>
+  <h2>Data source and API respect</h2>
+  <ul>
+    <li>SiteVerdict uses public, open, government and third-party data sources where permitted.</li>
+    <li>Data access depends on source availability, API terms, licences, permissions and technical limits.</li>
+    <li>We may limit, change, remove or stop using data where required by law, licence, API terms or data-source rules.</li>
+  </ul>
+  <p>Attribution is provided where required. Sources include NSW Planning Portal and NSW spatial services, other state and open data where available, and OpenStreetMap (© OpenStreetMap contributors). We do not resell or redistribute raw government or council datasets as standalone data products.</p>
+
+  <h2>Liability</h2>
   <p>To the maximum extent permitted by law, Arm Plus Pty Ltd accepts no liability for any direct, indirect, or consequential loss arising from reliance on SiteVerdict data, results, or tools. Use of SiteVerdict is at your own risk.</p>
 
   <h2>Governing law</h2>
   <p>These terms are governed by the laws of New South Wales, Australia.</p>
 
   <h2>Contact</h2>
-  <p>Questions about these terms or data use: <a href="https://wa.me/61402623628">WhatsApp 0402 623 628</a> or via the Professional Pathway enquiry form.</p>
-
+  <p>For enquiries, please use the <a href="/professional-review.html">Professional Review</a> form.</p>
 </div>
 
 <footer>
   <span>SiteVerdict &middot; ABN 42 663 950 070</span>
-  <a href="/">Free Site Check</a>
-  <a href="/what-this-may-mean.html">What This May Mean</a>
-  <a href="/full-report.html">Find Out What My Land Can Do</a>
-  <a href="/services">Professional Pathway</a>
-  <a href="/terms.html">Terms &amp; Data Use</a>
+  <a href="/">Site Check</a>
+  <a href="/professional-review.html">Professional Review</a>
+  <a href="/terms.html">Terms</a>
 </footer>
 
 </body>
