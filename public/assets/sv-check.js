@@ -1,8 +1,8 @@
-/* SiteVerdict — Site Check Engine v2.0
+/* SiteVerdict — Site Check Engine (Package 99C)
+   Public Site Check story + Professional Review flow.
    All 16 government APIs preserved.
-   Executive Verdict + Institutional Scorecard added.
-   Report gate via localStorage.
-   Registration via Netlify Forms.
+   No public Executive Verdict, Institutional Scorecard, approval-confidence score, or report gate.
+   Scoring functions retained as internal-only logic (not shown publicly).
 */
 
 // ── URL PARAM AUTO-FILL ──────────────────────────────
@@ -23,25 +23,18 @@
 // ─────────────────────────────────────────────────────────────────────────
 
 // ── REPORT GATE ──────────────────────────────────────
-var GATE_KEY='sv_reports_used';
-function gateUsed(){return parseInt(localStorage.getItem(GATE_KEY)||'0',10);}
-function gateIncrement(){localStorage.setItem(GATE_KEY,gateUsed()+1);}
-function gateIsFree(){return gateUsed()<1;}
+// ── REPORT GATE (retired from public flow in 99C) ────
+// The free-report gate is intentionally disabled. The public Site Check is not gated.
+function gateUsed(){return 0;}
+function gateIncrement(){/* no-op: public Site Check is not gated in 99C */}
+function gateIsFree(){return true;}
 
-// ── REGISTRATION MODAL ───────────────────────────────
-function openRegModal(reason){
-  var m=document.getElementById('reg-modal');
-  if(m){
-    var r=document.getElementById('reg-reason');
-    if(r)r.textContent=reason||'Register free to continue. No spam. No subscription.';
-    m.classList.add('open');
-  }
-}
+// ── REGISTRATION MODAL (retired in 99C) ──────────────
+// The register/free-report modal is removed from the public flow.
+// These are kept as harmless no-ops in case of any stray reference.
+function openRegModal(reason){ /* retired in 99C — public flow uses Professional Review page */ }
 function goFocusBlock(){var b=document.getElementById("block");if(b)b.focus();}
-function closeRegModal(){
-  var m=document.getElementById('reg-modal');
-  if(m)m.classList.remove('open');
-}
+function closeRegModal(){ /* retired in 99C */ }
 
 // ── REPORT GATE ──────────────────────────────────────────────────
 // First report free via localStorage. After that, show registration CTA.
@@ -598,11 +591,31 @@ async function autoLookupBlock(){
 
   }catch(e){
     console.error("Auto-detect failed:",e);
-    statusEl.innerHTML='<span style="color:var(--muted)">Block size was not auto-detected. This check is limited. Enter block size manually or request a professional review via the Professional Pathway.</span>';
+    statusEl.innerHTML='<span style="color:var(--muted)">Block size was not auto-detected. This check is limited. Enter block size manually or request a Professional Review.</span>';
     btn.style.display="";
   }
 }
-async function runCheck(){var e=normalizeAddressInput(document.getElementById("addr").value.trim()),t=parseFloat(document.getElementById("block").value),a=document.getElementById("front"),r=a&&a.value?parseFloat(a.value):15;if(e){var s=!t||t<100,n=document.getElementById("run-btn");n.disabled=!0,n.textContent="Checking...";var i=document.getElementById("result");i.innerHTML="",i.classList.remove("show");var o=document.getElementById("block-lookup-status");o&&(o.textContent="");if(window._loadingTimer){clearInterval(window._loadingTimer);window._loadingTimer=null;}var _geoResult=null;window._parcelConfidence=null;window._parcelWarning=null;window._cadastreArea=null;window._cadastreLot=null;setSt("Finding your address...");try{var _geoResult=await geocodeWithConfidence(e);var _geo=_geoResult;window._geoResult=_geoResult;
+async function runCheck(){var e=normalizeAddressInput(document.getElementById("addr").value.trim()),t=parseFloat(document.getElementById("block").value),a=document.getElementById("front"),r=a&&a.value?parseFloat(a.value):NaN;
+  // ── 99C STATE B: require address + land size + frontage. If either user value
+  // is missing, show the reduced state and stop. Never show confident parcel/size/dimensions.
+  var _msg=document.getElementById("missing-fields-msg");
+  if(e && (!(t>0) || !(r>0))){
+    if(_msg) _msg.style.display="block";
+    var _i=document.getElementById("result");
+    if(_i){ _i.innerHTML='<div class="rcard"><div class="signal-card">'
+      +'<div class="signal-section"><div class="signal-heading">What we found</div>'
+      +'<ul style="list-style:none;margin:0;padding:0;font-size:.78rem;line-height:1.75">'
+      +'<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">\u25a1</span>Land size: Not confirmed</li>'
+      +'<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">\u25a1</span>Frontage: Not confirmed</li>'
+      +'<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">\u25a1</span>Professional verification needed</li>'
+      +'</ul></div>'
+      +'<div class="signal-section"><div class="signal-body">Add your land size and frontage to continue \u2014 or request a professional review now.</div></div>'
+      +_proReviewCta(e)+_proVerifyLine()
+      +'</div></div>'; _i.classList.add("show"); _i.scrollIntoView({behavior:"smooth",block:"start"}); }
+    return;
+  }
+  if(_msg) _msg.style.display="none";
+  if(e){var s=!t||t<100,n=document.getElementById("run-btn");n.disabled=!0,n.textContent="Checking...";var i=document.getElementById("result");i.innerHTML="",i.classList.remove("show");var o=document.getElementById("block-lookup-status");o&&(o.textContent="");if(window._loadingTimer){clearInterval(window._loadingTimer);window._loadingTimer=null;}var _geoResult=null;window._parcelConfidence=null;window._parcelWarning=null;window._cadastreArea=null;window._cadastreLot=null;setSt("Finding your address...");try{var _geoResult=await geocodeWithConfidence(e);var _geo=_geoResult;window._geoResult=_geoResult;
     if(!_geo){_showAddrNotFound(i,n,e);return;}
     // ── HARD GATE: invalid / fake address ─────────────────────────
     // If geocode returned found:false (even with a reason), stop here.
@@ -791,7 +804,7 @@ function _showNonNSWResult(addr, state, geo, landSizeInput, frontage, addrType){
 
     // CTA — one button only
     '<div style="margin-top:16px">',
-      '<a href="/full-report.html" style="display:block;background:var(--gold);color:#07080a;text-decoration:none;padding:12px 18px;border-radius:10px;font-size:.84rem;font-weight:700;text-align:center">Find Out What My Land Can Do →</a>',
+      '<a href="/professional-review.html" style="display:block;background:var(--gold);color:#07080a;text-decoration:none;padding:12px 18px;border-radius:10px;font-size:.84rem;font-weight:700;text-align:center">Professional Review →</a>',
     '</div>',
 
     // Standard disclaimer
@@ -1236,9 +1249,8 @@ function _fetchParcelOutlineQLD(lat, lon, map) {
 
 // ── END MAP PREVIEW ──────────────────────────────────────────────
 
-function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,sepp800,mls,mlsReal,block,overallScore){
+function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,sepp800,mls,mlsReal,block,front,geoConf,blockSource,lotGeoWarn){
 
-  // ── Zone label ──────────────────────────────────────────────────
   var zLabel = ({
     'R1':'Low density residential',  'R2':'Low density residential',
     'R3':'Medium density residential','R4':'High density residential',
@@ -1250,106 +1262,116 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
 
   var hasZone    = !!zone;
   var hasBlock   = !!(block && block > 0);
+  var hasFront   = !!(front && front > 0);
   var hasOverlay = !!(heritage || flood || bushfire);
-  var hasSubdiv  = n >= 2;
 
-  // ── Section 1: What we found ────────────────────────────────────
+  // Parcel confidence is LOW when geocode confidence is low or lot geometry flagged.
+  // We never present an uncertain parcel as verified.
+  var lowParcel = (geoConf && /low/i.test(String(geoConf))) || !!lotGeoWarn;
+  var NBSP='\u00a0', DASH='\u2014', BOX='\u25a1', DOT='\u2022';
+  var USER_LABEL = ' <span class="conf-tag" style="font-size:.66rem;color:var(--muted2);white-space:nowrap">User entered '+DASH+' not independently verified</span>';
+
+  // REDUCED STATE: missing user land size or frontage
+  if (!hasBlock || !hasFront) {
+    return '<div class="signal-card">'
+      + '<div class="signal-section"><div class="signal-heading">What we found</div>'
+        + '<ul style="list-style:none;margin:0;padding:0;font-size:.78rem;line-height:1.75">'
+          + '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">'+BOX+'</span>Land size: Not confirmed</li>'
+          + '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">'+BOX+'</span>Frontage: Not confirmed</li>'
+          + '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">'+BOX+'</span>Professional verification needed</li>'
+        + '</ul></div>'
+      + '<div class="signal-section"><div class="signal-body">Add your land size and frontage above to see a fuller result '+DASH+' or request a professional review now.</div></div>'
+      + _proReviewCta(addr) + _proVerifyLine()
+    + '</div>';
+  }
+
+  // Section 1: What we found
   var found = [];
-  if (lga)          found.push('Council / LGA: ' + lga);
-  if (zLabel)       found.push('Zone: ' + zLabel + ' (' + zone + ')');
-  else              found.push('Zone: not confirmed from connected data');
-  if (block)        found.push('Approximate land size: ' + block.toLocaleString() + '\u00a0m\u00b2');
-  else              found.push('Land size: not confirmed from connected data');
-  if (mlsReal && mls) found.push('Minimum lot size (confirmed LEP): ' + mls + '\u00a0m\u00b2');
-  else if (mls)     found.push('Minimum lot size (zone default): ' + mls + '\u00a0m\u00b2 \u2014 confirm with council');
-  if (heritage)     found.push('Heritage indicator: present \u2014 scope needs verification');
-  if (flood)        found.push('Flood planning area: indicator present \u2014 scope needs verification');
-  if (bushfire)     found.push('Bushfire prone land: indicator present \u2014 scope needs verification');
+  if (lga)          found.push('Council / LGA: ' + esc(lga));
+  if (zLabel)       found.push('Zone: ' + esc(zLabel) + ' (' + esc(zone) + ')');
+  else              found.push('Zone: Not confirmed');
+  found.push('Land size: ' + Number(block).toLocaleString() + NBSP + 'm\u00b2' + USER_LABEL);
+  found.push('Frontage: ' + Number(front).toLocaleString() + NBSP + 'm' + USER_LABEL);
+  if (lowParcel)    found.push('Parcel match not confirmed ' + DASH + ' Professional verification needed');
+  if (mlsReal && mls) found.push('Minimum lot size (confirmed LEP): ' + mls + NBSP + 'm\u00b2');
+  else if (mls)     found.push('Minimum lot size (zone default): ' + mls + NBSP + 'm\u00b2 ' + DASH + ' confirm with council');
+  if (heritage)     found.push('Heritage indicator: present ' + DASH + ' scope needs verification');
+  if (flood)        found.push('Flood planning area: indicator present ' + DASH + ' scope needs verification');
+  if (bushfire)     found.push('Bushfire prone land: indicator present ' + DASH + ' scope needs verification');
   if (!heritage && !flood && !bushfire && hasZone)
                     found.push('Major overlay indicators: none detected in this check');
 
   var foundHtml = found.map(function(f) {
-    var isGap = f.indexOf('not confirmed') !== -1 || f.indexOf('not yet') !== -1;
+    var isGap = f.indexOf('Not confirmed') !== -1 || f.indexOf('not confirmed') !== -1;
     return '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:'
-      + (isGap ? 'var(--muted)' : 'var(--text)') + '">'
-      + '<span style="position:absolute;left:0;top:1px;color:var(--muted2)">'
-      + (isGap ? '\u25a1' : '\u2022') + '</span>'
-      + f + '</li>';
+      + (isGap ? 'var(--muted)' : 'var(--text)') + '"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">'
+      + (isGap ? BOX : DOT) + '</span>' + f + '</li>';
   }).join('');
 
-  // ── Section 2: What this may mean ───────────────────────────────
+  // Section 2: What this means
   var meaning = '';
-  if (!hasZone && !hasBlock) {
-    meaning = 'We could not confirm the zone or land size from connected government data. Entering the full address \u2014 including suburb, state and postcode \u2014 may give a better result. A licensed planner or surveyor can confirm the planning controls for this property.';
+  if (!hasZone) {
+    meaning = 'We could not confirm the zone from connected government data. Entering the full address ' + DASH + ' including suburb, state and postcode ' + DASH + ' may help. A licensed planner can confirm the planning controls for this property.';
   } else if (hasOverlay) {
     var ol = [heritage?'a heritage overlay':null, flood?'a flood planning area':null, bushfire?'bushfire prone land':null].filter(Boolean).join(' and ');
-    meaning = 'This property has ' + ol + ' indicator' + (([heritage,flood,bushfire].filter(Boolean).length > 1) ? 's' : '') + '. That does not necessarily stop development or sale \u2014 but it does mean any plans will need more assessment, more time, and possibly more cost. Professional verification is important before any decision.';
-  } else if (hasSubdiv && hasZone && hasBlock) {
-    meaning = 'Based on the zone and approximate land size, this property may have pathways worth understanding \u2014 such as ' + (n >= 4 ? 'subdivision, multi-lot development' : n >= 3 ? 'small subdivision' : 'a 2-lot subdivision or dual occupancy') + '. These pathways depend on survey, council controls, and site-specific factors that cannot be confirmed from automated data alone.';
-  } else if (hasZone && hasBlock) {
-    meaning = 'The zone and approximate land size were found. No major overlay indicators were detected in this automated check. That is a useful starting point \u2014 but there are still things we cannot check automatically that may matter for your decision.';
+    meaning = 'This property has ' + ol + ' indicator' + (([heritage,flood,bushfire].filter(Boolean).length > 1) ? 's' : '') + '. This does not by itself stop anything ' + DASH + ' but it means plans will need more assessment, time and possibly cost. Professional verification is important before any decision.';
   } else {
-    meaning = 'Some data was found, but parts of this check could not be confirmed. Professional verification will help fill in the gaps before any decision.';
+    meaning = 'The zone was found, and you entered a land size of ' + Number(block).toLocaleString() + NBSP + 'm\u00b2 and frontage of ' + Number(front).toLocaleString() + NBSP + 'm. The zone sets what use is generally expected; minimum lot size affects whether more than one dwelling or lot may be possible; frontage affects access and layout. These are starting points ' + DASH + ' not a decision, and not confirmation of what can be approved.';
   }
 
-  // ── Section 3: What is still missing ────────────────────────────
-  var missing = [];
-  if (!hasZone)   missing.push('Zone \u2014 contact council or a licensed town planner');
-  if (!hasBlock)  missing.push('Exact land size \u2014 confirm on title or with a licensed surveyor');
-  missing.push('Frontage, access and road boundaries \u2014 survey required');
-  missing.push('Easements and title encumbrances \u2014 title search required');
-  missing.push('Drainage, stormwater and slope \u2014 civil assessment required');
-  missing.push('Trees and environmental constraints \u2014 site-specific assessment');
-  missing.push('Local council DCP controls and conditions \u2014 confirm with council');
-  missing.push('Services (sewer, water, power, gas) \u2014 confirm with relevant authority');
-  if (!heritage) missing.push('Local heritage schedule \u2014 NSW EPI checked; local DCP may differ');
-  if (!flood)    missing.push('Flood category detail \u2014 indicator only; flood study required for DA');
-  missing.push('Contamination and acid sulfate soils \u2014 environmental assessment required');
+  // Section 3: Advantages (only if supported)
+  var adv = [];
+  if (zLabel && /residential|mixed use|local centre/i.test(zLabel)) adv.push('Zoning is a recognised residential/mixed-use category');
+  if (mls && hasBlock && block >= 2*mls) adv.push('Your entered land size is well above the minimum lot size for this zone (your figure, not verified)');
+  if (hasFront && front >= 12) adv.push('Your entered frontage is in a workable range for access and layout (your figure, not verified)');
+  if (!hasOverlay && hasZone) adv.push('No major overlay indicators (heritage, flood, bushfire) were detected in this check');
+  var advHtml = adv.length
+    ? adv.map(function(a){return '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--text)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">'+DOT+'</span>'+a+'</li>';}).join('')
+    : '<li style="color:var(--muted);padding-left:14px;list-style:none">No clear advantages could be confirmed from the available data.</li>';
 
-  var missingHtml = missing.map(function(m) {
-    return '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)">'
-      + '<span style="position:absolute;left:0;top:1px;color:var(--muted2)">\u25a1</span>'
-      + m + '</li>';
-  }).join('');
+  // Section 4: Disadvantages / missing checks
+  var dis = [];
+  if (lowParcel) dis.push('Parcel match not confirmed ' + DASH + ' professional verification needed');
+  dis.push('Land size and frontage are user-entered only ' + DASH + ' not independently verified');
+  if (hasFront && front < 10) dis.push('Entered frontage is narrow ' + DASH + ' may affect access and layout');
+  if (!heritage) dis.push('Heritage ' + DASH + ' not confirmed; local council schedule may differ');
+  if (!flood)    dis.push('Flood ' + DASH + ' not confirmed; flood study may be required');
+  if (!bushfire) dis.push('Bushfire ' + DASH + ' not confirmed');
+  dis.push('Easements, title encumbrances and exact boundaries ' + DASH + ' title search / survey required');
+  dis.push('Drainage, stormwater and slope ' + DASH + ' civil assessment may be needed');
+  dis.push('Council DCP controls and conditions ' + DASH + ' confirm with council');
+  var disHtml = dis.map(function(m){return '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">'+BOX+'</span>'+m+'</li>';}).join('');
 
-  // ── Build card ───────────────────────────────────────────────────
   return '<div class="signal-card">'
-
-    // Section 1
-    + '<div class="signal-section">'
-      + '<div class="signal-heading">What we found</div>'
-      + '<ul style="list-style:none;margin:0;padding:0;font-size:.77rem;line-height:1.75">' + foundHtml + '</ul>'
-    + '</div>'
-
-    // Section 2
-    + '<div class="signal-section">'
-      + '<div class="signal-heading">What this may mean</div>'
-      + '<div class="signal-body">' + meaning + '</div>'
-    + '</div>'
-
-    // Section 3
-    + '<div class="signal-section">'
-      + '<div class="signal-heading">What is still missing</div>'
-      + '<ul style="list-style:none;margin:0;padding:0;font-size:.74rem;line-height:1.75">' + missingHtml + '</ul>'
-    + '</div>'
-
-    // CTA
-    + '<div style="margin-top:18px">'
-      + '<button class="btn btn-gold" onclick="openRegModal()" '
-        + 'style="width:100%;padding:13px 18px;font-size:.84rem;letter-spacing:.01em">'
-        + 'Find Out What My Land Can Do \u2192'
-      + '</button>'
-    + '</div>'
-
-    // Professional verification — always shown
-    + '<div style="margin-top:10px;font-size:.64rem;color:var(--muted);line-height:1.6;text-align:center">'
-      + 'Professional verification required. Not a planning certificate, valuation, legal advice, '
-      + 'financial advice, or guarantee of any kind.'
-    + '</div>'
-
+    + '<div class="signal-section"><div class="signal-heading">What we found</div>'
+      + '<ul style="list-style:none;margin:0;padding:0;font-size:.77rem;line-height:1.75">' + foundHtml + '</ul></div>'
+    + '<div class="signal-section"><div class="signal-heading">What this means</div>'
+      + '<div class="signal-body">' + meaning + '</div></div>'
+    + '<div class="signal-section"><div class="signal-heading">Advantages</div>'
+      + '<ul style="list-style:none;margin:0;padding:0;font-size:.77rem;line-height:1.75">' + advHtml + '</ul></div>'
+    + '<div class="signal-section"><div class="signal-heading">Disadvantages / missing checks</div>'
+      + '<ul style="list-style:none;margin:0;padding:0;font-size:.74rem;line-height:1.75">' + disHtml + '</ul></div>'
+    + '<div class="signal-section"><div class="signal-heading">To add more value</div>'
+      + '<div class="signal-body">Based on this check, the next useful step is a professional review before spending money on plans, survey or consultants.</div></div>'
+    + _proReviewCta(addr) + _proVerifyLine()
   + '</div>';
 }
 
+function _proReviewCta(addr){
+  var q = addr ? ('?addr=' + encodeURIComponent(addr)) : '';
+  return '<div style="margin-top:18px">'
+    + '<a class="btn btn-gold" href="/professional-review.html' + q + '" '
+      + 'style="display:block;text-align:center;text-decoration:none;width:100%;padding:13px 18px;font-size:.84rem;letter-spacing:.01em">'
+      + 'Professional Review \u2192'
+    + '</a></div>';
+}
+function _proVerifyLine(){
+  return '<div style="margin-top:10px;font-size:.64rem;color:var(--muted);line-height:1.6;text-align:center">'
+    + 'Preliminary information only. Professional verification required before decisions or spending money. '
+    + 'Not a planning certificate, valuation, legal, financial or survey advice. '
+    + 'Approximate boundary and dimensions only \u2014 not a survey. Confirm by title plan or licensed surveyor.'
+  + '</div>';
+}
 
 
 function buildScorecard(){
@@ -1571,21 +1593,14 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
         +'<div class="rh-addr">'+esc(addr,80)+'</div>'
         +'<div class="rh-meta">'+esc(zLabel,60)+' \u00b7 '+esc(cmName,50)+'</div>'
       +'</div>'
-      +'<div class="rh-right">'
-        +'<div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);margin-bottom:4px">Overall</div>'
-        +'<div style="font-size:.8rem;font-weight:700;color:'+(geoConf==="Verified"&&zone&&block>0?'var(--green)':'var(--amber)')+'">'
-          +(geoConf==="Verified"&&zone&&block>0?'Facts available':skipLotCount?'Limited facts — add land size':'Limited facts')
-        +'</div>'
-        +'<div style="font-size:.62rem;color:var(--muted2);margin-top:2px">Professional review required</div>'
-      +'</div>'
     +'</div>'
 
-    // Stats row
+    // Stats row (facts only — no scoring, no DA-median estimate)
     +'<div class="stats-row">'
       +'<div class="sr"><div class="sr-v '+(zoneAllows?'g':'a')+'">'+esc(zone||'?',6)+'</div><div class="sr-l">Zone</div></div>'
       +'<div class="sr"><div class="sr-v '+(mlsReal?'g':'a')+'">'+(mls||'?')+'m\u00b2</div><div class="sr-l">Min lot</div></div>'
-      +'<div class="sr"><div class="sr-v b">'+esc(daMedian,20)+'</div><div class="sr-l">DA median</div></div>'
-      +'<div class="sr"><div class="sr-v">'+esc(blockDisp,20)+'</div><div class="sr-l">Land size</div></div>'
+      +'<div class="sr"><div class="sr-v">'+(block&&block>0?esc(block.toLocaleString('en-AU')+'m\u00b2',20):'\u2014')+'</div><div class="sr-l">Land size (entered)</div></div>'
+      +'<div class="sr"><div class="sr-v">'+(front&&front>0?esc(front+'m',12):'\u2014')+'</div><div class="sr-l">Frontage (entered)</div></div>'
     +'</div>'
 
 
@@ -1642,18 +1657,15 @@ function buildNextPathways(){
 
 
 function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,blockSource,geoSource,geoConf,matchedAddr,addrType,lotNum,councilSource,locationType,paidApiUsed,lotGeoWarn){
-  // Calculate scores
-  var ps =calcPlanningStrength(zone,mls,mlsReal,heritage,fsr,height,zoneAllows);
-  var ov =calcOverlayRisk(heritage,flood,bushfire,acidSulfate,contaminated,riparian,landReserve,foreshore);
-  var yp =calcYieldPotential(block,mls,zone);
-  var ac =calcApprovalConfidence(zone,heritage,flood,bushfire,zoneAllows,cm);
-  var hc =calcHoldingCostRisk(cm);
-  var cc =calcCouncilComplexity(cm);
-  var ir =5; // Infrastructure unknown — honest default
-  var ep =zoneAllows&&n>=2?7:4;
-  var overall=Math.min(99,Math.max(1,Math.round((ps*0.2+ov*0.15+yp*0.2+ac*0.15+(10-ir)*0.1+hc*0.1+cc*0.05+ep*0.05)*10)));
+  // Package 99C: public Site Check is fact-first and NOT scored.
+  // Executive Verdict, Institutional Scorecard, approval-confidence score and
+  // the report gate are retired from the PUBLIC flow. The scoring functions
+  // (calcApprovalConfidence, calcPlanningStrength, etc.) and the CD{} DA dataset
+  // remain defined in this file as INTERNAL logic for the future Professional
+  // Analysis Engine only. They are intentionally not called for public UI.
+  var overall=null; // no public score
 
-  // Run inner renderer (sets innerHTML on #result)
+  // Run inner renderer (sets innerHTML on #result) — renders map + planning facts
   try{
     _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,overall,blockSource,geoSource,geoConf,matchedAddr,addrType,lotNum,councilSource,locationType,paidApiUsed,lotGeoWarn);
   }catch(e){console.error("_renderResultInner failed:",e); return;}
@@ -1662,20 +1674,17 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
   var rcard=resultEl?resultEl.querySelector('.rcard'):null;
   if(!rcard){console.warn("rcard not found after render"); return;}
 
-  // Score-led verdict and scorecard removed from public result (fact-first approach)
-  // buildVerdictSection and buildScorecard kept as internal functions, not shown publicly.
-
-  // 2. New institutional sections
+  // 99C: the truthful story card (Map + What we found / What this means /
+  // Advantages / Disadvantages-missing / To add more value / Professional Review)
   try{
     var ctaBox=rcard.querySelector('.cta-box');
-    // Show the clean 3-section verdict card (What we found / What this may mean / What is still missing)
     var newSections=document.createElement('div');
     newSections.innerHTML=buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,
-      seppStation400,seppStation800,mls,mlsReal,block,overall);
+      seppStation400,seppStation800,mls,mlsReal,block,front,geoConf,blockSource,lotGeoWarn);
     if(ctaBox){rcard.insertBefore(newSections,ctaBox);}else{rcard.appendChild(newSections);}
-  }catch(e){console.warn("Institutional sections render failed",e);}
+  }catch(e){console.warn("Story sections render failed",e);}
 
-  // Report gate removed — single CTA flow
+  // Report gate removed — single Professional Review CTA flow
 
   // 4. Post-render DOM enhancements: add whtm to inner sections
   try{

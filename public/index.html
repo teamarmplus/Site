@@ -38,34 +38,15 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style id="homepage-qa-fix">
-/* Layout-only fix for the sticky header covering map/result. No markup/wording/logic change.
-   nav is position:sticky;top:0 (~58px tall desktop, ~58px mobile).
-   1) scroll-padding-top on the scroll root makes EVERY scroll-to (programmatic or anchor)
-      stop below the sticky bar — not just scrollIntoView.
-   2) scroll-margin-top on the targets is the matching belt-and-braces lever.
-   3) a little breathing space above map/result so the title area is never tucked under the bar. */
-html { scroll-padding-top: 84px; }
-#map-card, #result, .result-wrap, #result .rcard { scroll-margin-top: 90px; }
+/* 99C: nav is static (non-sticky), so it can never cover content.
+   Only modest spacing remains; large scroll offsets for a sticky bar are no longer needed. */
+#map-card, #result, .result-wrap, #result .rcard { scroll-margin-top: 12px; }
 .result-wrap { padding-top: 8px; }
-
-/* Sticky nav must fully hide content scrolling beneath it. The shared style uses a
-   translucent blurred background, which lets result text ghost through and look broken.
-   Make it solid (opaque) — layout/style only, no markup/wording/logic change. */
-nav { background: var(--bg) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; z-index: 400 !important; }
-/* Result/card use transform for fade-in, which creates a stacking context that can
-   paint over the sticky nav on some mobile engines. Keep them below the nav. */
 .result-wrap, #result, #result .rcard, #map-card { position: relative; z-index: 1; }
-
-/* Desktop hero spacing: a calmer, balanced gap below the sticky nav so the hero
-   doesn't feel cramped against the bar. Spacing only — no structure/wording change. */
 @media (min-width: 561px) {
-  .hero { padding-top: 64px; padding-bottom: 24px; }
+  .hero { padding-top: 24px; padding-bottom: 24px; }
 }
-
 @media (max-width: 560px) {
-  /* Mobile: give a touch more clearance so the result/map title sits clearly below the bar */
-  html { scroll-padding-top: 76px; }
-  #map-card, #result, .result-wrap, #result .rcard { scroll-margin-top: 84px; }
   #map-card { margin-top: 8px; }
 }
 </style>
@@ -75,11 +56,9 @@ nav { background: var(--bg) !important; backdrop-filter: none !important; -webki
 <nav>
   <a href='/'><div class="logo"><span class="logo-mark"></span>SiteVerdict</div></a>
   <div class="nl">
-    <a href='/' class='active'>Free Site Check</a>
-    <a href='/what-this-may-mean.html'>What This May Mean</a>
-    <a href='/full-report.html'>Find Out What My Land Can Do</a>
-    <a href='/services'>Professional Pathway</a>
-    <a href='/terms.html'>Terms</a>
+    <a href='/' class='active'>Site Check</a>
+    <a href='/professional-review.html'>Professional Review</a>
+    <a href='/terms'>Terms</a>
   </div>
   <a href='/' class="nav-cta">Check My Land</a>
 </nav>
@@ -93,7 +72,7 @@ nav { background: var(--bg) !important; backdrop-filter: none !important; -webki
   </div>
 </div>
 
-<!-- Site Check — address is the one clear action -->
+<!-- Site Check — address + land size + frontage, then one clear action -->
 <div class="form-card">
   <div style="margin-bottom:14px">
     <label class="lbl">Property address</label>
@@ -102,7 +81,21 @@ nav { background: var(--bg) !important; backdrop-filter: none !important; -webki
       autocomplete="off"
       onkeydown="if(event.key==='Enter')runCheck()">
   </div>
+  <div class="two" style="margin-bottom:8px">
+    <div>
+      <label class="lbl">Land size (m&#178;)</label>
+      <input class="fi" id="block" type="number" placeholder="e.g. 600" min="1"
+        onkeydown="if(event.key==='Enter')runCheck()">
+    </div>
+    <div>
+      <label class="lbl">Frontage (m)</label>
+      <input class="fi" id="front" type="number" placeholder="e.g. 15" min="1"
+        onkeydown="if(event.key==='Enter')runCheck()">
+    </div>
+  </div>
+  <div class="hint" style="margin-bottom:12px">Use your contract, title, survey, rates notice, planning document, or listing.</div>
   <button class="run-btn" id="run-btn" onclick="runCheck()">Check My Land &#8594;</button>
+  <div id="missing-fields-msg" style="display:none;margin-top:10px;font-size:.78rem;color:var(--muted)">Please add land size and frontage to continue.</div>
 </div>
 
 <!-- Base map visible on arrival (map-app feel). Map sits above the result. -->
@@ -138,119 +131,17 @@ nav { background: var(--bg) !important; backdrop-filter: none !important; -webki
   </div>
   <!-- Map first: user sees their land, then the plain-English result below -->
   <div id="result"></div>
-  <!-- Package 99A: optional user-entered values, BELOW the result (detect first, ask only if missing) -->
-  <div id="user-input-card" style="display:none;max-width:620px;margin:14px auto 0;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 16px">
-    <div style="font-size:.82rem;color:var(--text);font-weight:600;margin-bottom:4px">Add your own land details (optional)</div>
-    <div style="font-size:.72rem;color:var(--muted2);margin-bottom:10px">If you know these from your rates notice, title or plan, add them. These will be shown as <b>User entered</b>.</div>
-    <div class="two">
-      <div>
-        <label class="lbl">Land size (m&#178;)</label>
-        <input class="fi" id="block" type="number" placeholder="e.g. 600" min="100">
-        <div class="hint">From rates notice, title or listing</div>
-      </div>
-      <div>
-        <label class="lbl">Street frontage (m)</label>
-        <input class="fi" id="front" type="number" placeholder="e.g. 15" min="1">
-        <div class="hint">Width at street</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- REGISTRATION MODAL (Netlify Forms) -->
-<div class="modal-overlay" id="reg-modal">
-  <div class="modal" style="position:relative">
-    <button class="modal-close" onclick="closeRegModal()" aria-label="Close">&times;</button>
-    <div class="modal-title">Register to continue</div>
-    <div class="modal-sub" id="reg-reason">Register free to see the fuller picture. No spam. No subscription.</div>
-    <form name="siteverdict-registration" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="handleRegSubmit(event)">
-      <input type="hidden" name="form-name" value="siteverdict-registration">
-      <p style="display:none"><label>Don&apos;t fill this out: <input name="bot-field"></label></p>
-      <div class="form-group">
-        <label class="form-label">Full name *</label>
-        <input class="form-input" type="text" name="name" required placeholder="Your name">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email *</label>
-        <input class="form-input" type="email" name="email" required placeholder="your@email.com">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Phone</label>
-        <input class="form-input" type="tel" name="phone" placeholder="0400 000 000">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Property address (if applicable)</label>
-        <input class="form-input" type="text" name="property_address" id="reg-addr-field" placeholder="Address you are checking">
-      </div>
-      <div class="form-group">
-        <label class="form-label">I am a *</label>
-        <select class="form-select" name="investor_type" required>
-          <option value="">Select...</option>
-          <option value="homeowner">Homeowner exploring options</option>
-          <option value="investor">Property investor</option>
-          <option value="developer">Developer or builder</option>
-          <option value="professional">Town planner / surveyor / engineer</option>
-          <option value="buyer">Buyer doing due diligence</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-gold btn-full" style="margin-top:6px" id="reg-submit-btn">Register free &#8594;</button>
-      <div style="margin-top:10px;font-size:.62rem;color:var(--muted2);text-align:center">No spam. No subscription. We may contact you about your property query.</div>
-    </form>
-    <div id="reg-success" style="display:none;text-align:center;padding:20px 0">
-      <div style="font-size:1.8rem;margin-bottom:8px">&#10003;</div>
-      <div style="font-size:.88rem;font-weight:500;color:var(--green);margin-bottom:6px">Registered successfully</div>
-      <div style="font-size:.74rem;color:var(--muted);line-height:1.7">Your free report is unlocked. You can now run another full intelligence check.</div>
-      <button class="btn btn-outline btn-sm" onclick="closeRegModal()" style="margin-top:12px">Close</button>
-    </div>
-  </div>
 </div>
 
 <footer>
   <div>SiteVerdict &middot; ABN 42 663 950 070</div>
   <div>
-    <a href="/what-this-may-mean.html" style="color:inherit">What This May Mean</a> &middot;
-    <a href="/full-report.html" style="color:inherit">Find Out What My Land Can Do</a> &middot;
-    <a href='/services' style="color:inherit">Professional Pathway</a> &middot;
-    <a href='/terms' style="color:inherit">Terms</a> &middot;
-    <button onclick="window.print()" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:.6rem;font-family:inherit">&#128438; Print report</button>
+    <a href='/' style='color:inherit'>Site Check</a> &middot;
+    <a href='/professional-review.html' style='color:inherit'>Professional Review</a> &middot;
+    <a href='/terms' style="color:inherit">Terms</a>
   </div>
 </footer>
 
-<script>
-// Registration submit handler
-function handleRegSubmit(e){
-  e.preventDefault();
-  var form = e.target;
-
-  // Auto-fill address if empty
-  var addrField = document.getElementById('reg-addr-field');
-  if(addrField && !addrField.value){
-    var checkedAddr = document.getElementById('addr');
-    if(checkedAddr) addrField.value = checkedAddr.value;
-  }
-
-  // Disable submit button to prevent double-submit
-  var btn = document.getElementById('reg-submit-btn');
-  if(btn){btn.disabled=true;btn.textContent='Registering...';}
-
-  // Submit to Netlify
-  var data = new FormData(form);
-  fetch('/', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
-    body: new URLSearchParams(data).toString()
-  }).then(function(){
-    // Success: unlock reports, show success state
-    localStorage.setItem('sv_reports_used','0');
-    form.style.display='none';
-    var success = document.getElementById('reg-success');
-    if(success) success.style.display='block';
-  }).catch(function(){
-    // Fallback: still unlock on error (user registered intent)
-    localStorage.setItem('sv_reports_used','0');
-    closeRegModal();
-  });
-}
-</script>
 <script src="/assets/sv-check.js?v=sitecheck-expanded-report-2026-05-22"></script>
 
 <div id="sv-build" style="display:none" data-build="sitecheck-expanded-report-2026-05-22">SiteVerdict build: sitecheck-expanded-report-2026-05-22</div>
