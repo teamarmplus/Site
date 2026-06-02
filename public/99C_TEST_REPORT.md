@@ -69,7 +69,7 @@ name ✔ · phone ✔ · email ✔ · property address ✔ · purpose (buy/sell/
 
 ## 8. Site Check includes (confirmed)
 
-address input ✔ · land size input ✔ · frontage input ✔ · user-entered values labelled "User entered — not independently verified" ✔ · map / land view ✔ · What we found ✔ · What this means ✔ · Advantages ✔ · Disadvantages / missing checks ✔ · To add more value ✔ · one Professional Review button ✔ · uncertain parcel shown as "Parcel match not confirmed" + "Professional verification needed" on low confidence ✔ · no upload on Site Check ✔
+address input ✔ · land size input ✔ · frontage input ✔ · user-entered values labelled "User entered — not independently verified" ✔ · map / land view ✔ · What we found ✔ · What this means ✔ · What still needs checking ✔ · Next useful step ✔ · one Professional Review button ✔ · no public "Advantages"/"Disadvantages" headings ✔ · uncertain parcel shown as "Parcel match not confirmed" + "Professional verification needed" on low confidence ✔ · no upload on Site Check ✔
 
 ---
 
