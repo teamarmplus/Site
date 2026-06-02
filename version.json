@@ -1,15 +1,15 @@
 {
   "site": "siteverdict2",
-  "build_name": "sitecheck-release-check-99C-r4",
+  "build_name": "sitecheck-release-check-99C-r7",
   "package_number": "99C",
   "build_time": "2026-06-01T00:00:00Z",
-  "release_note": "Package 99C: Public flow simplified to Site Check -> Professional Review. Site Check entry now requires address + land size + frontage; user values labelled 'User entered - not independently verified'. Result is the truthful 7-part story (Map / What we found / What this means / Advantages / Disadvantages-missing / To add more value / one Professional Review button). State B reduced result when land size or frontage missing (Not confirmed / Professional verification needed). Low parcel confidence shows 'Parcel match not confirmed'. Executive Verdict, Institutional Scorecard, approval-confidence score and the report gate RETIRED from public flow (scoring functions retained as internal-only logic). New /professional-review.html (form + optional upload + 24-48 business-hours wording). No upload on Site Check. No public score numbers. Government-data engine, geocoding and parcel-outline fetch unchanged. [r3] Added professional-review-thanks.html (form success path). Verified real browser flow: State A shows entered land size/frontage with missing-message cleared. Removed residual scorecard header (OVERALL block + DA-median KPI) from result; stats row now Zone / Min lot / Land size (entered) / Frontage (entered). [r4] Removed sticky/fixed nav \u2014 header is now static on Site Check, Professional Review and thank-you pages, so it never covers content. Simplified the homepage sticky-compensation styles accordingly. No wording/flow change.",
+  "release_note": "Package 99C-r7: Free NSW Site Check \u2192 Professional Review. NSW-first wording, plain-English result sections, user-entered land size/frontage labels, Professional Review form with optional upload, 24\u201348 business-hours response wording, deploy files under public/.",
   "status": "draft-awaiting-private-gate",
   "features": {
     "publicFlowTwoStep": true,
     "siteCheckRequiresLandSizeFrontage": true,
     "userEnteredLabel": true,
-    "sevenPartStory": true,
+    "plainEnglishResultSections": true,
     "stateBReducedResult": true,
     "parcelMatchNotConfirmedWording": true,
     "executiveVerdictRetiredPublic": true,
@@ -24,7 +24,12 @@
     "thankYouPage": true,
     "scorecardHeaderResidueRemoved": true,
     "realFlowStateAVerified": true,
-    "staticNavNoOverlay": true
+    "staticNavNoOverlay": true,
+    "nswFirstWording": true,
+    "noPublicAdvDisHeadings": true,
+    "whatStillNeedsCheckingSection": true,
+    "deployUnderPublicDir": true,
+    "nswFirstPositioning": true
   },
   "principle_version": "1.0"
 }
