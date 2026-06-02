@@ -1249,7 +1249,7 @@ function _fetchParcelOutlineQLD(lat, lon, map) {
 
 // ── END MAP PREVIEW ──────────────────────────────────────────────
 
-function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,sepp800,mls,mlsReal,block,front,geoConf,blockSource,lotGeoWarn){
+function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,sepp800,mls,mlsReal,block,front,geoConf,blockSource,lotGeoWarn,fsr,height,matchedAddr){
 
   var zLabel = ({
     'R1':'Low density residential',  'R2':'Low density residential',
@@ -1285,24 +1285,39 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
     + '</div>';
   }
 
-  // Section 1: What we found
+  // Section 1: What we found — structured, address-specific, confidence-labelled.
+  // This is the standard that makes it a real Site Check, not a generic AI paragraph.
   var found = [];
+  // Address (the check is tied to a specific property)
+  found.push('Address: ' + esc(matchedAddr || addr, 90));
+  // Council + zone
   if (lga)          found.push('Council / LGA: ' + esc(lga));
+  else              found.push('Council / LGA: Not confirmed');
   if (zLabel)       found.push('Zone: ' + esc(zLabel) + ' (' + esc(zone) + ')');
   else              found.push('Zone: Not confirmed');
-  found.push('Land size: ' + Number(block).toLocaleString() + NBSP + 'm\u00b2' + USER_LABEL);
-  found.push('Frontage: ' + Number(front).toLocaleString() + NBSP + 'm' + USER_LABEL);
-  if (lowParcel)    found.push('Parcel match not confirmed ' + DASH + ' Professional verification needed');
+  // Minimum lot size
   if (mlsReal && mls) found.push('Minimum lot size (confirmed LEP): ' + mls + NBSP + 'm\u00b2');
   else if (mls)     found.push('Minimum lot size (zone default): ' + mls + NBSP + 'm\u00b2 ' + DASH + ' confirm with council');
-  if (heritage)     found.push('Heritage indicator: present ' + DASH + ' scope needs verification');
-  if (flood)        found.push('Flood planning area: indicator present ' + DASH + ' scope needs verification');
-  if (bushfire)     found.push('Bushfire prone land: indicator present ' + DASH + ' scope needs verification');
-  if (!heritage && !flood && !bushfire && hasZone)
-                    found.push('Major overlay indicators: none detected in this check');
+  else              found.push('Minimum lot size: Not confirmed');
+  // Height & FSR — show when available, else state Not confirmed (don't pretend)
+  if (height && Number(height) > 0) found.push('Height limit: ' + esc(String(height)) + NBSP + 'm');
+  else              found.push('Height limit: Not confirmed');
+  if (fsr && Number(fsr) > 0)       found.push('Floor space ratio (FSR): ' + esc(String(fsr)));
+  else              found.push('FSR: Not confirmed');
+  // User-supplied land facts (clearly labelled)
+  found.push('Land size: ' + Number(block).toLocaleString() + NBSP + 'm\u00b2' + USER_LABEL);
+  found.push('Frontage: ' + Number(front).toLocaleString() + NBSP + 'm' + USER_LABEL);
+  // Overlays — confirm each either way (positive confirmation, not silence)
+  found.push('Heritage indicator: ' + (heritage ? 'present ' + DASH + ' scope needs verification' : 'none detected in this check'));
+  found.push('Flood planning indicator: ' + (flood ? 'present ' + DASH + ' scope needs verification' : 'none detected in this check'));
+  found.push('Bushfire prone indicator: ' + (bushfire ? 'present ' + DASH + ' scope needs verification' : 'none detected in this check'));
+  // Parcel / location + data confidence (explicit, always shown)
+  if (lowParcel)    found.push('Parcel / location confidence: low ' + DASH + ' parcel match not confirmed; professional verification needed');
+  else              found.push('Parcel / location confidence: ' + esc(String(geoConf || 'Estimated')));
+  found.push('Data confidence: planning signals from NSW sources; land size and frontage user-entered; items above marked Not confirmed are not yet verified');
 
   var foundHtml = found.map(function(f) {
-    var isGap = f.indexOf('Not confirmed') !== -1 || f.indexOf('not confirmed') !== -1;
+    var isGap = /Not confirmed|not confirmed|confidence: low|not yet verified|none detected/.test(f);
     return '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:'
       + (isGap ? 'var(--muted)' : 'var(--text)') + '"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">'
       + (isGap ? BOX : DOT) + '</span>' + f + '</li>';
@@ -1319,40 +1334,30 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
     meaning = 'The zone was found, and you entered a land size of ' + Number(block).toLocaleString() + NBSP + 'm\u00b2 and frontage of ' + Number(front).toLocaleString() + NBSP + 'm. The zone sets what use is generally expected; minimum lot size affects whether more than one dwelling or lot may be possible; frontage affects access and layout. These are starting points ' + DASH + ' not a decision, and not confirmation of what can be approved.';
   }
 
-  // Section 3: Advantages (only if supported)
-  var adv = [];
-  if (zLabel && /residential|mixed use|local centre/i.test(zLabel)) adv.push('Zoning is a recognised residential/mixed-use category');
-  if (mls && hasBlock && block >= 2*mls) adv.push('Your entered land size is well above the minimum lot size for this zone (your figure, not verified)');
-  if (hasFront && front >= 12) adv.push('Your entered frontage is in a workable range for access and layout (your figure, not verified)');
-  if (!hasOverlay && hasZone) adv.push('No major overlay indicators (heritage, flood, bushfire) were detected in this check');
-  var advHtml = adv.length
-    ? adv.map(function(a){return '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--text)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">'+DOT+'</span>'+a+'</li>';}).join('')
-    : '<li style="color:var(--muted);padding-left:14px;list-style:none">No clear advantages could be confirmed from the available data.</li>';
-
-  // Section 4: Disadvantages / missing checks
-  var dis = [];
-  if (lowParcel) dis.push('Parcel match not confirmed ' + DASH + ' professional verification needed');
-  dis.push('Land size and frontage are user-entered only ' + DASH + ' not independently verified');
-  if (hasFront && front < 10) dis.push('Entered frontage is narrow ' + DASH + ' may affect access and layout');
-  if (!heritage) dis.push('Heritage ' + DASH + ' not confirmed; local council schedule may differ');
-  if (!flood)    dis.push('Flood ' + DASH + ' not confirmed; flood study may be required');
-  if (!bushfire) dis.push('Bushfire ' + DASH + ' not confirmed');
-  dis.push('Easements, title encumbrances and exact boundaries ' + DASH + ' title search / survey required');
-  dis.push('Drainage, stormwater and slope ' + DASH + ' civil assessment may be needed');
-  dis.push('Council DCP controls and conditions ' + DASH + ' confirm with council');
-  var disHtml = dis.map(function(m){return '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">'+BOX+'</span>'+m+'</li>';}).join('');
+  // Section 3: What still needs checking (missing/unconfirmed items, framed as checks not weaknesses)
+  // Missing/unconfirmed items are framed as checks needed, NOT as the land's weaknesses.
+  var check = [];
+  if (lowParcel) check.push('Parcel match not confirmed ' + DASH + ' professional verification needed');
+  check.push('Land size and frontage are user-entered ' + DASH + ' not independently verified');
+  check.push('Title, DP and easements ' + DASH + ' need checking (title search)');
+  check.push('Exact boundaries and dimensions ' + DASH + ' survey may be needed');
+  if (!heritage) check.push('Heritage ' + DASH + ' not fully confirmed; local council schedule may differ');
+  if (!flood)    check.push('Flood ' + DASH + ' not fully confirmed; flood study may be required');
+  if (!bushfire) check.push('Bushfire ' + DASH + ' not fully confirmed');
+  check.push('Stormwater and drainage ' + DASH + ' may need review');
+  check.push('Slope, earthworks and retaining ' + DASH + ' may need review');
+  check.push('Council / DCP controls ' + DASH + ' may need professional review');
+  var checkHtml = check.map(function(m){return '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">'+BOX+'</span>'+m+'</li>';}).join('');
 
   return '<div class="signal-card">'
     + '<div class="signal-section"><div class="signal-heading">What we found</div>'
       + '<ul style="list-style:none;margin:0;padding:0;font-size:.77rem;line-height:1.75">' + foundHtml + '</ul></div>'
     + '<div class="signal-section"><div class="signal-heading">What this means</div>'
       + '<div class="signal-body">' + meaning + '</div></div>'
-    + '<div class="signal-section"><div class="signal-heading">Advantages</div>'
-      + '<ul style="list-style:none;margin:0;padding:0;font-size:.77rem;line-height:1.75">' + advHtml + '</ul></div>'
-    + '<div class="signal-section"><div class="signal-heading">Disadvantages / missing checks</div>'
-      + '<ul style="list-style:none;margin:0;padding:0;font-size:.74rem;line-height:1.75">' + disHtml + '</ul></div>'
-    + '<div class="signal-section"><div class="signal-heading">To add more value</div>'
-      + '<div class="signal-body">Based on this check, the next useful step is a professional review before spending money on plans, survey or consultants.</div></div>'
+    + '<div class="signal-section"><div class="signal-heading">What still needs checking</div>'
+      + '<ul style="list-style:none;margin:0;padding:0;font-size:.74rem;line-height:1.75">' + checkHtml + '</ul></div>'
+    + '<div class="signal-section"><div class="signal-heading">Next useful step</div>'
+      + '<div class="signal-body">To understand what may add value or reduce risk, request a Professional Review.</div></div>'
     + _proReviewCta(addr) + _proVerifyLine()
   + '</div>';
 }
@@ -1675,12 +1680,12 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
   if(!rcard){console.warn("rcard not found after render"); return;}
 
   // 99C: the truthful story card (Map + What we found / What this means /
-  // Advantages / Disadvantages-missing / To add more value / Professional Review)
+  // Sections: What we found / What this means / What still needs checking / Next useful step / Professional Review
   try{
     var ctaBox=rcard.querySelector('.cta-box');
     var newSections=document.createElement('div');
     newSections.innerHTML=buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,
-      seppStation400,seppStation800,mls,mlsReal,block,front,geoConf,blockSource,lotGeoWarn);
+      seppStation400,seppStation800,mls,mlsReal,block,front,geoConf,blockSource,lotGeoWarn,fsr,height,matchedAddr);
     if(ctaBox){rcard.insertBefore(newSections,ctaBox);}else{rcard.appendChild(newSections);}
   }catch(e){console.warn("Story sections render failed",e);}
 
