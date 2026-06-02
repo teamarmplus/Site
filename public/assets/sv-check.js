@@ -1,7 +1,7 @@
 /* SiteVerdict — Site Check Engine (Package 99C)
    Public Site Check story + Professional Review flow.
    All 16 government APIs preserved.
-   No public Executive Verdict, Institutional Scorecard, approval-confidence score, or report gate.
+   No public scoring widgets or report gate (retired); scoring kept internal-only.
    Scoring functions retained as internal-only logic (not shown publicly).
 */
 
@@ -1663,7 +1663,7 @@ function buildNextPathways(){
 
 function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood,fsr,height,infra,comps,landReserve,foreshore,zoneAllows,mlsReal,acidSulfate,contaminated,riparian,bushfire,seppStation400,seppStation800,seppLightRail800,skipLotCount,blockSource,geoSource,geoConf,matchedAddr,addrType,lotNum,councilSource,locationType,paidApiUsed,lotGeoWarn){
   // Package 99C: public Site Check is fact-first and NOT scored.
-  // Executive Verdict, Institutional Scorecard, approval-confidence score and
+  // The retired public scoring widgets (kept internal-only) and
   // the report gate are retired from the PUBLIC flow. The scoring functions
   // (calcApprovalConfidence, calcPlanningStrength, etc.) and the CD{} DA dataset
   // remain defined in this file as INTERNAL logic for the future Professional
