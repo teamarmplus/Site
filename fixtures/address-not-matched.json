@@ -1,6 +1,0 @@
-{
-  "_label": "Address not matched (no street number)",
-  "enquiry": {"address":"GEORGE STREET SYDNEY","purpose":"notsure","name":"Cara NoMatch","email":"cara@example.com","notes":"No street number provided"},
-  "geocode": {"found":false},
-  "zone": null, "minLotLayer": null, "heritage": false, "flood": false, "bushfire": false
-}

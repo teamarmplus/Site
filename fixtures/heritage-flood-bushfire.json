@@ -1,8 +1,0 @@
-{
-  "_label": "Heritage + flood + bushfire all detected",
-  "enquiry": {"address":"1 Heritage Lane Springwood NSW 2777","purpose":"build","block":900,"front":20,"name":"Gita Build","email":"gita@example.com","notes":"Wants to build; older area near bushland and creek"},
-  "geocode": {"found":true,"lat":-33.6996,"lon":150.5636,"confidence":"Verified","locationType":"ROOFTOP","matchedAddr":"1 Heritage Lane, Springwood NSW 2777, Australia","council":"Blue Mountains City Council","postcode":"2777"},
-  "zone": {"code":"R2","name":"Low Density Residential"},
-  "minLotLayer": 600,
-  "heritage": true, "flood": true, "bushfire": true
-}

@@ -1,8 +1,0 @@
-{
-  "_label": "OC / external works",
-  "enquiry": {"address":"2 Honeysuckle Drive Newcastle NSW 2300","purpose":"oc","name":"Dan OC","email":"dan@example.com","notes":"Needs OC handover external works"},
-  "geocode": {"found":true,"lat":-32.9267,"lon":151.7789,"confidence":"Verified","locationType":"ROOFTOP","matchedAddr":"2 Honeysuckle Dr, Newcastle NSW 2300, Australia","council":"City of Newcastle","postcode":"2300"},
-  "zone": {"code":"MU1","name":"Mixed Use"},
-  "minLotLayer": null,
-  "heritage": false, "flood": false, "bushfire": false
-}
