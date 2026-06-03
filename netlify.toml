@@ -6,6 +6,20 @@
 [build]
   publish   = "public"
   functions = "public/netlify/functions"
+  # Deploy gate: skip production deploy when only internal/docs files change.
+  # exit 0 = cancel build (ignore); exit non-zero = proceed (deploy).
+  # Deploy ONLY when public/, functions, package*.json, netlify.toml, scripts/, predeploy, playwright, or tests change.
+  ignore = """
+    bash -c '
+      BASE="${CACHED_COMMIT_REF:-}"; HEAD="${COMMIT_REF:-HEAD}";
+      if [ -z "$BASE" ] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then echo proceed:no-base; exit 1; fi;
+      CHANGED="$(git diff --name-only "$BASE" "$HEAD" 2>/dev/null || true)";
+      if [ -z "$CHANGED" ]; then echo proceed:no-changes; exit 1; fi;
+      TRIGGER="^(public/|netlify/functions/|public/netlify/functions/|package\\.json$|package-lock\\.json$|netlify\\.toml$|scripts/predeploy\\.js$|scripts/|playwright\\.config\\.js$|tests/)";
+      if echo "$CHANGED" | grep -qE "$TRIGGER"; then echo proceed:public-change; exit 1; fi;
+      echo skip:internal-only; exit 0;
+    '
+  """
 
 [functions]
   node_bundler = "esbuild"
