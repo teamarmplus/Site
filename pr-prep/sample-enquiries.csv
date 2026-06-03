@@ -1,0 +1,4 @@
+name,email,phone,address,purpose,block,front,notes
+Alice Resident,alice@example.com,,45 Oxford Street Epping NSW 2121,develop,580,15,Wants development options
+Ben Buyer,ben@example.com,,12 Valentine Avenue Parramatta NSW 2150,buy,600,18,Considering purchase
+Dan OC,dan@example.com,,2 Honeysuckle Drive Newcastle NSW 2300,oc,,,OC handover external works

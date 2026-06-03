@@ -1,0 +1,8 @@
+{
+  "_label": "No zone returned + no min-lot",
+  "enquiry": {"address":"100 George Street Sydney NSW 2000","purpose":"develop","name":"Frank Dev","email":"frank@example.com","notes":"Develop intent, CBD edge"},
+  "geocode": {"found":true,"lat":-33.8582,"lon":151.2094,"confidence":"Verified","locationType":"ROOFTOP","matchedAddr":"100 George St, The Rocks NSW 2000, Australia","council":"Council of the City of Sydney","postcode":"2000"},
+  "zone": null,
+  "minLotLayer": null,
+  "heritage": false, "flood": false, "bushfire": false
+}

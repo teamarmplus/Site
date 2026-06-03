@@ -1,0 +1,8 @@
+{
+  "_label": "Non-residential E2, no fake min-lot",
+  "enquiry": {"address":"12 Valentine Avenue Parramatta NSW 2150","purpose":"buy","block":600,"front":18,"name":"Ben Buyer","email":"ben@example.com","notes":"Considering purchase"},
+  "geocode": {"found":true,"lat":-33.8186,"lon":151.0057,"confidence":"Verified","locationType":"RANGE_INTERPOLATED","matchedAddr":"12 Valentine Ave, Parramatta NSW 2150, Australia","council":"City of Parramatta Council","postcode":"2150"},
+  "zone": {"code":"E2","name":"Commercial Centre"},
+  "minLotLayer": null,
+  "heritage": false, "flood": false, "bushfire": false
+}

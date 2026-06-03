@@ -1,0 +1,6 @@
+name,email,phone,property_address,purpose,notes,Submitted At
+Alice Resident,alice@example.com,0400000001,45 Oxford Street Epping NSW 2121,develop,Wants to understand development options,2026-06-03T01:10:00Z
+Ben Buyer,ben@example.com,0400000002,12 Valentine Avenue Parramatta NSW 2150,buy,Considering purchase of a site,2026-06-03T01:22:00Z
+Dan OC,dan@example.com,0400000003,2 Honeysuckle Drive Newcastle NSW 2300,oc_handover,Needs OC handover external works,2026-06-03T01:35:00Z
+Cara NoMatch,cara@example.com,0400000004,GEORGE STREET,not_sure,No street number provided,2026-06-03T01:48:00Z
+Gita Build,gita@example.com,0400000005,1 Heritage Lane Springwood NSW 2777,build,Older area near bushland and creek,2026-06-03T02:01:00Z

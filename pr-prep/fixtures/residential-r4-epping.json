@@ -1,0 +1,8 @@
+{
+  "_label": "Residential R4, confirmed LEP min-lot",
+  "enquiry": {"address":"45 Oxford Street Epping NSW 2121","purpose":"develop","block":580,"front":15,"name":"Alice Resident","email":"alice@example.com","notes":"Wants to understand development options"},
+  "geocode": {"found":true,"lat":-33.7695,"lon":151.0820,"confidence":"Verified","locationType":"ROOFTOP","matchedAddr":"45 Oxford St, Epping NSW 2121, Australia","council":"City of Parramatta Council","postcode":"2121"},
+  "zone": {"code":"R4","name":"High Density Residential"},
+  "minLotLayer": 550,
+  "heritage": false, "flood": false, "bushfire": false
+}

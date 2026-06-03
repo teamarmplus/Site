@@ -1,0 +1,18 @@
+[
+  {
+    "decision_id": "dec-001",
+    "enquiry_id": "ENQ-001-alice-resident",
+    "decision": "APPROVED_TO_SEND",
+    "decided_by": "T",
+    "decision_note": "Approved draft after checking address",
+    "created_at": "2026-06-03T06:18:46.614Z"
+  },
+  {
+    "decision_id": "dec-002",
+    "enquiry_id": "ENQ-004-dan-oc",
+    "decision": "PREPARE_QUOTE",
+    "decided_by": "T",
+    "decision_note": "OC external works quote to be priced",
+    "created_at": "2026-06-03T06:18:46.647Z"
+  }
+]

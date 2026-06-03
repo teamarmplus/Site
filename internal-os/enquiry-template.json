@@ -1,0 +1,10 @@
+{
+  "address": "45 Oxford Street Epping NSW 2121",
+  "purpose": "develop",
+  "block": 580,
+  "front": 15,
+  "name": "Client name",
+  "email": "client@example.com",
+  "phone": "",
+  "notes": "Client wants to understand development options."
+}
