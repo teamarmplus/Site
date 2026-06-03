@@ -1,0 +1,8 @@
+interest_id,lead_id,trader_id,availability,est_response_time_hrs,note,wants_site_visit,submitted_at,status
+INT-001,LEAD-001,TR-012,available,3,Can scope stormwater this week,yes,2026-06-03T03:00:00Z,received
+INT-002,LEAD-001,TR-001,available,4,Experienced with rear-yard drainage,yes,2026-06-03T03:10:00Z,received
+INT-003,LEAD-001,TR-006,available,2,Cheap and fast,no,2026-06-03T03:20:00Z,received
+INT-004,LEAD-002,TR-002,available,6,Driveways and crossovers regularly,yes,2026-06-03T03:30:00Z,received
+INT-005,LEAD-003,TR-003,available,8,OC handover external works specialty,yes,2026-06-03T03:40:00Z,received
+INT-006,LEAD-004,TR-007,available,72,Will do earthworks,no,2026-06-03T03:50:00Z,received
+INT-007,LEAD-001,TR-009,available,10,New but keen,yes,2026-06-03T04:00:00Z,received

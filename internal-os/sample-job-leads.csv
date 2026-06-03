@@ -1,0 +1,7 @@
+lead_id,created_at,source_enquiry_id,suburb,council,service_category,client_purpose,job_summary,property_type,urgency,risk_flags,photos_plans,status
+LEAD-001,2026-06-03T01:10:00Z,ENQ-001,Parramatta,City of Parramatta,drainage,oc,Stormwater drainage issue after rain near rear yard,residential,normal,none,yes,NEEDS_T_REVIEW
+LEAD-002,2026-06-03T01:22:00Z,ENQ-002,Blacktown,Blacktown City,driveway,external,New driveway and council crossover,residential,normal,none,no,NEEDS_T_REVIEW
+LEAD-003,2026-06-03T01:35:00Z,ENQ-003,Newcastle,City of Newcastle,external,oc,OC handover external works - driveway and landscaping,residential,normal,none,yes,NEEDS_T_REVIEW
+LEAD-004,2026-06-03T01:48:00Z,ENQ-006,Parramatta,City of Parramatta,excavation,develop,Major earthworks near boundary,residential,high,boundary|earthworks,no,NEEDS_T_REVIEW
+LEAD-005,2026-06-03T02:01:00Z,ENQ-007,Springwood,Blue Mountains,bushfire,build,BAL assessment for new build near bushland,residential,high,bushfire,no,NEEDS_T_REVIEW
+LEAD-006,2026-06-03T02:12:00Z,ENQ-009,Dubbo,Dubbo Regional,drainage,external,Stormwater issue - regional,residential,normal,none,no,NEEDS_T_REVIEW

@@ -1,0 +1,6 @@
+client_id,trader_id,job_type,response_time,showed_up,communication,quote_reasonable,workmanship,client_rating,complaint,outcome,action_taken,follow_up_required
+CL-101,TR-001,drainage,fast,yes,good,yes,good,5,none,completed,none,no
+CL-102,TR-012,drainage,fast,yes,excellent,yes,excellent,5,none,completed,none,no
+CL-103,TR-006,concrete,slow,no,poor,no,unknown,1,no-show and overcharge,unresolved,flag,yes
+CL-104,TR-002,driveway,ok,yes,good,yes,good,4,none,completed,none,no
+CL-105,TR-007,excavation,none,no,none,no,unknown,1,abandoned job,unresolved,ban,yes
