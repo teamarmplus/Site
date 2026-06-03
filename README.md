@@ -1,35 +1,48 @@
-# README — SiteVerdict 99C Clean Direction
+# SiteVerdict Internal Operating System — V1
 
-This bundle realigns the SiteVerdict documents after several direction changes. Where any older note conflicts, the files in this bundle win.
+INTERNAL ONLY. Not a public feature. Changes NO public website file. No deploy.
+No real emails sent. No real invoices issued. AI prepares · T approves · System records.
 
-## What changed
+## What it does
+Turns Professional Review enquiries into a review-ready internal queue: prep sheet + draft email
++ (when suitable) a quote draft per enquiry, triaged for T to approve/edit/reject. Reuses the
+proven PR Prep V2 engine (live SV geocode + NSW planning layers; same min-lot honesty rule).
 
-- **Public flow simplified to two steps:** Site Check → Professional Review. The old public 4-engine flow is removed.
-- **No public Engine 2 / 3 / 4 pages.** The deeper analysis is now the **Professional Analysis Engine — internal only**.
-- **Upload moved out of Site Check.** Optional file upload happens only on Professional Review.
-- **Site Check made stronger but truthful:** one app-like page telling the story — map, What we found, What this means, Advantages, Disadvantages / missing checks, To add more value, one Professional Review button.
-- **Two Site Check states:** full result when land size AND frontage are provided; a reduced "Not confirmed / Professional verification needed" state when either is missing.
-- **No false parcel certainty:** auto parcel detection is shown only as a confidence-labelled preview.
-- **Removed clutter:** old "do not" lists trimmed to essential safety only; orphan sections removed.
-- **Kept:** Eightfold Path foundation, first-principles execution, Site Check first, trust first, simple/useful/truthful/low-harm, "better than Landchecker for NSW first" (on honesty and clarity), and a homeowner-simple flow.
+## Architecture (chosen): Option A — local file workflow
+CSV/JSON in → markdown prep sheets + drafts + queue-index.md out. Simplest, safest, fastest:
+no new infrastructure, no webhook, no public-site change, works today. (Google Sheets/Netlify
+webhook/Airtable are later options if volume justifies; all backend-only, none change public UI.)
 
-## Files in this bundle
+## Run it (two commands)
+    # 1) export Professional Review submissions from Netlify Forms as CSV, then:
+    node intake_import.js --csv sample-netlify-form-export.csv --out ./output
+    # 2) build the approval queue:
+    node approval_queue.js --input ./output/enquiries.json --out ./output
+    #    add --fixtures to run fully offline (demo/testing)
 
-1. `AI_WORKING_STYLE.md` — how Claude works with T.
-2. `CLAUDE.md` — current SiteVerdict project context (read first).
-3. `SITEVERDICT_99C_BUILD_SPEC.md` — current build spec.
-4. `SITEVERDICT_ROADMAP.md` — build order and what waits.
-5. `README.md` — this file.
+Then open **output/queue-index.md** — that's T's console.
 
-Related specs (not in this bundle, still valid): `SITEVERDICT_99B_BUILD_SPEC.md`, `SITEVERDICT_ENGINE1_PACKET_SPEC.md`.
+## Files
+- intake_import.js — Netlify CSV → output/enquiries.json (internal records)
+- approval_queue.js — per enquiry: prep sheet + draft email + quote draft (if suitable) + queue-index.md
+- pr_prep.js — PR Prep V2 engine (reused; fixture mode kept)
+- draft_templates/ — 6 safe email templates (no-guarantee wording, [INTERNAL: human approval required])
+- fixtures/ — offline signals for testing
+- output/ — generated prep-sheets/, draft-emails/, quote-drafts/, queue-index.md
+- enquiry-template.json, sample-netlify-form-export.csv, sample-enquiries.csv
+- WORKFLOW.md (full machine + modules), TEST_REPORT.md
 
-## What is NOT done here
+## What ALWAYS requires human approval
+- Sending any email (tool only drafts; marked NEEDS HUMAN APPROVAL).
+- Issuing any quote/invoice (price/GST/ABN = "T to confirm"; never sent).
+- Any professional/legal/planning/financial statement (left to licensed professionals).
+- Confirming address/parcel and that a pathway fits the client.
 
-No product code was built or changed. This is documentation alignment only.
+## What it never does
+Send emails · issue invoices · expose API keys · promise approval/value/profit/loan/outcome ·
+change the public site · build a Hot List.
 
-## What is next
-
-1. T reviews and approves the clean 99C spec.
-2. T uploads the live Site Check package (this has not yet reached the workspace in prior attempts).
-3. On approval + upload, build Package 99C (and 99B confidence logic, which ships with it), run the full test gate, and return screenshots.
-4. Package 100 and the internal Professional Analysis Engine come only after the 99 series is live.
+## How it helps T
+Open queue-index.md → see who enquired, what property, what they want, what we know, what we don't,
+the likely pathway, the ready draft, and whether a quote/referral suits → approve / edit / reject.
+AI prepares. T approves. The business moves.
