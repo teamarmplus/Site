@@ -1,0 +1,13 @@
+item_id,client,suburb,purpose,status,created_at,last_touch_at,rev_review_fee,rev_service_quote,rev_trader_referral,rev_status,related_prep,related_email,related_quote,related_trader_match,notes
+FU-001,Alice,Epping,develop,NEW,2026-06-02T09:00:00+10:00,,yes,no,no,draft,prep-enq-001.md,,,,New enquiry not yet reviewed
+FU-002,Cara,Sydney,notsure,NEEDS_MORE_INFO,2026-06-03T08:00:00+10:00,,no,no,no,draft,prep-enq-004.md,email-enq-004.md,,,Blocked - address not matched
+FU-003,Ben,Parramatta,buy,RESPONSE_READY,2026-06-01T09:00:00+10:00,,yes,no,no,draft,prep-enq-002.md,email-enq-002.md,,,Draft ready not approved
+FU-004,Dan,Newcastle,oc,QUOTE_READY,2026-06-03T07:00:00+10:00,,yes,yes,yes,draft,prep-enq-003.md,email-enq-003.md,quote-enq-003.md,,OC external works quote ready
+FU-005,Frank,Sydney,develop,QUOTE_SENT_MANUALLY,2026-05-30T09:00:00+10:00,2026-05-30T09:00:00+10:00,yes,yes,no,sent manually,prep-enq-006.md,email-enq-006.md,quote-enq-006.md,,Quote sent 4 days ago no reply
+FU-006,Gita,Springwood,build,WAITING_CLIENT,2026-05-26T09:00:00+10:00,2026-05-26T09:00:00+10:00,yes,no,yes,approved,prep-enq-007.md,email-enq-007.md,,,Client silent 8 days
+FU-007,Maya,Penrith,external,TRADER_MATCH_PENDING,2026-06-02T09:00:00+10:00,,no,yes,yes,draft,,,,LEAD-006,Drainage trader match pending
+FU-008,Sofia,Wollongong,sell,CLIENT_CONSENT_NEEDED,2026-06-02T12:00:00+10:00,,no,no,yes,draft,,,,LEAD-003,Need client consent before intro
+FU-009,Will,Camden,develop,JOB_IN_PROGRESS,2026-05-20T09:00:00+10:00,2026-05-28T09:00:00+10:00,yes,no,no,won,prep-enq-008.md,,,,Review in progress
+FU-010,Quinn,Newcastle,develop,WON,2026-05-15T09:00:00+10:00,2026-05-20T09:00:00+10:00,yes,no,no,won,,,,,Completed and paid
+FU-011,Lou,Wollongong,sell,LOST,2026-05-18T09:00:00+10:00,2026-05-19T09:00:00+10:00,no,no,no,lost,,,,,Went elsewhere
+FU-012,Rita,Sydney,develop,ARCHIVED,2026-04-20T09:00:00+10:00,2026-04-25T09:00:00+10:00,no,no,no,lost,,,,,Old - archived
