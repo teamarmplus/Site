@@ -365,6 +365,7 @@ async function geocodeWithConfidence(addr){
           paidApiUsed: data.paidApiUsed || false,
           isLotAddress: data.isLotAddress || false,
           lotWarning: data.lotWarning || null,
+          numberWarning: data.numberWarning || null,
           addressQuality: data.addressQuality || '',
           found: data.found !== false,
           reason: data.reason || null

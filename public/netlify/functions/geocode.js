@@ -130,6 +130,26 @@ exports.handler = async function(event) {
             };
           }
 
+          // ── Street-substitution guard ───────────────────────────
+          // Google sometimes "corrects" a non-existent/mistyped address to a DIFFERENT street
+          // (e.g. "148 Canley Road" -> "337 Canley Vale Rd") and still reports ROOFTOP/exact.
+          // Showing that as a confirmed parcel would mislead the user. Catch it here.
+          const sm = streetMatch(addr, hit);
+          if (sm.checked && sm.streetMismatch && !_isLotAddr) {
+            // Different street entirely — do not show a parcel for the wrong property.
+            return {
+              statusCode: 200, headers: CORS,
+              body: JSON.stringify({
+                found: false,
+                reason: 'The address could not be confidently matched — the closest match is on a different street ('
+                  + (hit.formatted_address || '') + '). Please check the street name and number.',
+                attempted: addr,
+                matchedAddr: hit.formatted_address || '',
+                addressQuality: 'street_mismatch'
+              })
+            };
+          }
+
           // Determine addressQuality from locationType
           let addressQuality = 'approximate';
           if (lType === 'ROOFTOP') addressQuality = 'exact';
@@ -144,6 +164,15 @@ exports.handler = async function(event) {
           let googleConf = (lType === 'ROOFTOP' || lType === 'RANGE_INTERPOLATED') ? 'Verified' : 'Needs review';
           if (_isRangeAddr) googleConf = 'Estimated';
           if (_isLotAddr)   googleConf = 'Needs review';
+          // Street name matched but the NUMBER differs (e.g. typed 148, Google returned 152):
+          // the street is right but the exact parcel may not be — never show as Verified.
+          let numberWarning = null;
+          if (sm.checked && sm.numberMismatch && !_isLotAddr) {
+            googleConf = 'Needs review';
+            if (addressQuality === 'exact') addressQuality = 'approximate';
+            numberWarning = 'The street number you entered (' + sm.inNum + ') did not match exactly; the closest known address is '
+              + (hit.formatted_address || '') + '. Parcel and frontage need review before relying on this result.';
+          }
 
           const lotWarning = _isLotAddr
             ? 'Lot-based address detected. Lot number is not a street number. Verify lot/DP/title details before relying on parcel, zoning or planning conclusions.'
@@ -166,6 +195,7 @@ exports.handler = async function(event) {
               postcode,
               council,
               lotWarning,
+              numberWarning,
               isLotAddress: _isLotAddr
             })
           };
@@ -357,6 +387,55 @@ function extractPostcodeFromGoogleResult(hit) {
   const pc = (hit.address_components || [])
     .find(c => c.types.includes('postal_code'));
   return pc ? pc.long_name : '';
+}
+
+// Returns Google's street number + route (street name) from structured components.
+function extractStreetFromGoogleResult(hit) {
+  const comp = hit.address_components || [];
+  const num   = comp.find(c => c.types.includes('street_number'));
+  const route = comp.find(c => c.types.includes('route'));
+  return {
+    number: num   ? num.long_name.trim()           : '',
+    street: route ? route.long_name.trim().toLowerCase() : ''
+  };
+}
+
+// Normalise a street name for comparison: lowercase, expand common abbreviations, strip punctuation.
+function _normStreet(s) {
+  if (!s) return '';
+  s = String(s).toLowerCase().replace(/[.,]/g, ' ');
+  const ab = [[/\brd\b/g,'road'],[/\bst\b/g,'street'],[/\bave\b/g,'avenue'],[/\bdr\b/g,'drive'],
+    [/\bcr\b/g,'crescent'],[/\bcres\b/g,'crescent'],[/\bpde\b/g,'parade'],[/\bcl\b/g,'close'],
+    [/\bpl\b/g,'place'],[/\bct\b/g,'court'],[/\bhwy\b/g,'highway'],[/\bln\b/g,'lane'],
+    [/\bbvd\b/g,'boulevard'],[/\btce\b/g,'terrace']];
+  for (const [p,r] of ab) s = s.replace(p,r);
+  return s.replace(/\s{2,}/g,' ').trim();
+}
+
+// Decide whether Google's returned street matches what the user typed.
+// Returns { numberMismatch, streetMismatch } — used to downgrade confidence (never silently accept).
+function streetMatch(inputAddr, hit) {
+  const parsed = parseAddressParts(inputAddr);
+  const g = extractStreetFromGoogleResult(hit);
+  if (!parsed) return { numberMismatch: false, streetMismatch: false, checked: false };
+  const inNum = (parsed.number || '').trim();
+  const inStreet = _normStreet(parsed.street);
+  const gStreet = _normStreet(g.street);
+  // street name comparison: the street name (minus road-type word) must match exactly.
+  // "canley" (Canley Road) must NOT be treated as matching "canley vale" (Canley Vale Road).
+  let streetMismatch = false;
+  if (inStreet && gStreet) {
+    const RT = /\b(road|street|avenue|drive|place|court|crescent|close|lane|way|boulevard|parade|terrace|highway|circuit|esplanade|grove|rise|walk|track)\b/g;
+    const core  = inStreet.replace(RT,'').replace(/\s{2,}/g,' ').trim();
+    const gCore = gStreet.replace(RT,'').replace(/\s{2,}/g,' ').trim();
+    // mismatch when the core street names differ (exact token-sequence match required)
+    if (core && gCore && core !== gCore) {
+      streetMismatch = true;
+    }
+  }
+  let numberMismatch = false;
+  if (inNum && g.number && inNum !== g.number) numberMismatch = true;
+  return { numberMismatch, streetMismatch, checked: !!(inStreet && gStreet), inStreet: parsed.street, gStreet: g.street, inNum, gNum: g.number };
 }
 
 function extractCouncilFromGoogleResult(hit) {
