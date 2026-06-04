@@ -1159,7 +1159,7 @@ function _fetchParcelOutline(lat, lon, map) {
         var chips = [];
         if (landArea) chips.push('<b>Land size</b> ~' + landArea + ' m&#178; <span style="color:var(--muted2);font-size:.82em">(' + landLabel + ')</span>');
         else chips.push('<b>Land size</b> <span style="color:var(--muted2)">Not confirmed</span>');
-        if (lotPlan)  chips.push('<b>Lot/Plan</b> ' + lotPlan);
+        if (lotPlan)  chips.push('<b>Lot/Plan</b> ' + lotPlan + ((window._parcelConfidence === 'Verified') ? '' : ' <span style="color:var(--muted2);font-size:.82em">(signal — needs review)</span>'));
         if (council)  chips.push('<b>Council</b> ' + council);
         if (window._svZoneName) chips.push('<b>Planning zone</b> ' + window._svZoneName);
         if (chips.length) {
@@ -1355,6 +1355,7 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
 
   return '<div class="signal-card">'
     + _confirmLocationBanner(matchedAddr, geoConf, addr)
+    + _parcelConfidenceLine()
     + '<div class="signal-section"><div class="signal-heading">What we found</div>'
       + '<ul style="list-style:none;margin:0;padding:0;font-size:.77rem;line-height:1.75">' + foundHtml + '</ul></div>'
     + '<div class="signal-section"><div class="signal-heading">What this means</div>'
@@ -1536,6 +1537,30 @@ function _confirmLocationBanner(matchedAddr, geoConf, inputAddr){
     + '<div style="color:var(--muted);margin-top:6px">Please check the map before relying on this result. '
     + 'This map is approximate and not a survey. If this is not your property, edit the address and check again.</div></div>';
 }
+
+// Parcel confidence line — render-only. Reads window._parcelConfidence (set by cadastre).
+// Defaults to "needs review" unless confidence is strongly Verified. Never claims a parcel/lot is
+// confirmed when the system cannot prove it. No flow change.
+function _parcelConfidenceLine(){
+  var pc = '';
+  try { pc = (typeof window !== 'undefined' && window._parcelConfidence) ? String(window._parcelConfidence) : ''; } catch(e){ pc = ''; }
+  var strong = (pc === 'Verified');
+  if (strong) {
+    return '<div style="border:1px solid var(--border);background:var(--bg2);border-radius:12px;'
+      + 'padding:10px 14px;margin:0 0 12px;font-size:.74rem;line-height:1.6;color:var(--muted)">'
+      + '<span style="font-weight:700;color:var(--text)">Parcel signal detected.</span> '
+      + 'This is a map signal only, not a boundary or survey. Confirm the exact lot, boundaries and '
+      + 'frontage by title plan or a licensed surveyor before relying on it.</div>';
+  }
+  // Default / weak / unknown: explicitly "needs review", never verified.
+  return '<div style="border:1px solid var(--border);background:var(--bg2);border-radius:12px;'
+    + 'padding:10px 14px;margin:0 0 12px;font-size:.74rem;line-height:1.6;color:var(--muted)">'
+    + '<span style="font-weight:700;color:var(--text)">Parcel signal needs review</span> ' + '\u2014 '
+    + 'confirm by title plan or survey. The parcel/lot shown on the map is an approximate signal only and '
+    + 'may not be the exact property. It is not confirmed, not a boundary, and not a survey. '
+    + 'Any land size or frontage you entered is treated as user-entered and not independently verified.</div>';
+}
+
 
 
 function buildScorecard(){
