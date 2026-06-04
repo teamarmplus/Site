@@ -1251,7 +1251,7 @@ function _fetchParcelOutlineQLD(lat, lon, map) {
 
 // ── END MAP PREVIEW ──────────────────────────────────────────────
 
-function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,sepp800,mls,mlsReal,block,front,geoConf,blockSource,lotGeoWarn,fsr,height,matchedAddr){
+function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,sepp800,mls,mlsReal,block,front,geoConf,blockSource,lotGeoWarn,fsr,height,matchedAddr,infra,purpose){
 
   var zLabel = ({
     'R1':'Low density residential',  'R2':'Low density residential',
@@ -1357,10 +1357,12 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
       + '<ul style="list-style:none;margin:0;padding:0;font-size:.77rem;line-height:1.75">' + foundHtml + '</ul></div>'
     + '<div class="signal-section"><div class="signal-heading">What this means</div>'
       + '<div class="signal-body">' + meaning + '</div></div>'
+    + _pathwaysSection(zone, hasZone, hasBlock, hasFront, block, mls, mlsReal, hasOverlay, purpose, DASH, BOX)
+    + _nearbyContextSection(infra, DASH, DOT)
     + '<div class="signal-section"><div class="signal-heading">What still needs checking</div>'
       + '<ul style="list-style:none;margin:0;padding:0;font-size:.74rem;line-height:1.75">' + checkHtml + '</ul></div>'
     + '<div class="signal-section"><div class="signal-heading">Next useful step</div>'
-      + '<div class="signal-body">To understand what may add value or reduce risk, request a Professional Review.</div></div>'
+      + '<div class="signal-body">To understand what may be worth reviewing or help reduce risk, request a Professional Review.</div></div>'
     + _proReviewCta(addr) + _proVerifyLine()
   + '</div>';
 }
@@ -1379,6 +1381,86 @@ function _proVerifyLine(){
     + 'Not a planning certificate, valuation, legal, financial or survey advice. '
     + 'Approximate boundary and dimensions only \u2014 not a survey. Confirm by title plan or licensed surveyor.'
   + '</div>';
+}
+
+// Possible pathways to review — safe, signal-based, never a promise of approval/yield/value.
+function _pathwaysSection(zone, hasZone, hasBlock, hasFront, block, mls, mlsReal, hasOverlay, purpose, DASH, BOX){
+  var items = [];
+  var RESI = ['R1','R2','R3','R4','R5','R6'];
+  var NONRESI_PRO = ['E1','E2','E3','E4','C1','C2','C3','C4','MU1','MU2','B1','B2','B3','B4','B5','B6','B7','IN1','IN2','IN3','SP1','SP2','SP3','RE1','RE2','W1','W2','W3'];
+  var isResi = hasZone && RESI.indexOf(zone) > -1;
+  var isNonResiPro = hasZone && NONRESI_PRO.indexOf(zone) > -1;
+
+  // OC / external works purpose takes priority as a pathway signal
+  if (purpose === 'oc' || purpose === 'external' || purpose === 'oc_handover' || purpose === 'external_works') {
+    items.push('External works / OC pathway ' + DASH + ' drainage, driveway/crossover, retaining and compliance may be worth reviewing (early signal only, subject to verification)');
+  }
+
+  if (!hasZone) {
+    items.push('Not enough confirmed data to assess pathways ' + DASH + ' enter the full address or request a Professional Review');
+  } else if (isNonResiPro) {
+    items.push('Professional planning review recommended before relying on this site ' + DASH + ' this zone is not a standard residential zone, so residential development assumptions do not apply');
+  } else if (isResi) {
+    if (hasBlock && hasFront) {
+      items.push('Secondary dwelling / granny flat ' + DASH + ' may be worth reviewing (early signal only, subject to council controls and verification)');
+      items.push('Dual occupancy ' + DASH + ' may be worth reviewing with a planner (subject to verification)');
+      // Subdivision signal ONLY when user land size meaningfully exceeds a confirmed min-lot
+      if (mlsReal && mls && block >= (mls * 2)) {
+        items.push('Subdivision feasibility ' + DASH + ' may be worth reviewing; possible lot count depends on verified survey, frontage, access, services, easements, overlays and council controls (no lot count is implied here)');
+      } else if (!mlsReal || !mls) {
+        items.push('Subdivision ' + DASH + ' minimum lot size not confirmed for this lot, so subdivision cannot be assessed from this basic check');
+      }
+    } else {
+      items.push('Add land size and frontage above, or request a Professional Review, to see which residential pathways may be worth checking');
+    }
+  } else {
+    items.push('Professional planning review recommended before relying on this site');
+  }
+
+  if (hasOverlay) {
+    items.push('Overlay present ' + DASH + ' any pathway above will need extra assessment for the detected overlay (heritage / flood / bushfire) before relying on it');
+  }
+
+  var li = items.map(function(t){
+    return '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">' + BOX + '</span>' + t + '</li>';
+  }).join('');
+
+  return '<div class="signal-section"><div class="signal-heading">Possible pathways to review</div>'
+    + '<ul style="list-style:none;margin:0;padding:0;font-size:.75rem;line-height:1.75">' + li + '</ul>'
+    + '<div style="font-size:.64rem;color:var(--muted2);margin-top:4px;line-height:1.55">These are early signals that may be worth reviewing '
+    + DASH + ' subject to council controls, overlays, title, survey, services and professional verification. '
+    + 'They are not approval, not a guarantee, and not confirmation of what can be built or subdivided.</div></div>';
+}
+
+// Nearby context — visible open-map signals only. Hidden entirely if no data; never fabricated.
+function _nearbyContextSection(infra, DASH, DOT){
+  if (!infra) return '';
+  var rows = [];
+  function add(label, list){
+    if (list && list.length){
+      var s = list[0];
+      if (s && s.name) rows.push(label + ': ' + esc(s.name, 40) + ' ' + DASH + ' approx. ' + s.dist + ' km');
+    }
+  }
+  add('Transport', infra.transport);
+  add('Health service', infra.health);
+  add('Retail / shops', infra.shopping);
+  if (infra.openspace) add('Open space', infra.openspace);
+
+  if (!rows.length){
+    return '<div class="signal-section"><div class="signal-heading">Nearby context</div>'
+      + '<div class="signal-body" style="font-size:.74rem;color:var(--muted)">Nearby context was not confirmed from available open-map data.</div></div>';
+  }
+
+  var li = rows.slice(0,5).map(function(t){
+    return '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--text)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">' + DOT + '</span>' + t + '</li>';
+  }).join('');
+
+  return '<div class="signal-section"><div class="signal-heading">Nearby context</div>'
+    + '<ul style="list-style:none;margin:0;padding:0;font-size:.75rem;line-height:1.75">' + li + '</ul>'
+    + '<div style="font-size:.64rem;color:var(--muted2);margin-top:4px;line-height:1.55">Nearby context signals are early open-map / open-data signals only '
+    + '(\u00a9 OpenStreetMap contributors). They can help you understand the area, but they are not a valuation, '
+    + 'school-catchment check, transport assessment, or professional advice. Verify before relying.</div></div>';
 }
 
 
@@ -1688,7 +1770,8 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
     var ctaBox=rcard.querySelector('.cta-box');
     var newSections=document.createElement('div');
     newSections.innerHTML=buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,
-      seppStation400,seppStation800,mls,mlsReal,block,front,geoConf,blockSource,lotGeoWarn,fsr,height,matchedAddr);
+      seppStation400,seppStation800,mls,mlsReal,block,front,geoConf,blockSource,lotGeoWarn,fsr,height,matchedAddr,
+      infra,(typeof window!=='undefined'&&window._svPurpose)?window._svPurpose:undefined);
     if(ctaBox){rcard.insertBefore(newSections,ctaBox);}else{rcard.appendChild(newSections);}
   }catch(e){console.warn("Story sections render failed",e);}
 
@@ -1709,7 +1792,7 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
     if(ctrl0 && !ctrl0.nextElementSibling?.classList?.contains('whtm')){
       var w1=document.createElement('div');
       w1.className='whtm';
-      w1.innerHTML='<strong>Why this matters:</strong> Zone and minimum lot size are the two numbers that determine whether subdivision is possible and how many lots you can create. Every other check depends on getting these right.';
+      w1.innerHTML='<strong>Why this matters:</strong> Zone and minimum lot size help indicate whether subdivision may be worth reviewing, subject to survey, access, services, overlays and council controls. Every other check depends on getting these right.';
       ctrl0.insertAdjacentElement('afterend',w1);
     }
     // Add whtm to overlays section
