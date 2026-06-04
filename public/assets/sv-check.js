@@ -1354,6 +1354,7 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
   var checkHtml = check.map(function(m){return '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">'+BOX+'</span>'+m+'</li>';}).join('');
 
   return '<div class="signal-card">'
+    + _confirmLocationBanner(matchedAddr, geoConf, addr)
     + '<div class="signal-section"><div class="signal-heading">What we found</div>'
       + '<ul style="list-style:none;margin:0;padding:0;font-size:.77rem;line-height:1.75">' + foundHtml + '</ul></div>'
     + '<div class="signal-section"><div class="signal-heading">What this means</div>'
@@ -1462,6 +1463,36 @@ function _nearbyContextSection(infra, DASH, DOT){
     + '<div style="font-size:.64rem;color:var(--muted2);margin-top:4px;line-height:1.55">Nearby context signals are early open-map / open-data signals only '
     + '(\u00a9 OpenStreetMap contributors). They can help you understand the area, but they are not a valuation, '
     + 'school-catchment check, transport assessment, or professional advice. Verify before relying.</div></div>';
+}
+
+// Render-only confirm-location banner shown at the top of the result card.
+// Shows the matched address + confidence and asks the user to check the map.
+// Does NOT claim parcel/boundary/frontage confirmed. Does not change the flow.
+function _confirmLocationBanner(matchedAddr, geoConf, inputAddr){
+  var conf = String(geoConf || '').toLowerCase();
+  // Treat these as weak confidence -> stronger "needs review" wording.
+  var weak = (conf === 'needs review' || conf === 'approximate' || conf === 'estimated' ||
+              conf === 'interpolated' || conf === '' || conf === 'not matched' || conf === 'low');
+  var confLabel = geoConf ? esc(String(geoConf), 24) : 'not confirmed';
+  var matched = matchedAddr ? esc(String(matchedAddr), 90) : '(no matched address returned)';
+
+  if (weak) {
+    return '<div style="border:1px solid var(--border);background:var(--bg2);border-radius:12px;'
+      + 'padding:12px 14px;margin:0 0 12px;font-size:.78rem;line-height:1.6">'
+      + '<div style="font-weight:700;color:var(--text);margin-bottom:4px">Location needs review</div>'
+      + '<div style="color:var(--muted)">We matched: <span style="color:var(--text)">' + matched + '</span><br>'
+      + 'Confidence: <span style="color:var(--text)">' + confLabel + '</span></div>'
+      + '<div style="color:var(--muted);margin-top:6px">The address was not matched confidently enough to confirm the exact property. '
+      + 'Please enter a full street number, street name, suburb and postcode, or request a Professional Review. '
+      + 'This map is approximate and not a survey.</div></div>';
+  }
+  return '<div style="border:1px solid var(--border);background:var(--bg2);border-radius:12px;'
+    + 'padding:12px 14px;margin:0 0 12px;font-size:.78rem;line-height:1.6">'
+    + '<div style="font-weight:700;color:var(--text);margin-bottom:4px">Confirm the location</div>'
+    + '<div style="color:var(--muted)">We matched: <span style="color:var(--text)">' + matched + '</span><br>'
+    + 'Confidence: <span style="color:var(--text)">' + confLabel + '</span></div>'
+    + '<div style="color:var(--muted);margin-top:6px">Please check the map before relying on this result. '
+    + 'This map is approximate and not a survey. If this is not your property, edit the address and check again.</div></div>';
 }
 
 
