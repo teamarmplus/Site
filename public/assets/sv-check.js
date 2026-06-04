@@ -1360,6 +1360,7 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
     + '<div class="signal-section"><div class="signal-heading">What this means</div>'
       + '<div class="signal-body">' + meaning + '</div></div>'
     + _pathwaysSection(zone, hasZone, hasBlock, hasFront, block, mls, mlsReal, hasOverlay, purpose, DASH, BOX)
+    + _constraintsSection(heritage, flood, bushfire, hasZone, mlsReal, DASH, BOX)
     + _nearbyContextSection(infra, DASH, DOT)
     + '<div class="signal-section"><div class="signal-heading">What still needs checking</div>'
       + '<ul style="list-style:none;margin:0;padding:0;font-size:.74rem;line-height:1.75">' + checkHtml + '</ul></div>'
@@ -1432,6 +1433,47 @@ function _pathwaysSection(zone, hasZone, hasBlock, hasFront, block, mls, mlsReal
     + '<div style="font-size:.64rem;color:var(--muted2);margin-top:4px;line-height:1.55">These are early signals that may be worth reviewing '
     + DASH + ' subject to council controls, overlays, title, survey, services and professional verification. '
     + 'They are not approval, not a guarantee, and not confirmation of what can be built or subdivided.</div></div>';
+}
+
+// Development constraints to check — lists items that can affect what is suitable/approvable.
+// Marks what this basic report DID look at vs. what is NOT checked here and needs professional
+// verification. Never implies all constraints were detected.
+function _constraintsSection(heritage, flood, bushfire, hasZone, mlsReal, DASH, BOX){
+  // What this basic check actually looked at (detected status, honestly labelled)
+  var checked = [];
+  checked.push('Zoning ' + DASH + (hasZone ? ' detected (verify with council)' : ' not confirmed from this check'));
+  checked.push('Minimum lot size ' + DASH + (mlsReal ? ' detected (estimate, verify with council)' : ' not confirmed for this lot'));
+  checked.push('Heritage ' + DASH + (heritage ? ' a heritage signal was detected (verify)' : ' none detected in this basic check (still verify)'));
+  checked.push('Flood ' + DASH + (flood ? ' a flood-related signal was detected (verify)' : ' none detected in this basic check (still verify)'));
+  checked.push('Bushfire ' + DASH + (bushfire ? ' a bushfire signal was detected (verify)' : ' none detected in this basic check (still verify)'));
+
+  // Items NOT assessed by this basic report — must be professionally verified
+  var notChecked = [
+    'Exact lot boundaries and title',
+    'Survey area and frontage',
+    'DCP and council-specific controls',
+    'Biodiversity and trees',
+    'Slope / earthworks',
+    'Easements and restrictions on title',
+    'Drainage and stormwater',
+    'Driveway / access and crossover',
+    'Services (water, sewer, power, NBN)'
+  ];
+
+  var ci = checked.map(function(t){
+    return '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">' + BOX + '</span>' + t + '</li>';
+  }).join('');
+  var ni = notChecked.map(function(t){
+    return '<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">' + BOX + '</span>' + t + ' ' + DASH + ' not checked in this basic report</li>';
+  }).join('');
+
+  return '<div class="signal-section"><div class="signal-heading">Development constraints to check</div>'
+    + '<div style="font-size:.7rem;color:var(--muted2);margin-bottom:6px;line-height:1.55">These items can affect what is suitable or approvable. '
+    + 'Some are looked at in this basic report; many are not checked here and need professional verification.</div>'
+    + '<ul style="list-style:none;margin:0 0 6px;padding:0;font-size:.75rem;line-height:1.7">' + ci + '</ul>'
+    + '<ul style="list-style:none;margin:0;padding:0;font-size:.74rem;line-height:1.7">' + ni + '</ul>'
+    + '<div style="font-size:.64rem;color:var(--muted2);margin-top:4px;line-height:1.55">Not confirmed from this basic check. '
+    + 'Verify before relying. A Professional Review can assess these properly.</div></div>';
 }
 
 // Nearby context — visible open-map signals only. Hidden entirely if no data; never fabricated.
@@ -1524,16 +1566,11 @@ function calcOverlayRisk(heritage,flood,bushfire,acid,contaminated,riparian,land
   return Math.max(0,Math.round(s*10)/10);
 }
 
-function calcYieldPotential(block,mls,zone){
-  if(!block||block<100) return 4;
-  var lots=Math.floor(block/(mls||450));
-  if(lots>=15) return 10;
-  if(lots>=10) return 9;
-  if(lots>=6)  return 8;
-  if(lots>=4)  return 7;
-  if(lots>=3)  return 6;
-  if(lots>=2)  return 5;
-  return 2;
+function calcYieldPotential(){
+  // Neutralised for launch: SiteVerdict does not compute lot counts, yield scores, or use any
+  // minimum-lot fallback. This stub performs no calculation and is intentionally unused.
+  // (The old lot-math and yield scoring were removed for violating the no-fake-min-lot rule.)
+  return null;
 }
 
 function calcApprovalConfidence(zone,heritage,flood,bushfire,zoneAllows,cm){
@@ -1833,7 +1870,7 @@ function renderResult(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
       var w2=document.createElement('div');
       w2.className='whtm';
       w2.style.marginBottom='8px';
-      w2.innerHTML='<strong>Why this matters:</strong> Each overlay adds cost, time or constraints to the DA process. A clean result here is the best possible planning outcome — it means no additional reports are required at DA stage.';
+      w2.innerHTML='<strong>Why this matters:</strong> Each overlay adds cost, time or constraints to the DA process. A clean result here is a positive early planning signal, but it does not rule out other DA-stage reports or site-specific requirements. Confirm with council or a qualified professional before relying on it.';
       ovList.insertAdjacentElement('beforebegin',w2);
     }
   }catch(e){}
@@ -1847,7 +1884,7 @@ function prepareForAI(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
   return {
     address: addr,
     zone: { code: zone||'', name: zoneName||'', lga: lga||'' },
-    minLot: { value: mls||450, verified: !!mlsReal },
+    minLot: { value: mlsReal ? mls : null, verified: !!mlsReal },
     block:  { area: block||0, verified: !!(block&&block>100) },
     estimatedLots: (!skipLotCount && n>=0) ? n : 0,
     zoneAllows: !!zoneAllows,

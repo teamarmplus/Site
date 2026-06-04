@@ -415,27 +415,36 @@ function _normStreet(s) {
 // Decide whether Google's returned street matches what the user typed.
 // Returns { numberMismatch, streetMismatch } — used to downgrade confidence (never silently accept).
 function streetMatch(inputAddr, hit) {
-  const parsed = parseAddressParts(inputAddr);
   const g = extractStreetFromGoogleResult(hit);
-  if (!parsed) return { numberMismatch: false, streetMismatch: false, checked: false };
-  const inNum = (parsed.number || '').trim();
-  const inStreet = _normStreet(parsed.street);
+  // Expand road-type abbreviations in the INPUT first (Dr->Drive, St->Street, Rd->Road, ...)
+  // so the street can be anchored on a full road-type word.
+  const cleaned = cleanAddress(inputAddr);
+  const RT = 'Road|Street|Avenue|Drive|Place|Court|Crescent|Close|Lane|Way|Boulevard|Parade|Terrace|Highway|Circuit|Esplanade|Grove|Rise|Walk|Track';
+
+  // Extract the INPUT street name independently of suburb/postcode/state and of commas:
+  // take the run of words ending at the FIRST road-type word, after an optional leading number.
+  // This works for "148 Canley Vale Road, Canley Heights, 2166 NSW" (commas) AND
+  // "148 Canley Vale Road Canley Heights NSW 2166" (no commas) AND "Canley Road ..." (no number).
+  let inNum = '';
+  let inStreetRaw = '';
+  const numM = cleaned.match(/^\s*(\d+[A-Za-z]?)\b/);
+  if (numM) inNum = numM[1].replace(/[A-Za-z]$/,'').trim();
+  const stM = cleaned.match(new RegExp('^\\s*(?:\\d+[A-Za-z]?\\s+)?(.+?\\b(?:' + RT + '))\\b', 'i'));
+  if (stM) inStreetRaw = stM[1].trim();
+
+  const inStreet = _normStreet(inStreetRaw);
   const gStreet = _normStreet(g.street);
-  // street name comparison: the street name (minus road-type word) must match exactly.
-  // "canley" (Canley Road) must NOT be treated as matching "canley vale" (Canley Vale Road).
+  // Compare the FULL normalised street name for exact equality.
+  // Abbreviations already expanded by _normStreet, so "canley vale road" == "canley vale rd" (accept)
+  // but "canley road" != "canley vale road" (reject). Distinguishing words are NOT stripped, and
+  // "Canley Vale Road" is never rejected merely for containing "Canley".
   let streetMismatch = false;
-  if (inStreet && gStreet) {
-    const RT = /\b(road|street|avenue|drive|place|court|crescent|close|lane|way|boulevard|parade|terrace|highway|circuit|esplanade|grove|rise|walk|track)\b/g;
-    const core  = inStreet.replace(RT,'').replace(/\s{2,}/g,' ').trim();
-    const gCore = gStreet.replace(RT,'').replace(/\s{2,}/g,' ').trim();
-    // mismatch when the core street names differ (exact token-sequence match required)
-    if (core && gCore && core !== gCore) {
-      streetMismatch = true;
-    }
+  if (inStreet && gStreet && inStreet !== gStreet) {
+    streetMismatch = true;
   }
   let numberMismatch = false;
   if (inNum && g.number && inNum !== g.number) numberMismatch = true;
-  return { numberMismatch, streetMismatch, checked: !!(inStreet && gStreet), inStreet: parsed.street, gStreet: g.street, inNum, gNum: g.number };
+  return { numberMismatch, streetMismatch, checked: !!(inStreet && gStreet), inStreet: inStreetRaw, gStreet: g.street, inNum, gNum: g.number };
 }
 
 function extractCouncilFromGoogleResult(hit) {
