@@ -599,24 +599,10 @@ async function autoLookupBlock(){
   }
 }
 async function runCheck(){var e=normalizeAddressInput(document.getElementById("addr").value.trim()),t=parseFloat(document.getElementById("block").value),a=document.getElementById("front"),r=a&&a.value?parseFloat(a.value):NaN;
-  // ── 99C STATE B: require address + land size + frontage. If either user value
-  // is missing, show the reduced state and stop. Never show confident parcel/size/dimensions.
+  // Land size + frontage are OPTIONAL. A user with only an address still gets the full
+  // address-derived Site Check (zone, overlays, min-lot signal, nearby, parcel-needs-review).
+  // Size/frontage, when provided, are treated as user-entered and only enrich the report.
   var _msg=document.getElementById("missing-fields-msg");
-  if(e && (!(t>0) || !(r>0))){
-    if(_msg) _msg.style.display="block";
-    var _i=document.getElementById("result");
-    if(_i){ _i.innerHTML='<div class="rcard"><div class="signal-card">'
-      +'<div class="signal-section"><div class="signal-heading">What we found</div>'
-      +'<ul style="list-style:none;margin:0;padding:0;font-size:.78rem;line-height:1.75">'
-      +'<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">\u25a1</span>Land size: Not confirmed</li>'
-      +'<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">\u25a1</span>Frontage: Not confirmed</li>'
-      +'<li style="margin:0 0 5px;padding-left:14px;position:relative;color:var(--muted)"><span style="position:absolute;left:0;top:1px;color:var(--muted2)">\u25a1</span>Professional verification needed</li>'
-      +'</ul></div>'
-      +'<div class="signal-section"><div class="signal-body">Add your land size and frontage to continue \u2014 or request a professional review now.</div></div>'
-      +_proReviewCta(e)+_proVerifyLine()
-      +'</div></div>'; _i.classList.add("show"); _i.scrollIntoView({behavior:"smooth",block:"start"}); }
-    return;
-  }
   if(_msg) _msg.style.display="none";
   if(e){var s=!t||t<100,n=document.getElementById("run-btn");n.disabled=!0,n.textContent="Checking...";var i=document.getElementById("result");i.innerHTML="",i.classList.remove("show");var o=document.getElementById("block-lookup-status");o&&(o.textContent="");if(window._loadingTimer){clearInterval(window._loadingTimer);window._loadingTimer=null;}var _geoResult=null;window._parcelConfidence=null;window._parcelWarning=null;window._cadastreArea=null;window._cadastreLot=null;setSt("Finding your address...");try{var _geoResult=await geocodeWithConfidence(e);var _geo=_geoResult;window._geoResult=_geoResult;
     if(!_geo){_showAddrNotFound(i,n,e);return;}

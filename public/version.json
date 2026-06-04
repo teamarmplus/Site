@@ -1,16 +1,16 @@
 {
   "site": "siteverdict2",
-  "build_name": "sitecheck-release-check-99C-r7",
+  "build_name": "sitecheck-99C-ux-v5-2026-06-04",
   "package_number": "99C",
-  "build_time": "2026-06-01T00:00:00Z",
-  "release_note": "Package 99C-r7: Free NSW Site Check -> Professional Review. NSW wording, plain-English result sections, user-entered land size/frontage labels, Professional Review form with optional upload, 24-48 business-hours response wording, NSW-focused initial map, deploy files under public/.",
+  "build_time": "2026-06-04T00:00:00Z",
+  "release_note": "UX v5 (CSS/layout only): wider desktop result (880px), larger body text, two-column desktop report layout (single column mobile), bigger map, location-trust banner + parcel-confidence line kept full-width at top, Professional Review CTA full-width. No geocode/report-logic change. Address autocomplete + draggable pin DEFERRED (need paid API / browser testing).",
   "status": "draft-awaiting-private-gate",
   "features": {
     "publicFlowTwoStep": true,
-    "siteCheckRequiresLandSizeFrontage": true,
+    "siteCheckRequiresLandSizeFrontage": false,
     "userEnteredLabel": true,
     "plainEnglishResultSections": true,
-    "stateBReducedResult": true,
+    "stateBReducedResult": false,
     "parcelMatchNotConfirmedWording": true,
     "executiveVerdictRetiredPublic": true,
     "institutionalScorecardRetiredPublic": true,
@@ -29,7 +29,18 @@
     "noPublicAdvDisHeadings": true,
     "whatStillNeedsCheckingSection": true,
     "deployUnderPublicDir": true,
-    "nswPositioning": true
+    "nswPositioning": true,
+    "siteCheckAddressOnly": true,
+    "landSizeFrontageOptional": true,
+    "parcelConfidenceNeedsReviewLine": true,
+    "yieldFunctionNeutralised": true,
+    "noFabricatedMinLot": true,
+    "r3AddressGuard": true,
+    "uxTwoColumnDesktop": true,
+    "largerBodyText": true,
+    "widerResultDesktop": true,
+    "autocompleteDeferred": true,
+    "draggablePinDeferred": true
   },
   "principle_version": "1.0"
 }

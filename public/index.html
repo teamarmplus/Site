@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="siteverdict-build" content="sitecheck-expanded-report-2026-05-22">
+<meta name="siteverdict-build" content="sitecheck-99C-ux-v5-2026-06-04">
   <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SiteVerdict — Free NSW Site Check</title>
 <meta name="description" content="Check a NSW property in plain English. See basic land and planning signals, what they may mean, what still needs checking, and request Professional Review if needed.">
@@ -12,13 +12,13 @@
 <meta property="og:url" content="https://siteverdict.com.au">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="/assets/sv-check.js?v=sitecheck-expanded-report-2026-05-22" as="script">
+<link rel="preload" href="/assets/sv-check.js?v=sitecheck-99C-ux-v5-2026-06-04" as="script">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/sv-tokens.css?v=sitecheck-expanded-report-2026-05-22">
-<link rel="stylesheet" href="/assets/sv-base.css?v=sitecheck-expanded-report-2026-05-22">
-<link rel="stylesheet" href="/assets/sv-components.css?v=sitecheck-expanded-report-2026-05-22">
-<link rel="stylesheet" href="/assets/sv-layout.css?v=sitecheck-expanded-report-2026-05-22">
-<link rel="stylesheet" href="/assets/sv-print.css?v=sitecheck-expanded-report-2026-05-22">
+<link rel="stylesheet" href="/assets/sv-tokens.css?v=sitecheck-99C-ux-v5-2026-06-04">
+<link rel="stylesheet" href="/assets/sv-base.css?v=sitecheck-99C-ux-v5-2026-06-04">
+<link rel="stylesheet" href="/assets/sv-components.css?v=sitecheck-99C-ux-v5-2026-06-04">
+<link rel="stylesheet" href="/assets/sv-layout.css?v=sitecheck-99C-ux-v5-2026-06-04">
+<link rel="stylesheet" href="/assets/sv-print.css?v=sitecheck-99C-ux-v5-2026-06-04">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -66,7 +66,7 @@
 <div class="hero">
   
   <h1>Check your land</h1>
-  <div class="hero-sub">Enter a NSW address. Add your land size and frontage, then see a plain-English Site Check.</div>
+  <div class="hero-sub">Enter a NSW address to see a plain-English Site Check. Land size and frontage are optional — add them to enrich the report.</div>
   <div class="trust-row">
     <div class="trust-item"><span class="ti-dot a"></span>NSW Site Check</div>
   </div>
@@ -83,19 +83,19 @@
   </div>
   <div class="two" style="margin-bottom:8px">
     <div>
-      <label class="lbl">Land size (m&#178;)</label>
+      <label class="lbl">Land size (m&#178;) <span style="color:var(--muted2);font-weight:400">— optional</span></label>
       <input class="fi" id="block" type="number" placeholder="e.g. 600" min="1"
         onkeydown="if(event.key==='Enter')runCheck()">
     </div>
     <div>
-      <label class="lbl">Frontage (m)</label>
+      <label class="lbl">Frontage (m) <span style="color:var(--muted2);font-weight:400">— optional</span></label>
       <input class="fi" id="front" type="number" placeholder="e.g. 15" min="1"
         onkeydown="if(event.key==='Enter')runCheck()">
     </div>
   </div>
-  <div class="hint" style="margin-bottom:12px">Use your contract, title, survey, rates notice, planning document, or listing.</div>
+  <div class="hint" style="margin-bottom:12px">Optional — if you have them, use your contract, title, survey, rates notice, planning document, or listing. You can run the check with just an address.</div>
   <button class="run-btn" id="run-btn" onclick="runCheck()">Check My Land &#8594;</button>
-  <div id="missing-fields-msg" style="display:none;margin-top:10px;font-size:.78rem;color:var(--muted)">Please add land size and frontage to continue.</div>
+  <div id="missing-fields-msg" style="display:none;margin-top:10px;font-size:.78rem;color:var(--muted)">Land size and frontage are optional.</div>
 </div>
 
 <!-- Base map visible on arrival (map-app feel). Map sits above the result. -->
@@ -142,8 +142,8 @@
   </div>
 </footer>
 
-<script src="/assets/sv-check.js?v=sitecheck-expanded-report-2026-05-22"></script>
+<script src="/assets/sv-check.js?v=sitecheck-99C-ux-v5-2026-06-04"></script>
 
-<div id="sv-build" style="display:none" data-build="sitecheck-expanded-report-2026-05-22">SiteVerdict build: sitecheck-expanded-report-2026-05-22</div>
+<div id="sv-build" style="display:none" data-build="sitecheck-99C-ux-v5-2026-06-04">SiteVerdict build: sitecheck-99C-ux-v5-2026-06-04</div>
 </body>
 </html>

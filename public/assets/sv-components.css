@@ -82,8 +82,8 @@
 .signal-card{padding:18px 20px;border-bottom:1px solid var(--border);background:var(--bg3)}
 .signal-section{margin-bottom:14px}
 .signal-section:last-of-type{margin-bottom:0}
-.signal-heading{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);margin-bottom:5px}
-.signal-body{font-size:.78rem;color:var(--muted);line-height:1.7}
+.signal-heading{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);margin-bottom:7px}
+.signal-body{font-size:.92rem;color:var(--muted);line-height:1.75}
 
 /* ── INSTITUTIONAL SCORECARD ─────────────────────────── */
 .scorecard-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -245,3 +245,29 @@
 #map-card { animation: fadeIn .3s ease; }
 #sv-map { background: var(--bg3); }
 .leaflet-container { font-family: inherit; background: var(--bg3); }
+
+/* ── UX v5: readability + map-first two-column desktop layout (CSS only) ─────
+   Single column on mobile; two columns on desktop. No HTML/logic change.
+   Sections are direct children of .signal-card, so CSS multicolumn flows them
+   into two balanced columns and collapses to one on narrow screens. */
+.signal-card{padding:22px 26px}
+.signal-section{margin-bottom:18px}
+.signal-section ul{font-size:.9rem !important;line-height:1.8 !important}
+.signal-section li{margin-bottom:7px !important}
+/* larger map preview + clearer confirm wording */
+#sv-map{min-height:380px}
+@media(min-width:900px){
+  #sv-map{height:440px !important}
+  /* two-column report: break sections across columns, avoid splitting a section */
+  .signal-card{column-count:2;column-gap:34px}
+  .signal-section{break-inside:avoid;-webkit-column-break-inside:avoid;page-break-inside:avoid}
+  /* keep the location-trust banner + parcel line full-width across both columns */
+  .signal-card > div:first-child,
+  .signal-card > div:nth-child(2){column-span:all;-webkit-column-span:all}
+  /* keep the Professional Review CTA + verify line full-width at the bottom */
+  .signal-card > div:last-child,
+  .signal-card > div:nth-last-child(2){column-span:all;-webkit-column-span:all}
+}
+@media(max-width:899px){
+  .signal-card{column-count:1}
+}
