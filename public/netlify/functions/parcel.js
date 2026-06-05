@@ -136,8 +136,10 @@ function dcsAddressWhere(norm) {
 function streetName(addr) {
   if (!addr) return '';
   var s = ' ' + String(addr).toUpperCase().replace(/,/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
-  // drop a leading unit/number token like "101/43" or "12"
-  s = s.replace(/^\s*\d+\s*\/\s*\d+\s+/, ' ').replace(/^\s*\d+[A-Z]?\s+/, ' ');
+  // drop a leading unit/number token like "101/43", "28-30", "25A", or "12"
+  s = s.replace(/^\s*\d+\s*\/\s*\d+\s+/, ' ')   // unit/number
+       .replace(/^\s*\d+\s*-\s*\d+\s+/, ' ')     // range "28-30"
+       .replace(/^\s*\d+[A-Z]?\s+/, ' ');         // single "12" / "25A"
   var ABBR = { ST: 'STREET', RD: 'ROAD', AVE: 'AVENUE', AV: 'AVENUE', DR: 'DRIVE', CT: 'COURT', CR: 'CRESCENT', CRES: 'CRESCENT', PL: 'PLACE', PDE: 'PARADE', HWY: 'HIGHWAY', LN: 'LANE', CL: 'CLOSE', BVD: 'BOULEVARD', TCE: 'TERRACE' };
   var TYPES = { STREET:1, ROAD:1, AVENUE:1, DRIVE:1, COURT:1, CRESCENT:1, PLACE:1, PARADE:1, HIGHWAY:1, LANE:1, CLOSE:1, BOULEVARD:1, TERRACE:1, WAY:1, GROVE:1, CIRCUIT:1 };
   var words = s.trim().split(' ');
@@ -169,11 +171,29 @@ function streetNumber(addr) {
 
 // Full address match: same street AND same street number. Used to gate verified/estimated so a
 // geocode point that drifts onto a SAME-STREET neighbour (e.g. 45 vs 46 Beecroft Rd) does NOT verify.
+// Extract the street-number RANGE from an address as [lo,hi]. "30"->[30,30]; "28-30"->[28,30];
+// "10/45"->[45,45] (unit form, base number). Returns null if no leading number.
+function streetNumberRange(addr) {
+  if (!addr) return null;
+  var s = String(addr).trim().toUpperCase().replace(/,/g, ' ');
+  var unit = s.match(/^\s*(\d+)\s*\/\s*(\d+)\b/);            // unit/number -> base number
+  if (unit) { var b = parseInt(unit[2], 10); return [b, b]; }
+  var range = s.match(/^\s*(\d+)\s*-\s*(\d+)\b/);            // range "28-30"
+  if (range) { var lo = parseInt(range[1], 10), hi = parseInt(range[2], 10); return [Math.min(lo, hi), Math.max(lo, hi)]; }
+  var single = s.match(/^\s*(\d+)[A-Z]?\b/);
+  if (single) { var n = parseInt(single[1], 10); return [n, n]; }
+  return null;
+}
+
+// Full address match: same street AND street number agrees. Number agreement is range-aware so a
+// user's "30" matches a DCS range address "28-30 STATION STREET" (common for combined/dual lots).
+// Still rejects different streets and clearly different numbers (45 vs 46).
 function addressMatches(candidate, input) {
   if (!streetsMatch(candidate, input)) return false;
-  var cn = streetNumber(candidate), inn = streetNumber(input);
-  if (!cn || !inn) return false;       // can't confirm number -> do not assert
-  return cn === inn;
+  var cr = streetNumberRange(candidate), ir = streetNumberRange(input);
+  if (!cr || !ir) return false;          // can't confirm number -> do not assert
+  // agree if the ranges overlap (user number falls within a DCS range, or vice versa)
+  return ir[0] <= cr[1] && cr[0] <= ir[1];
 }
 
 // Extract the suburb (last token-run after the street type) from an address, uppercased.
@@ -380,4 +400,4 @@ exports.handler = async function (event) {
   return { statusCode: 200, headers: CORS, body: JSON.stringify(resolved) };
 };
 
-exports._test = { lotIdentity, sumLotArea, decideConfidence, areaConflict, buildResolved, streetName, streetsMatch, streetNumber, addressMatches, isStrataAddress, selectProperty, normaliseForDcs, dcsAddressWhere, pointInRings, ringDistanceMetres, suburbOf };
+exports._test = { lotIdentity, sumLotArea, decideConfidence, areaConflict, buildResolved, streetName, streetsMatch, streetNumber, streetNumberRange, addressMatches, isStrataAddress, selectProperty, normaliseForDcs, dcsAddressWhere, pointInRings, ringDistanceMetres, suburbOf };

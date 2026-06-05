@@ -1,9 +1,9 @@
 {
   "site": "siteverdict2",
-  "build_name": "sitecheck-99C-parcel-precision-p4-2026-06-04",
+  "build_name": "sitecheck-99C-planning-feeds-p0-2026-06-04",
   "package_number": "99C",
   "build_time": "2026-06-04T00:00:00Z",
-  "release_note": "Parcel precision Phase 4: near-tolerance (point within 30m of address-matched property) + SUBURB GUARD (user-typed suburb must equal matched property suburb, kills geocode-relocation wrongs). Measured on 320 stratified addresses: verified 64.0%->68.0%, exact-on-verified 100%, CONFIDENT-WRONG 0. geocode/nearby unchanged.",
+  "release_note": "Planning feeds P0: flood rewired from retired EPI_Flood_Planning_Area (404) to Planning/Hazard/MapServer/1; height HEIGHT_MAX->MAX_B_H (9m); FSR FSR_MAX->FSR (0.45). Hazards (flood/bushfire/heritage) now 3-state: present/none/error \u2014 a failed/404/timeout query reads couldn-t-be-checked, NEVER none detected (incl ArcGIS error bodies, not just timeouts). Overlay summary, risk score, parcel-confidence, JSON export and constraints section all 3-state-aware. Service-health self-test added (caught a 2nd dead service: bushfire). geocode/nearby unchanged.",
   "status": "draft-awaiting-private-gate",
   "features": {
     "publicFlowTwoStep": true,
@@ -54,7 +54,12 @@
     "parcelAddressFirst": true,
     "parcelFailSafeContext": true,
     "parcelNearToleranceSuburbGuard": true,
-    "parcelVerifiedRate68": true
+    "parcelVerifiedRate68": true,
+    "parcelRangeAddressMatch": true,
+    "planningFeedsFixed": true,
+    "hazardErrorVsNone": true,
+    "hazard3State": true,
+    "serviceHealthSelfTest": true
   },
   "principle_version": "1.0"
 }

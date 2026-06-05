@@ -682,7 +682,7 @@ async function runCheck(){var e=normalizeAddressInput(document.getElementById("a
     _geoResult.lotGeoWarn    = _lotGeoWarn;
     if(_isLot||_isRange||(_isStreetLevel&&!_geoIsGoogle)){
       setSt('Address found — verifying parcel data…');
-    }var _mAddr=(_geoResult&&_geoResult.matchedAddr)||'';var _mAddrU=_mAddr.toUpperCase();var _detState=(/\bNSW\b/.test(_mAddrU)||(/\b(1[0-9]{3}|2[0-9]{3})\b/.test(_mAddrU)&&!/\b(ACT|VIC|QLD|SA|WA|TAS|NT)\b/.test(_mAddrU)))?'NSW':/\bACT\b/.test(_mAddrU)?'ACT':/\bVIC\b/.test(_mAddrU)?'VIC':/\bQLD\b/.test(_mAddrU)?'QLD':/\bSA\b/.test(_mAddrU)?'SA':/\bTAS\b/.test(_mAddrU)?'TAS':/\bWA\b/.test(_mAddrU)?'WA':/\bNT\b/.test(_mAddrU)?'NT':'NSW';if(_detState!=='NSW'){_showNonNSWResult(e,_detState,_geoResult,t,r,_addrType);n.disabled=false;n.textContent='Check this property →';return;}var v=_geo.lat,u=_geo.lon,m=20037508.34*u/180,p=Math.log(Math.tan((90+v)*Math.PI/360))/(Math.PI/180)*20037508.34/180,g=encodeURIComponent(JSON.stringify({x:m,y:p,spatialReference:{wkid:102100}})),y="https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer";function ftx(u,_try){_try=_try||0;var c=new AbortController();var t=setTimeout(function(){c.abort();},9000);return fetch(u,{signal:c.signal}).then(function(r){clearTimeout(t);return r;}).catch(function(e){clearTimeout(t);if(_try<2){return new Promise(function(res){setTimeout(function(){res(ftx(u,_try+1));},400);});}return{json:function(){return Promise.resolve({features:[],_svTimeout:true});}};});}setSt("Checking zone, heritage, flood and overlays...");var[f,h,b,L,S,R,A,E,w,P,C,I]=await Promise.all([ftx(y+"/11/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,SYM_CODE,LGA_NAME&returnGeometry=false&f=json"),ftx(y+"/14/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LOT_SIZE&returnGeometry=false&f=json"),ftx(y+"/8/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=H_NAME,H_ID,LEGIS_REF_CLAUSE&returnGeometry=false&f=json"),ftx(y+"/4/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=FSR_MAX,LAY_CLASS&returnGeometry=false&f=json"),ftx(y+"/7/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=HEIGHT_MAX,LAY_CLASS&returnGeometry=false&f=json"),ftx("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Flood_Planning_Area/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json"),ftx(y+"/16/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=RESERVE_TYPE,LAY_CLASS&returnGeometry=false&f=json"),ftx(y+"/18/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json"),ftx(y+"/15/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,ACID_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),ftx(y+"/17/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),ftx(y+"/13/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),ftx("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Bush_Fire_Prone_Land/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})}))]),[N,k,x,M,U,T,B,D,H,F,_,O]=await Promise.all([f.json(),h.json(),b.json(),L.json(),S.json(),R.json(),A.json(),E.json(),w.json(),P.json(),C.json(),I.json()]),j=B.features&&B.features.length?B.features[0].attributes.RESERVE_TYPE||B.features[0].attributes.LAY_CLASS||"Yes":null,z=D.features&&D.features.length>0,G=H.features&&H.features.length?H.features[0].attributes.ACID_CLASS||H.features[0].attributes.LAY_CLASS||"Yes":null,W=F.features&&F.features.length>0,q=_.features&&_.features.length>0,Y=O.features&&O.features.length>0,Z="",K="",V="";if(N.features&&N.features.length){var $=N.features[0].attributes;Z=$.SYM_CODE||"",K=$.LAY_CLASS||"",V=$.LGA_NAME||""}var XR={R1:450,R2:450,R3:400,R4:350,R5:2e3,R6:450},Q=!1,J=(XR[Z]!==undefined?XR[Z]:null);if(k.features&&k.features.length&&k.features[0].attributes.LOT_SIZE){var ee=k.features[0].attributes.LOT_SIZE;ee>=({R1:50,R2:50,R3:50,R4:50,R5:100,R6:100}[Z]||50)?(J=ee,Q=!0):(Q=!1,J=(XR[Z]!==undefined?XR[Z]:null),console.warn("Min lot size sanity fail: "+ee+"m² for zone "+Z+" — not confirmed"))}var te=["R1","R2","R3","R4","R5","R6","RU1","RU2","RU3","RU4","RU5","RU6","E4","E3","C4","UR","MU1","MU2","B4","SP1","SP2"].indexOf(Z)>-1,ae=null;if(x.features&&x.features.length){var re=x.features[0].attributes;ae={name:re.H_NAME,clause:re.LEGIS_REF_CLAUSE}}var se=M.features&&M.features.length?M.features[0].attributes.FSR_MAX||M.features[0].attributes.LAY_CLASS:null,ne=U.features&&U.features.length?U.features[0].attributes.HEIGHT_MAX||U.features[0].attributes.LAY_CLASS:null,ie=T.features&&T.features.length>0;setSt("Loading infrastructure and comparable projects...");var oe=gc(V,_geoResult&&_geoResult.suburbHint,_geoResult&&_geoResult.postcodeHint),le=(oe&&oe.name,fetch("/.netlify/functions/daleads?mode=comps&council="+encodeURIComponent(V||"")+"&lat="+v+"&lng="+u).catch(()=>null)),de=(function(){var _oc=new AbortController();var _ot=setTimeout(function(){_oc.abort();},9000);return fetch("/.netlify/functions/nearby?lat="+v+"&lng="+u,{signal:_oc.signal}).then(function(r){clearTimeout(_ot);return r;}).catch(function(){clearTimeout(_ot);return null;});})(),pr2=fetch("/.netlify/functions/parcel?lat="+v+"&lng="+u+(t>0?"&area="+t:"")+"&addr="+encodeURIComponent((_geoResult&&_geoResult.matchedAddr)||e)+"&uaddr="+encodeURIComponent(e)).then(function(r){return r.json();}).catch(function(){return null;});var[ce,ve]=await Promise.all([le,de]),ue=[];try{window._resolvedParcel=await pr2;}catch(e){window._resolvedParcel=null;}if(ce)try{var me=await ce.json();for(var pe of me.comps||[])if(ue.push({addr:pe.address||"",lots:pe.lots||2,cost:pe.cost||0,days:pe.days||0}),ue.length>=3)break}catch(e){console.warn("DA Leads comps parse failed",e);ue=[];}var ge={transport:[],health:[],shopping:[],openspace:[],nearbyState:"unavailable"};if(ve)try{var ny=await ve.json();ge.nearbyState=ny.state||"unavailable";var nc=ny.categories||{};ge.transport=(nc.transport||[]).slice(0,3);ge.health=(nc.health||[]).slice(0,3);ge.shopping=(nc.shops||[]).slice(0,3);ge.openspace=(nc.parks||[]).slice(0,3);}catch(e){ge.nearbyState="unavailable";}var seppStation400=null,seppStation800=null,seppLightRail800=null;(ge.transport||[]).forEach(function(_st){if(_st.dist<=0.4&&!seppStation400)seppStation400=_st;if(_st.dist<=0.8&&!seppStation800)seppStation800=_st;});setSt("");var Re=calcLots(t,r,J,Z);s&&(Re=0),renderResult(e,Z,K,V,J,t,r,Re,oe,ae,ie,se,ne,ge,ue,j,z,te,Q,G,W,q,Y,seppStation400,seppStation800,seppLightRail800,s,(s&&window._parcelConfidence&&window._parcelConfidence!=='Not found'?window._parcelConfidence==='Verified'?'auto-detected':window._parcelConfidence==='Estimated'?'estimated':window._parcelConfidence==='Needs review'?'needs-review':'auto-detected':s?'auto-detected':'manual'),_geoResult&&_geoResult.source?_geoResult.source:'',_geoResult&&_geoResult.addrConfidence?_geoResult.addrConfidence:(_geoResult&&_geoResult.confidence?_geoResult.confidence:''),_geoResult&&_geoResult.matchedAddr?_geoResult.matchedAddr:'',_geoResult&&_geoResult.addrType?_geoResult.addrType:'normal',_geoResult&&_geoResult.lotNum?_geoResult.lotNum:null,oe&&oe.councilSource?oe.councilSource:'',_geoResult&&_geoResult.locationType?_geoResult.locationType:'',_geoResult&&_geoResult.paidApiUsed?_geoResult.paidApiUsed:false,_geoResult&&_geoResult.lotGeoWarn?_geoResult.lotGeoWarn:null)}catch(e){console.error("SiteVerdict runCheck failed:",e);setSt("Something went wrong: "+(e&&e.message?e.message:"Unknown error. Check browser console."));}n.disabled=!1,n.textContent="Check this property →"}else setSt("Please enter a property address.")}
+    }var _mAddr=(_geoResult&&_geoResult.matchedAddr)||'';var _mAddrU=_mAddr.toUpperCase();var _detState=(/\bNSW\b/.test(_mAddrU)||(/\b(1[0-9]{3}|2[0-9]{3})\b/.test(_mAddrU)&&!/\b(ACT|VIC|QLD|SA|WA|TAS|NT)\b/.test(_mAddrU)))?'NSW':/\bACT\b/.test(_mAddrU)?'ACT':/\bVIC\b/.test(_mAddrU)?'VIC':/\bQLD\b/.test(_mAddrU)?'QLD':/\bSA\b/.test(_mAddrU)?'SA':/\bTAS\b/.test(_mAddrU)?'TAS':/\bWA\b/.test(_mAddrU)?'WA':/\bNT\b/.test(_mAddrU)?'NT':'NSW';if(_detState!=='NSW'){_showNonNSWResult(e,_detState,_geoResult,t,r,_addrType);n.disabled=false;n.textContent='Check this property →';return;}var v=_geo.lat,u=_geo.lon,m=20037508.34*u/180,p=Math.log(Math.tan((90+v)*Math.PI/360))/(Math.PI/180)*20037508.34/180,g=encodeURIComponent(JSON.stringify({x:m,y:p,spatialReference:{wkid:102100}})),y="https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer";function ftx(u,_try){_try=_try||0;var c=new AbortController();var t=setTimeout(function(){c.abort();},9000);return fetch(u,{signal:c.signal}).then(function(r){clearTimeout(t);return r;}).catch(function(e){clearTimeout(t);if(_try<2){return new Promise(function(res){setTimeout(function(){res(ftx(u,_try+1));},400);});}return{json:function(){return Promise.resolve({features:[],_svTimeout:true});}};});}setSt("Checking zone, heritage, flood and overlays...");var[f,h,b,L,S,R,A,E,w,P,C,I]=await Promise.all([ftx(y+"/11/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,SYM_CODE,LGA_NAME&returnGeometry=false&f=json"),ftx(y+"/14/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LOT_SIZE&returnGeometry=false&f=json"),ftx(y+"/8/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=H_NAME,H_ID,LEGIS_REF_CLAUSE&returnGeometry=false&f=json"),ftx(y+"/4/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=FSR,LAY_CLASS&returnGeometry=false&f=json"),ftx(y+"/7/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=MAX_B_H&returnGeometry=false&f=json"),ftx("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Hazard/MapServer/1/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json"),ftx(y+"/16/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=RESERVE_TYPE,LAY_CLASS&returnGeometry=false&f=json"),ftx(y+"/18/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json"),ftx(y+"/15/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS,ACID_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),ftx(y+"/17/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),ftx(y+"/13/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=LAY_CLASS&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})})),ftx("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Bush_Fire_Prone_Land/MapServer/0/query?geometry="+g+"&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json").catch(()=>({json:()=>({features:[]})}))]),[N,k,x,M,U,T,B,D,H,F,_,O]=await Promise.all([f.json(),h.json(),b.json(),L.json(),S.json(),R.json(),A.json(),E.json(),w.json(),P.json(),C.json(),I.json()]),j=B.features&&B.features.length?B.features[0].attributes.RESERVE_TYPE||B.features[0].attributes.LAY_CLASS||"Yes":null,z=D.features&&D.features.length>0,G=H.features&&H.features.length?H.features[0].attributes.ACID_CLASS||H.features[0].attributes.LAY_CLASS||"Yes":null,W=F.features&&F.features.length>0,q=_.features&&_.features.length>0,Y=(O&&(O._svTimeout||O.error))?"error":((O.features&&O.features.length>0)?"present":"none"),Z="",K="",V="";if(N.features&&N.features.length){var $=N.features[0].attributes;Z=$.SYM_CODE||"",K=$.LAY_CLASS||"",V=$.LGA_NAME||""}var XR={R1:450,R2:450,R3:400,R4:350,R5:2e3,R6:450},Q=!1,J=(XR[Z]!==undefined?XR[Z]:null);if(k.features&&k.features.length&&k.features[0].attributes.LOT_SIZE){var ee=k.features[0].attributes.LOT_SIZE;ee>=({R1:50,R2:50,R3:50,R4:50,R5:100,R6:100}[Z]||50)?(J=ee,Q=!0):(Q=!1,J=(XR[Z]!==undefined?XR[Z]:null),console.warn("Min lot size sanity fail: "+ee+"m² for zone "+Z+" — not confirmed"))}var te=["R1","R2","R3","R4","R5","R6","RU1","RU2","RU3","RU4","RU5","RU6","E4","E3","C4","UR","MU1","MU2","B4","SP1","SP2"].indexOf(Z)>-1,ae=null;if(x.features&&x.features.length){var re=x.features[0].attributes;ae={name:re.H_NAME,clause:re.LEGIS_REF_CLAUSE}}else if(x&&(x._svTimeout||x.error)){ae='error';}var se=M.features&&M.features.length?M.features[0].attributes.FSR||M.features[0].attributes.LAY_CLASS:null,ne=U.features&&U.features.length?U.features[0].attributes.MAX_B_H||U.features[0].attributes.LAY_CLASS:null,ie=(T&&(T._svTimeout||T.error))?"error":((T.features&&T.features.length>0)?"present":"none");setSt("Loading infrastructure and comparable projects...");var oe=gc(V,_geoResult&&_geoResult.suburbHint,_geoResult&&_geoResult.postcodeHint),le=(oe&&oe.name,fetch("/.netlify/functions/daleads?mode=comps&council="+encodeURIComponent(V||"")+"&lat="+v+"&lng="+u).catch(()=>null)),de=(function(){var _oc=new AbortController();var _ot=setTimeout(function(){_oc.abort();},9000);return fetch("/.netlify/functions/nearby?lat="+v+"&lng="+u,{signal:_oc.signal}).then(function(r){clearTimeout(_ot);return r;}).catch(function(){clearTimeout(_ot);return null;});})(),pr2=fetch("/.netlify/functions/parcel?lat="+v+"&lng="+u+(t>0?"&area="+t:"")+"&addr="+encodeURIComponent((_geoResult&&_geoResult.matchedAddr)||e)+"&uaddr="+encodeURIComponent(e)).then(function(r){return r.json();}).catch(function(){return null;});var[ce,ve]=await Promise.all([le,de]),ue=[];try{window._resolvedParcel=await pr2;}catch(e){window._resolvedParcel=null;}if(ce)try{var me=await ce.json();for(var pe of me.comps||[])if(ue.push({addr:pe.address||"",lots:pe.lots||2,cost:pe.cost||0,days:pe.days||0}),ue.length>=3)break}catch(e){console.warn("DA Leads comps parse failed",e);ue=[];}var ge={transport:[],health:[],shopping:[],openspace:[],nearbyState:"unavailable"};if(ve)try{var ny=await ve.json();ge.nearbyState=ny.state||"unavailable";var nc=ny.categories||{};ge.transport=(nc.transport||[]).slice(0,3);ge.health=(nc.health||[]).slice(0,3);ge.shopping=(nc.shops||[]).slice(0,3);ge.openspace=(nc.parks||[]).slice(0,3);}catch(e){ge.nearbyState="unavailable";}var seppStation400=null,seppStation800=null,seppLightRail800=null;(ge.transport||[]).forEach(function(_st){if(_st.dist<=0.4&&!seppStation400)seppStation400=_st;if(_st.dist<=0.8&&!seppStation800)seppStation800=_st;});setSt("");var Re=calcLots(t,r,J,Z);s&&(Re=0),renderResult(e,Z,K,V,J,t,r,Re,oe,ae,ie,se,ne,ge,ue,j,z,te,Q,G,W,q,Y,seppStation400,seppStation800,seppLightRail800,s,(s&&window._parcelConfidence&&window._parcelConfidence!=='Not found'?window._parcelConfidence==='Verified'?'auto-detected':window._parcelConfidence==='Estimated'?'estimated':window._parcelConfidence==='Needs review'?'needs-review':'auto-detected':s?'auto-detected':'manual'),_geoResult&&_geoResult.source?_geoResult.source:'',_geoResult&&_geoResult.addrConfidence?_geoResult.addrConfidence:(_geoResult&&_geoResult.confidence?_geoResult.confidence:''),_geoResult&&_geoResult.matchedAddr?_geoResult.matchedAddr:'',_geoResult&&_geoResult.addrType?_geoResult.addrType:'normal',_geoResult&&_geoResult.lotNum?_geoResult.lotNum:null,oe&&oe.councilSource?oe.councilSource:'',_geoResult&&_geoResult.locationType?_geoResult.locationType:'',_geoResult&&_geoResult.paidApiUsed?_geoResult.paidApiUsed:false,_geoResult&&_geoResult.lotGeoWarn?_geoResult.lotGeoWarn:null)}catch(e){console.error("SiteVerdict runCheck failed:",e);setSt("Something went wrong: "+(e&&e.message?e.message:"Unknown error. Check browser console."));}n.disabled=!1,n.textContent="Check this property →"}else setSt("Please enter a property address.")}
 
 
 
@@ -1252,7 +1252,7 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
   var hasZone    = !!zone;
   var hasBlock   = !!(block && block > 0);
   var hasFront   = !!(front && front > 0);
-  var hasOverlay = !!(heritage || flood || bushfire);
+  var hasOverlay = (heritage==='present' || flood==='present' || bushfire==='present');
 
   // Parcel confidence is LOW when geocode confidence is low or lot geometry flagged.
   // We never present an uncertain parcel as verified.
@@ -1297,9 +1297,9 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
   found.push('Land size: ' + Number(block).toLocaleString() + NBSP + 'm\u00b2' + USER_LABEL);
   found.push('Frontage: ' + Number(front).toLocaleString() + NBSP + 'm' + USER_LABEL);
   // Overlays — confirm each either way (positive confirmation, not silence)
-  found.push('Heritage indicator: ' + (heritage ? 'present ' + DASH + ' scope needs verification' : 'none detected in this check'));
-  found.push('Flood planning indicator: ' + (flood ? 'present ' + DASH + ' scope needs verification' : 'none detected in this check'));
-  found.push('Bushfire prone indicator: ' + (bushfire ? 'present ' + DASH + ' scope needs verification' : 'none detected in this check'));
+  found.push('Heritage indicator: ' + (heritage==='error' ? 'couldn\u2019t be checked here ' + DASH + ' verify; do not rely' : (heritage ? 'listed ' + DASH + ' ' + esc((heritage.name||'heritage item')) + ' (verify scope)' : 'none mapped in the NSW state layer ' + DASH + ' still verify')));
+  found.push('Flood planning (state layer): ' + (flood==='present' ? 'mapped flood planning area ' + DASH + ' verify scope' : (flood==='error' ? 'couldn\u2019t be checked here ' + DASH + ' verify; do not rely' : 'none mapped in the NSW state layer ' + DASH + ' councils may map flood locally; still verify')));
+  found.push('Bushfire prone (state layer): ' + (bushfire==='present' ? 'mapped bushfire-prone land ' + DASH + ' verify scope' : (bushfire==='error' ? 'couldn\u2019t be checked here ' + DASH + ' verify; do not rely' : 'none mapped in the NSW state layer ' + DASH + ' still verify')));
   // Parcel / location + data confidence (explicit, always shown)
   if (lowParcel)    found.push('Parcel / location confidence: low ' + DASH + ' parcel match not confirmed; professional verification needed');
   else              found.push('Parcel / location confidence: ' + esc(String(geoConf || 'Estimated')));
@@ -1317,7 +1317,7 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
   if (!hasZone) {
     meaning = 'We could not confirm the zone from connected government data. Entering the full address ' + DASH + ' including suburb, state and postcode ' + DASH + ' may help. A licensed planner can confirm the planning controls for this property.';
   } else if (hasOverlay) {
-    var ol = [heritage?'a heritage overlay':null, flood?'a flood planning area':null, bushfire?'bushfire prone land':null].filter(Boolean).join(' and ');
+    var ol = [heritage==='present'?'a heritage overlay':null, flood==='present'?'a flood planning area':null, bushfire==='present'?'bushfire prone land':null].filter(Boolean).join(' and ');
     meaning = 'This property has ' + ol + ' indicator' + (([heritage,flood,bushfire].filter(Boolean).length > 1) ? 's' : '') + '. This does not by itself stop anything ' + DASH + ' but it means plans will need more assessment, time and possibly cost. Professional verification is important before any decision.';
   } else {
     meaning = 'The zone was found, and you entered a land size of ' + Number(block).toLocaleString() + NBSP + 'm\u00b2 and frontage of ' + Number(front).toLocaleString() + NBSP + 'm. The zone sets what use is generally expected; minimum lot size affects whether more than one dwelling or lot may be possible; frontage affects access and layout. These are starting points ' + DASH + ' not a decision, and not confirmation of what can be approved.';
@@ -1331,9 +1331,9 @@ function buildVerdictSection(addr,zone,lga,n,cm,heritage,flood,bushfire,sepp400,
   check.push('Land size and frontage are user-entered ' + DASH + ' not independently verified');
   check.push('Title, DP and easements ' + DASH + ' need checking (title search)');
   check.push('Exact boundaries and dimensions ' + DASH + ' survey may be needed');
-  if (!heritage) check.push('Heritage ' + DASH + ' not fully confirmed; local council schedule may differ');
-  if (!flood)    check.push('Flood ' + DASH + ' not fully confirmed; flood study may be required');
-  if (!bushfire) check.push('Bushfire ' + DASH + ' not fully confirmed');
+  if (heritage!=='present') check.push('Heritage ' + DASH + ' not fully confirmed; local council schedule may differ');
+  if (flood!=='present')    check.push('Flood ' + DASH + ' not fully confirmed; flood study may be required');
+  if (bushfire!=='present') check.push('Bushfire ' + DASH + ' not fully confirmed');
   check.push('Stormwater and drainage ' + DASH + ' may need review');
   check.push('Slope, earthworks and retaining ' + DASH + ' may need review');
   check.push('Council / DCP controls ' + DASH + ' may need professional review');
@@ -1430,9 +1430,9 @@ function _constraintsSection(heritage, flood, bushfire, hasZone, mlsReal, DASH, 
   var checked = [];
   checked.push('Zoning ' + DASH + (hasZone ? ' detected (verify with council)' : ' not confirmed from this check'));
   checked.push('Minimum lot size ' + DASH + (mlsReal ? ' detected (estimate, verify with council)' : ' not confirmed for this lot'));
-  checked.push('Heritage ' + DASH + (heritage ? ' a heritage signal was detected (verify)' : ' none detected in this basic check (still verify)'));
-  checked.push('Flood ' + DASH + (flood ? ' a flood-related signal was detected (verify)' : ' none detected in this basic check (still verify)'));
-  checked.push('Bushfire ' + DASH + (bushfire ? ' a bushfire signal was detected (verify)' : ' none detected in this basic check (still verify)'));
+  checked.push('Heritage ' + DASH + (heritage==='error' ? ' couldn\u2019t be checked here \u2014 verify; do not rely (still' : (heritage==='present' ? ' a heritage signal was detected (verify)' : ' none detected in this basic check (still verify)')));
+  checked.push('Flood ' + DASH + (flood==='present' ? ' a flood-related signal was detected (verify)' : (flood==='error' ? ' couldn\u2019t be checked here \u2014 verify; do not rely (still' : ' none mapped in the state layer (still verify)')));
+  checked.push('Bushfire ' + DASH + (bushfire==='present' ? ' a bushfire signal was detected (verify)' : (bushfire==='error' ? ' couldn\u2019t be checked here \u2014 verify; do not rely (still' : ' none mapped in the state layer (still verify)')));
 
   // Items NOT assessed by this basic report — must be professionally verified
   var notChecked = [
@@ -1610,7 +1610,7 @@ function calcPlanningStrength(zone,mls,mlsReal,heritage,fsr,height,zoneAllows){
   var s=0;
   if(zoneAllows) s+=3; else if(zone) s+=1;
   if(mlsReal) s+=2; else if(mls>0) s+=1;
-  if(!heritage) s+=1;
+  if(heritage==='none') s+=1;
   if(!fsr) s+=1;
   if(!height) s+=1;
   if(zone&&['R2','R3','R4'].indexOf(zone)>-1) s+=1;
@@ -1619,9 +1619,9 @@ function calcPlanningStrength(zone,mls,mlsReal,heritage,fsr,height,zoneAllows){
 
 function calcOverlayRisk(heritage,flood,bushfire,acid,contaminated,riparian,landRes,foreshore){
   var s=10;
-  if(heritage)     s-=2;
-  if(flood)        s-=2;
-  if(bushfire)     s-=1;
+  if(heritage==='present')     s-=2;
+  if(flood==='present')        s-=2;
+  if(bushfire==='present')     s-=1;
   if(acid)         s-=1;
   if(contaminated) s-=1.5;
   if(riparian)     s-=1;
@@ -1640,9 +1640,9 @@ function calcYieldPotential(){
 function calcApprovalConfidence(zone,heritage,flood,bushfire,zoneAllows,cm){
   var s=5;
   if(zoneAllows) s+=2;
-  if(!heritage)  s+=1;
-  if(!flood)     s+=0.5;
-  if(!bushfire)  s+=0.5;
+  if(heritage==='none')  s+=1;
+  if(flood==='none')     s+=0.5;
+  if(bushfire==='none')  s+=0.5;
   if(cm&&cm.data){
     var days=cm.data.days;
     if(days&&days<=60) s+=1;
@@ -1745,17 +1745,18 @@ function _renderResultInner(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage
   var _lsSrcColor = _lsUserVal?'var(--blue)':'var(--muted2)';
   var _lsConflict = false; // auto-detection removed from beta — no conflict check needed
 
-  // Overlays summary
+  // Overlays summary. heritage/flood/bushfire are 3-state ('present'|'none'|'error'); the rest are booleans.
   var ovSummary = [];
-  if(heritage)     ovSummary.push('Heritage');
-  if(flood)        ovSummary.push('Flood');
-  if(bushfire)     ovSummary.push('Bushfire');
+  var ovUnchecked = [];
+  if(heritage==='present')     ovSummary.push('Heritage'); else if(heritage==='error') ovUnchecked.push('Heritage');
+  if(flood==='present')        ovSummary.push('Flood');    else if(flood==='error')    ovUnchecked.push('Flood');
+  if(bushfire==='present')     ovSummary.push('Bushfire'); else if(bushfire==='error') ovUnchecked.push('Bushfire');
   if(acidSulfate)  ovSummary.push('Acid sulfate');
   if(contaminated) ovSummary.push('Contaminated');
   if(riparian)     ovSummary.push('Riparian');
   if(landReserve)  ovSummary.push('Land reservation');
   if(foreshore)    ovSummary.push('Foreshore');
-  var ovAllClear = ovSummary.length===0;
+  var ovAllClear = ovSummary.length===0 && ovUnchecked.length===0;
 
   // SEPP note
   var seppNote='';
@@ -1953,10 +1954,13 @@ function prepareForAI(addr,zone,zoneName,lga,mls,block,front,n,cm,heritage,flood
     estimatedLots: (!skipLotCount && n>=0) ? n : 0,
     zoneAllows: !!zoneAllows,
     overlays: {
-      heritage:      !!(heritage),
-      heritageName:  heritage?heritage.name||'Heritage item':'',
-      flood:         !!flood,
-      bushfire:      !!bushfire,
+      heritage:      (heritage==='present'),
+      heritageName:  (heritage && heritage!=='error' && heritage!=='none')?(heritage.name||'Heritage item'):'',
+      heritageState: (heritage==='error'?'error':(heritage==='present'?'present':'none')),
+      flood:         (flood==='present'),
+      floodState:    (flood==='error'?'error':(flood==='present'?'present':'none')),
+      bushfire:      (bushfire==='present'),
+      bushfireState: (bushfire==='error'?'error':(bushfire==='present'?'present':'none')),
       acidSulfate:   acidSulfate||null,
       contaminated:  !!contaminated,
       riparian:      !!riparian,
