@@ -63,6 +63,72 @@ function areaConflict(detected, entered) {
   return { conflict: pct > 0.25, detected: Math.round(d), entered: Math.round(e), pct: Math.round(pct * 100) };
 }
 
+// Point-in-polygon (ray casting) against esri rings [[ [x,y], ... ]]. lon=x, lat=y.
+function pointInRings(lat, lon, rings) {
+  if (!rings || !rings.length) return false;
+  var inside = false;
+  for (var r = 0; r < rings.length; r++) {
+    var ring = rings[r];
+    for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      var xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+      var intersect = ((yi > lat) !== (yj > lat)) && (lon < (xj - xi) * (lat - yi) / ((yj - yi) || 1e-12) + xi);
+      if (intersect) inside = !inside;
+    }
+  }
+  return inside;
+}
+
+// Nearest-edge distance (metres, approx) from a point to polygon rings. 0 if inside.
+function ringDistanceMetres(lat, lon, rings) {
+  if (!rings || !rings.length) return Infinity;
+  if (pointInRings(lat, lon, rings)) return 0;
+  var mPerDegLat = 111000, mPerDegLon = 111000 * Math.cos(lat * Math.PI / 180);
+  var best = Infinity;
+  for (var r = 0; r < rings.length; r++) {
+    var ring = rings[r];
+    for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      var ax = ring[j][0], ay = ring[j][1], bx = ring[i][0], by = ring[i][1];
+      // segment a-b, point p; work in metres
+      var px = (lon - ax) * mPerDegLon, py = (lat - ay) * mPerDegLat;
+      var vx = (bx - ax) * mPerDegLon, vy = (by - ay) * mPerDegLat;
+      var len2 = vx * vx + vy * vy;
+      var t = len2 ? Math.max(0, Math.min(1, (px * vx + py * vy) / len2)) : 0;
+      var dx = px - t * vx, dy = py - t * vy;
+      var d = Math.sqrt(dx * dx + dy * dy);
+      if (d < best) best = d;
+    }
+  }
+  return best;
+}
+
+// --- Phase 3: authoritative address-first resolution ---
+
+// Normalise a free-form address to the DCS property 'address' format: "<NUMBER> <STREET> <TYPE> <SUBURB>"
+// Expands road-type abbreviations, uppercases, strips unit prefixes, state, postcode, country.
+// Returns '' if it can't form a "<number> <street...> <suburb>" shape.
+function normaliseForDcs(addr) {
+  if (!addr) return '';
+  var s = ' ' + String(addr).toUpperCase().replace(/,/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
+  s = s.replace(/\bAUSTRALIA\b/g, ' ');
+  s = s.replace(/\b(NSW|NEW SOUTH WALES|ACT|VIC|QLD|SA|WA|TAS|NT)\b/g, ' ');
+  s = s.replace(/\b\d{4}\b/g, ' '); // postcode
+  // drop a leading unit/number like "10/45" -> keep base number "45"
+  s = s.replace(/^\s*(\d+)\s*\/\s*(\d+)\b/, ' $2 ');
+  s = s.replace(/\s+/g, ' ').trim();
+  var ABBR = { ST: 'STREET', RD: 'ROAD', AVE: 'AVENUE', AV: 'AVENUE', DR: 'DRIVE', DRV: 'DRIVE', CT: 'COURT', CR: 'CRESCENT', CRES: 'CRESCENT', PL: 'PLACE', PDE: 'PARADE', HWY: 'HIGHWAY', LN: 'LANE', CL: 'CLOSE', BVD: 'BOULEVARD', TCE: 'TERRACE', GR: 'GROVE', CCT: 'CIRCUIT' };
+  var words = s.split(' ').filter(Boolean).map(function (w) { return ABBR[w] || w; });
+  if (!words.length || !/^\d+[A-Z]?$/.test(words[0])) return ''; // must start with a house number
+  // normalise leading "25A" -> "25"
+  words[0] = words[0].replace(/[A-Z]$/, '');
+  return words.join(' ');
+}
+
+// Build an exact DCS where-clause value for the address (escape single quotes).
+function dcsAddressWhere(norm) {
+  if (!norm) return '';
+  return "address='" + norm.replace(/'/g, "''") + "'";
+}
+
 // --- Phase 2: safe verified-rate helpers ---
 
 // Extract a comparable street name from a free-form address.
@@ -108,6 +174,19 @@ function addressMatches(candidate, input) {
   var cn = streetNumber(candidate), inn = streetNumber(input);
   if (!cn || !inn) return false;       // can't confirm number -> do not assert
   return cn === inn;
+}
+
+// Extract the suburb (last token-run after the street type) from an address, uppercased.
+function suburbOf(addr){
+  if(!addr) return '';
+  var s=String(addr).toUpperCase().replace(/,/g,' ').replace(/\s+/g,' ').trim();
+  s=s.replace(/\bAUSTRALIA\b/g,' ').replace(/\b(NSW|NEW SOUTH WALES|ACT|VIC|QLD|SA|WA|TAS|NT)\b/g,' ').replace(/\b\d{4}\b/g,' ').replace(/\s+/g,' ').trim();
+  var TYPES=['STREET','ROAD','AVENUE','DRIVE','COURT','CRESCENT','PLACE','PARADE','HIGHWAY','LANE','CLOSE','BOULEVARD','TERRACE','WAY','GROVE','CIRCUIT','ST','RD','AVE','AV','DR','CT','CR','CRES','PL','PDE','HWY','LN','CL','BVD','TCE'];
+  var w=s.split(' ').filter(Boolean);
+  var lastType=-1;
+  for(var i=0;i<w.length;i++){ if(TYPES.indexOf(w[i])>=0) lastType=i; }
+  if(lastType>=0 && lastType<w.length-1) return w.slice(lastType+1).join(' ');
+  return '';
 }
 
 // Strata signature: a unit-prefixed address like "101/43 OXFORD STREET" or many co-located unit properties.
@@ -225,6 +304,46 @@ exports.handler = async function (event) {
     return { statusCode: 400, headers: CORS, body: JSON.stringify({ confidence: 'needs_review', reason: 'lat/lng required' }) };
   }
 
+  var inputAddr = q.addr || q.matched || '';
+  var userAddr = q.uaddr || inputAddr;  // raw user-typed address (suburb-relocation guard)
+
+  // PART A: authoritative address-first resolution (eliminates geocode drift).
+  var norm = normaliseForDcs(inputAddr);
+  if (norm) {
+    var addrRes = await fetchJson(PROPERTY_URL + '?where=' + encodeURIComponent(dcsAddressWhere(norm)) + '&outFields=propid,address&returnGeometry=true&outSR=4326&f=json');
+    var addrMatches = (addrRes && addrRes.features) || [];
+    // unique exact address match
+    var uniqByProp = addrMatches.filter(function (f, i, arr) {
+      var pid = f.attributes.propid;
+      return arr.findIndex(function (x) { return x.attributes.propid === pid; }) === i;
+    });
+    if (uniqByProp.length === 1) {
+      var ap = uniqByProp[0];
+      // cross-check: geocode point inside the address-matched polygon, or NEAR it (<=30m).
+      // The address match is authoritative (exact number+street+suburb -> unique propid); an
+      // interpolated geocode often lands ~10-20m away on the road or an adjacent parcel. "Near"
+      // confirms agreement without demanding strict containment. A FAR point means real disagreement.
+      var inside = pointInRings(lat, lon, ap.geometry.rings);
+      // Phase 4 near+suburb-guard: accept when point is inside OR within 30m, BUT only if the
+      // geocoded suburb equals the address-matched property's suburb (kills the Newcastle->Stockton
+      // relocation class). suburbGuard fails closed when either suburb is unknown.
+      var near = inside || (isFinite(lat) && isFinite(lon) && ringDistanceMetres(lat, lon, ap.geometry.rings) <= 30);
+      var gSub = suburbOf(userAddr), pSub = suburbOf(ap.attributes.address);
+      var suburbOk = gSub && pSub && (gSub === pSub);
+      var apoly = enc({ rings: ap.geometry.rings, spatialReference: { wkid: 4326 } });
+      var apLotRes = await fetchJson(LOT_URL + '?geometry=' + apoly + '&geometryType=esriGeometryPolygon&inSR=4326&spatialRel=esriSpatialRelContains&outFields=lotnumber,sectionnumber,planlabel,planlotarea,shape_Area,hasstratum&returnGeometry=false&f=json');
+      var apLots = (apLotRes && apLotRes.features) || [];
+      var accept = (inside || near) && suburbOk;
+      var resA = buildResolved(ap, apLots, accept, enteredArea, false);
+      if (isFinite(lat) && isFinite(lon) && !accept) {
+        if (resA.confidence === 'verified' || resA.confidence === 'estimated') resA.confidence = 'needs_review';
+      }
+      resA.resolvedBy = 'address';
+      return { statusCode: 200, headers: CORS, body: JSON.stringify(resA) };
+    }
+  }
+
+  // PART A fallback / Phase 2: point-in-property method.
   // 1) properties at point + a small buffer (for geocode drift), both on Urban_Property.
   var ptGeom = enc({ x: lon, y: lat, spatialReference: { wkid: 4326 } });
   var atPointRes = await fetchJson(PROPERTY_URL + '?geometry=' + ptGeom + '&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=propid,address&returnGeometry=false&f=json');
@@ -236,7 +355,6 @@ exports.handler = async function (event) {
     inBuffer = (bufRes && bufRes.features) || [];
   }
 
-  var inputAddr = q.addr || q.matched || '';
   var sel = selectProperty(atPoint, inBuffer, inputAddr);
 
   if (sel.strata) {
@@ -262,4 +380,4 @@ exports.handler = async function (event) {
   return { statusCode: 200, headers: CORS, body: JSON.stringify(resolved) };
 };
 
-exports._test = { lotIdentity, sumLotArea, decideConfidence, areaConflict, buildResolved, streetName, streetsMatch, streetNumber, addressMatches, isStrataAddress, selectProperty };
+exports._test = { lotIdentity, sumLotArea, decideConfidence, areaConflict, buildResolved, streetName, streetsMatch, streetNumber, addressMatches, isStrataAddress, selectProperty, normaliseForDcs, dcsAddressWhere, pointInRings, ringDistanceMetres, suburbOf };

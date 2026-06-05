@@ -1,9 +1,9 @@
 {
   "site": "siteverdict2",
-  "build_name": "sitecheck-99C-parcel-precision-p2-2026-06-04",
+  "build_name": "sitecheck-99C-parcel-precision-p4-2026-06-04",
   "package_number": "99C",
   "build_time": "2026-06-04T00:00:00Z",
-  "release_note": "Parcel precision Phase 2: verified-rate raised 37%->64.8% (measured on 320 stratified NSW addresses, 20 LGAs) with ZERO confident-wrong and 100% exact-on-verified. Safe relaxations: buffer fallback for geocode drift (street+number gated), strata (SP plan) detection, multi-property street+number selection, >4-lot block cap. No geocode/safety change.",
+  "release_note": "Parcel precision Phase 4: near-tolerance (point within 30m of address-matched property) + SUBURB GUARD (user-typed suburb must equal matched property suburb, kills geocode-relocation wrongs). Measured on 320 stratified addresses: verified 64.0%->68.0%, exact-on-verified 100%, CONFIDENT-WRONG 0. geocode/nearby unchanged.",
   "status": "draft-awaiting-private-gate",
   "features": {
     "publicFlowTwoStep": true,
@@ -50,7 +50,11 @@
     "parcelAreaConflictWarning": true,
     "parcelVerifiedRate65": true,
     "parcelStrataDetection": true,
-    "parcelBufferFallback": true
+    "parcelBufferFallback": true,
+    "parcelAddressFirst": true,
+    "parcelFailSafeContext": true,
+    "parcelNearToleranceSuburbGuard": true,
+    "parcelVerifiedRate68": true
   },
   "principle_version": "1.0"
 }
