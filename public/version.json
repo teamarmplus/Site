@@ -1,9 +1,9 @@
 {
   "site": "siteverdict2",
-  "build_name": "sitecheck-99C-planning-feeds-p0-2026-06-04",
+  "build_name": "sitecheck-99C-insight-2026-06-04",
   "package_number": "99C",
   "build_time": "2026-06-04T00:00:00Z",
-  "release_note": "Planning feeds P0: flood rewired from retired EPI_Flood_Planning_Area (404) to Planning/Hazard/MapServer/1; height HEIGHT_MAX->MAX_B_H (9m); FSR FSR_MAX->FSR (0.45). Hazards (flood/bushfire/heritage) now 3-state: present/none/error \u2014 a failed/404/timeout query reads couldn-t-be-checked, NEVER none detected (incl ArcGIS error bodies, not just timeouts). Overlay summary, risk score, parcel-confidence, JSON export and constraints section all 3-state-aware. Service-health self-test added (caught a 2nd dead service: bushfire). geocode/nearby unchanged.",
+  "release_note": "Insight layer: indicative GFA (FSR x land), storeys (height), secondary-dwelling vs ~450m2 Housing SEPP, number-tied subdivision/dual-occ \u2014 all plain-English, personalised, strictly indicative + verify. Zero forbidden phrases (safety grep clean). Approximate frontage/depth derived from parcel polygon so insight works with no user input. 0 confident-wrong; no yield counts; no fabricated min-lot. geocode unchanged.",
   "status": "draft-awaiting-private-gate",
   "features": {
     "publicFlowTwoStep": true,
@@ -59,7 +59,12 @@
     "planningFeedsFixed": true,
     "hazardErrorVsNone": true,
     "hazard3State": true,
-    "serviceHealthSelfTest": true
+    "serviceHealthSelfTest": true,
+    "addressAutocomplete": true,
+    "parcelDisplaySingleSourced": true,
+    "suggestHardened": true,
+    "insightLayer": true,
+    "parcelDimensionsApprox": true
   },
   "principle_version": "1.0"
 }

@@ -258,6 +258,25 @@ function selectProperty(candidatesAtPoint, candidatesInBuffer, inputAddr) {
 }
 
 // Build the full resolved-parcel object from a property + its contained lots (pure).
+// Approximate parcel dimensions from the property polygon bounding box (metres). NOT a survey.
+// Returns {frontageApprox, depthApprox} (shorter side treated as frontage) or null.
+function approxDimensions(property){
+  try{
+    var rings = property && property.geometry && property.geometry.rings;
+    if(!rings || !rings.length) return null;
+    var ring = rings[0];
+    var minx=Infinity,miny=Infinity,maxx=-Infinity,maxy=-Infinity;
+    for(var i=0;i<ring.length;i++){var x=ring[i][0],y=ring[i][1];if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y;}
+    var midLat=(miny+maxy)/2;
+    var mPerDegLat=111000, mPerDegLon=111000*Math.cos(midLat*Math.PI/180);
+    var w=(maxx-minx)*mPerDegLon, h=(maxy-miny)*mPerDegLat;
+    if(!(w>0)||!(h>0)) return null;
+    var frontage=Math.round(Math.min(w,h)), depth=Math.round(Math.max(w,h));
+    if(frontage<3||frontage>500) return null; // implausible -> don't assert
+    return {frontageApprox:frontage, depthApprox:depth};
+  }catch(e){return null;}
+}
+
 function buildResolved(property, lots, pointInside, enteredArea, strata) {
   if (strata) {
     return {
@@ -285,8 +304,11 @@ function buildResolved(property, lots, pointInside, enteredArea, strata) {
   // spans a block/parent parcel — never assert that as verified OR estimated; force needs_review.
   if ((confidence === 'verified' || confidence === 'estimated') && lotList.length > 4) confidence = 'needs_review';
   if (anyStrata) confidence = 'needs_review';
+  var dims = (confidence === 'verified' || confidence === 'estimated') ? approxDimensions(property) : null;
   return {
     confidence: confidence,
+    frontageApprox: dims ? dims.frontageApprox : null,
+    depthApprox: dims ? dims.depthApprox : null,
     propertyAddress: property && (property.attributes ? property.attributes.address : property.address) || null,
     lots: lotList,
     lotCount: lotList.length,
@@ -318,10 +340,35 @@ exports.handler = async function (event) {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
 
   var q = event.queryStringParameters || {};
+
+  // PART 0: authoritative ADDRESS-PICK path. When the user picked a suggestion we have the propid
+  // directly -> resolve the parcel from propid with NO geocode and NO drift -> verified when unambiguous.
+  var pickedPropid = q.propid != null ? String(q.propid).trim() : '';
+  if (/^\d+$/.test(pickedPropid)) {
+    var pgRes = await fetchJson(PROPERTY_URL + '?where=propid=' + encodeURIComponent(pickedPropid) + '&outFields=propid,address&returnGeometry=true&outSR=4326&f=json');
+    var pgFeats = (pgRes && pgRes.features) || [];
+    if (pgFeats.length === 1 && pgFeats[0].geometry) {
+      var pp = pgFeats[0];
+      var ppoly = enc({ rings: pp.geometry.rings, spatialReference: { wkid: 4326 } });
+      var ppLotRes = await fetchJson(LOT_URL + '?geometry=' + ppoly + '&geometryType=esriGeometryPolygon&inSR=4326&spatialRel=esriSpatialRelContains&outFields=lotnumber,sectionnumber,planlabel,planlotarea,shape_Area,hasstratum&returnGeometry=false&f=json');
+      var ppLots = (ppLotRes && ppLotRes.features) || [];
+      var ea0 = q.area != null ? parseFloat(q.area) : null;
+      // pointInside=true: the propid IS the authoritative property; no geocode to disagree with.
+      var resP = buildResolved(pp, ppLots, true, ea0, false);
+      resP.resolvedBy = 'address-pick';
+      // provide a representative point (polygon centroid) for downstream planning-layer queries
+      var cx = 0, cy = 0, ring0 = pp.geometry.rings[0] || [];
+      for (var ci = 0; ci < ring0.length; ci++) { cx += ring0[ci][0]; cy += ring0[ci][1]; }
+      if (ring0.length) { resP.point = { lat: cy / ring0.length, lon: cx / ring0.length }; }
+      return { statusCode: 200, headers: CORS, body: JSON.stringify(resP) };
+    }
+    // propid didn't resolve uniquely -> fall through to lat/lng path if present, else needs_review
+  }
+
   var lat = parseFloat(q.lat), lon = parseFloat(q.lng != null ? q.lng : q.lon);
   var enteredArea = q.area != null ? parseFloat(q.area) : null;
   if (!isFinite(lat) || !isFinite(lon)) {
-    return { statusCode: 400, headers: CORS, body: JSON.stringify({ confidence: 'needs_review', reason: 'lat/lng required' }) };
+    return { statusCode: 400, headers: CORS, body: JSON.stringify({ confidence: 'needs_review', reason: 'lat/lng or propid required' }) };
   }
 
   var inputAddr = q.addr || q.matched || '';
